@@ -11,9 +11,9 @@ import psycopg2 as pg2
 from config.db_config import get_oltp_test_config, get_olap_test_config, test_db_connection
 from config.files_config import METADATA_FILENAME
 from config.data_formats import *
-from utils.extract import *
+from etl_utils.extract import *
 
-from utils.etl import *
+from etl_utils.etl import *
 
     
 def main():

@@ -1,5 +1,3 @@
-import psycopg2
-
 def extract_employee_data(conn):
     # SQL query
     query = """

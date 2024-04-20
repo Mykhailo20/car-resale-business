@@ -22,8 +22,8 @@ from classes.OLAP.purchase_fact import CarPurchaseFact
 from classes.OLAP.repair_fact import *
 from classes.OLAP.sale_fact import CarSaleFact
 
-from utils.metadata_for_etl import calculate_and_check_value
-from utils.create_OLTP_class_instances import *
+from etl_utils.metadata_for_etl import calculate_and_check_value
+from etl_utils.create_OLTP_class_instances import *
 
 
 def OLTP_to_OLAP_dim(dim_metadata, dim_attrs_dict):

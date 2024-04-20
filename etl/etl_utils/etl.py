@@ -1,10 +1,10 @@
-from utils.extract import *
+from etl_utils.extract import *
 
-from utils.transform import *
-from utils.create_OLTP_class_instances import *
-from utils.OLTP_to_OLAP_mapper import *
+from etl_utils.transform import *
+from etl_utils.create_OLTP_class_instances import *
+from etl_utils.OLTP_to_OLAP_mapper import *
 
-from utils.load import *
+from etl_utils.load import *
 
 
 def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
