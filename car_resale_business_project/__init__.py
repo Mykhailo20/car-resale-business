@@ -1,6 +1,8 @@
 from flask import Flask
 
-app = Flask(__name__)
+from car_resale_business_project.purchases.purchases import purchases
 
-# Often people will also separate these into a separate config.py file 
+app = Flask(__name__)
+app.register_blueprint(purchases, url_prefix="/purchase")
+
 app.config['SECRET_KEY'] = 'mysecretkey'
