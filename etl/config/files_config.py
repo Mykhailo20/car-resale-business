@@ -1,0 +1,1 @@
+METADATA_FILENAME = '../data/metadata/car_resale_business_OLAP.json'

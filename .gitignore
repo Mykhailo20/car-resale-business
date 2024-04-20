@@ -22,3 +22,5 @@ venv/
 
 # Files/directories added by me
 db_config.py
+logging/
+datasets_data/

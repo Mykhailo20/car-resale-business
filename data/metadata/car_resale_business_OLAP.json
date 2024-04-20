@@ -1,0 +1,1264 @@
+{
+    "facts": {
+        "fact_car_purchase": {
+            "name": "Car Purchase",
+            "table": "fact_car_purchase",
+            "type": "transactional",
+            "key_fields": [
+                {
+                    "column": "car_vin",
+                    "dimension_table": "dim_car",
+                    "dimension_key_column": "vin"
+                },
+                {
+                    "column": "seller_id",
+                    "dimension_table": "dim_seller",
+                    "dimension_key_column": "seller_id"
+                },
+                {
+                    "column": "employee_id",
+                    "dimension_table": "dim_employee",
+                    "dimension_key_column": "employee_id"
+                },
+                {
+                    "column": "location_id",
+                    "dimension_table": "dim_location",
+                    "dimension_key_column": "location_id"
+                },
+                {
+                    "column": "date_id",
+                    "dimension_table": "dim_date",
+                    "dimension_key_column": "date_id"
+                }
+            ],
+            "sources": [
+                {
+                    "name": "purchase",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "dimensions": [
+                "dim_car",
+                "dim_seller",
+                "dim_employee",
+                "dim_location",
+                "dim_date"
+            ],
+            "metrics": {
+                "price": {
+                    "name": "Price",
+                    "definition": "The price at which the car was purchased from the seller.",
+                    "unit_of_measurement": "USD",
+                    "column": "price",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid price value detected. The price value must be greater than 0. The process is stopped to prevent loss of profit.')",
+                        "conclusion": "The process is stopped because incorrect price data could lead to significant loss of profit."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "car_years": {
+                    "name": "Car Age",
+                    "definition": "Age of the sold car",
+                    "unit_of_measurement": "year",
+                    "column": "car_years",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for car age. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "car_age = current_year - car_manufacture_year",
+                    "calculation_code": "lambda current_year, manufacture_year: current_year - manufacture_year",
+                    "calculation_description": "The age of the car is calculated as the difference between the current year and the year of the car manufacture."
+                },
+                "odometer": {
+                    "name": "Car Mileage",
+                    "definition": "Mileage of the sold car",
+                    "unit_of_measurement": "mi",
+                    "column": "odometer",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for car mileage. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "condition": {
+                    "name": "Car Condition",
+                    "definition": "Technical condition of the sold car",
+                    "unit_of_measurement": null,
+                    "column": "condition",
+                    "data_type": "float",
+                    "value_restriction": "lambda x: 1.0 <= x <= 5.0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid car condition value detected. The condition value must be in the range [1.0; 5.0].', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "employee_experience": {
+                    "name": "Employee Experience",
+                    "definition": "Experience of the employee",
+                    "unit_of_measurement": "month",
+                    "column": "employee_experience",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for employee experience. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "employee_experience = (current_date - hire_date).month",
+                    "calculation_code": "lambda current_date, hire_date: (current_date.year - hire_date.year) * 12 + current_date.month - hire_date.month",
+                    "calculation_description": "The experience of the employee is calculated as the difference in months between the current date and the date of hiring."
+                },
+                "purchase_time": {
+                    "name": "Purchase Time",
+                    "definition": "Negotiation time between an employee of the researched company and a car seller",
+                    "unit_of_measurement": "hour",
+                    "column": "purchase_time",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for purchase time. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "service_time = (sale_end_timestamp - sale_start_timestamp).seconds / 3600",
+                    "calculation_code": "lambda sale_start_timestamp, sale_end_timestamp: (sale_end_timestamp - sale_start_timestamp).total_seconds() / 3600",
+                    "calculation_description": "Service time is calculated as the difference between the sale's start timestamp and end timestamp, converted to hours."
+                }
+            }
+        },
+        "fact_car_repair": {
+            "name": "Car Repair",
+            "table": "fact_car_repair",
+            "type": "transactional",
+            "key_fields": [
+                {
+                    "column": "car_vin",
+                    "dimension_table": "dim_car",
+                    "dimension_key_column": "vin"
+                },
+                {
+                    "column": "employee_id",
+                    "dimension_table": "dim_employee",
+                    "dimension_key_column": "employee_id"
+                },
+                {
+                    "column": "location_id",
+                    "dimension_table": "dim_location",
+                    "dimension_key_column": "location_id"
+                },
+                {
+                    "column": "date_id",
+                    "dimension_table": "dim_date",
+                    "dimension_key_column": "date_id"
+                },
+                {
+                    "column": "repair_type_id",
+                    "dimension_table": "dim_car_repair_type",
+                    "dimension_key_column": "repair_type_id"
+                }
+            ],
+            "sources": [
+                {
+                    "name": "repair",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "dimensions": [
+                "dim_car",
+                "dim_employee",
+                "dim_location",
+                "dim_date",
+                "dim_car_repair_type"
+            ],
+            "metrics": {
+                "cost": {
+                    "name": "Cost",
+                    "definition": "The cost of the car repair",
+                    "unit_of_measurement": "USD",
+                    "column": "cost",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid car repair cost value detected. The car repair cost value must be greater than 0. The process is stopped to prevent loss of profit.')",
+                        "conclusion": "The process is stopped because incorrect car repair cost data could lead to significant loss of profit."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "condition_delta": {
+                    "name": "Car Condition Delta",
+                    "definition": "Change in the technical condition of the car as a result of additional work.",
+                    "unit_of_measurement": null,
+                    "column": "condition",
+                    "data_type": "float",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid car repair condition_delta value detected. The condition_delta value must be greater than or equal to 0.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "condition_delta = car_repair_condition - car_purchase_condition",
+                    "calculation_code": "lambda repair_condition, purchase_condition: repair_condition - purchase_condition",
+                    "calculation_description": "condition_delta is calculated as the difference between the condition of the car after repair and the condition of the car at the time of purchase."
+                },
+                "oltp_id": {
+                    "name": "OLTP id",
+                    "definition": "id of the corresponding record in the OLTP database",
+                    "unit_of_measurement": null,
+                    "column": "oltp_id",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid car_repair_oltp_id value detected. The car_repair_oltp_id value must be greater than 0. The process is stopped to prevent OLTP and OLAP database id mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data car_repair_oltp_id will lead to OLTP and OLAP database id mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            }
+        },
+        "fact_car_sale": {
+            "name": "Car Sale",
+            "table": "fact_car_sale",
+            "type": "transactional",
+            "key_fields": [
+                {
+                    "column": "car_vin",
+                    "dimension_table": "dim_car",
+                    "dimension_key_column": "vin"
+                },
+                {
+                    "column": "buyer_id",
+                    "dimension_table": "dim_buyer",
+                    "dimension_key_column": "buyer_id"
+                },
+                {
+                    "column": "employee_id",
+                    "dimension_table": "dim_employee",
+                    "dimension_key_column": "employee_id"
+                },
+                {
+                    "column": "location_id",
+                    "dimension_table": "dim_location",
+                    "dimension_key_column": "location_id"
+                },
+                {
+                    "column": "date_id",
+                    "dimension_table": "dim_date",
+                    "dimension_key_column": "date_id"
+                }
+            ],
+            "sources": [
+                {
+                    "name": "sale",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "dimensions": [
+                "dim_car",
+                "dim_buyer",
+                "dim_employee",
+                "dim_location",
+                "dim_date"
+            ],
+            "metrics": {
+                "price": {
+                    "name": "Price",
+                    "definition": "The price at which the car was sold to the buyer.",
+                    "unit_of_measurement": "USD",
+                    "column": "price",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid price value detected. The price value must be greater than 0. The process is stopped to prevent loss of profit.')",
+                        "conclusion": "The process is stopped because incorrect price data could lead to significant loss of profit."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "gross_profit_amount": {
+                    "name": "Gross Profit Amount",
+                    "definition": "The amount of gross profit from the sale of the car",
+                    "unit_of_measurement": "USD",
+                    "column": "gross_profit_amount",
+                    "data_type": "integer",
+                    "value_restriction": "NOT SPECIFIED",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid gross profit amount detected. The process is stopped to prevent loss of profit.')",
+                        "conclusion": "The process is stopped because incorrect gross profit amount data could lead to significant loss of profit."
+                    },
+                    "calculation_formula": "gross_profit_amount = sale_price - (purchase_price + repair_cost)",
+                    "calculation_code": "lambda purchase_price, sale_price, repair_cost: sale_price - purchase_price - repair_cost",
+                    "calculation_description": "Gross profit is calculated as the difference between the selling price and the total cost of the car (purchase price + maintenance cost)."
+                },
+                "gross_profit_percentage": {
+                    "name": "Gross Profit Percentage",
+                    "definition": "Percentage of gross profit",
+                    "unit_of_measurement": "%",
+                    "column": "gross_profit_percentage",
+                    "data_type": "float",
+                    "value_restriction": "lambda x: 0 <= x <= 100",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid gross profit percentage value detected. The percentage value must be between 0 and 100. The process is stopped to prevent loss of data.')",
+                        "conclusion": "The process is stopped because incorrect gross profit percentage data could lead to loss of data."
+                    },
+                    "calculation_formula": "gross_profit_percentage = (gross_profit_amount / sale_price) * 100",
+                    "calculation_code": "lambda gross_profit_amount, sale_price: (gross_profit_amount / sale_price) * 100",
+                    "calculation_description": "Gross profit percentage is calculated as the ratio of the amount of gross profit to the selling price of the car."
+                },
+                "mmr": {
+                    "name": "Manheim Market Report",
+                    "definition": "Current wholesale market value of the car",
+                    "unit_of_measurement": "USD",
+                    "column": "mmr",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for Manheim Market Report. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "price_margin": {
+                    "name": "Price Margin",
+                    "definition": "Markup compared to Manheim Market Report (MMR)",
+                    "unit_of_measurement": "USD",
+                    "column": "price_margin",
+                    "data_type": "integer",
+                    "value_restriction": "NOT SPECIFIED",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid price margin detected. The process is stopped to prevent loss of profit.')",
+                        "conclusion": "The process is stopped because incorrect price margin data could lead to significant loss of profit."
+                    },
+                    "calculation_formula": "price_margin = sale_price - mmr",
+                    "calculation_code": "lambda sale_price, mmr: sale_price - mmr",
+                    "calculation_description": "The price margin shows how much higher or lower the selling price is compared to the estimated market value provided by MMR."
+                },
+                "car_years": {
+                    "name": "Car Age",
+                    "definition": "Age of the sold car",
+                    "unit_of_measurement": "year",
+                    "column": "car_years",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for fact_car_sale car age. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "car_age = current_year - car_manufacture_year",
+                    "calculation_code": "lambda current_year, manufacture_year: current_year - manufacture_year",
+                    "calculation_description": "The age of the car is calculated as the difference between the current year and the year of the car manufacture."
+                },
+                "odometer": {
+                    "name": "Car Mileage",
+                    "definition": "Mileage of the sold car",
+                    "unit_of_measurement": "mi",
+                    "column": "odometer",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for car mileage. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "condition": {
+                    "name": "Car Condition",
+                    "definition": "Technical condition of the sold car",
+                    "unit_of_measurement": null,
+                    "column": "condition",
+                    "data_type": "float",
+                    "value_restriction": "lambda x: 1.0 <= x <= 5.0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid car condition value detected (fact_car_sale). The condition value must be in the range [1.0; 5.0].', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "employee_experience": {
+                    "name": "Employee Experience",
+                    "definition": "Experience of the employee",
+                    "unit_of_measurement": "month",
+                    "column": "employee_experience",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for employee experience. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "employee_experience = (current_date - hire_date).month",
+                    "calculation_code": "lambda current_date, hire_date: (current_date.year - hire_date.year) * 12 + current_date.month - hire_date.month",
+                    "calculation_description": "The experience of the employee is calculated as the difference in months between the current date and the date of hiring."
+                },
+                "service_time": {
+                    "name": "Service Time",
+                    "definition": "Negotiation time between an employee of the researched company and a car buyer",
+                    "unit_of_measurement": "hour",
+                    "column": "service_time",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "warning",
+                        "error_code": "warnings.warn('Invalid value detected for service time. The value should be non-negative.', UserWarning)",
+                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
+                    },
+                    "calculation_formula": "service_time = (sale_date - purchase_date).day",
+                    "calculation_code": "lambda sale_date, purchase_date: (sale_date - purchase_date).days",
+                    "calculation_description": "Service time is calculated as the difference between the sale's date and purchase's date, converted to days."
+                },
+                "service_cost": {
+                    "name": "Service Cost",
+                    "definition": "Sum of all costs for servicing the car (at the time of car sale)",
+                    "unit_of_measurement": "USD",
+                    "column": "service_cost",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid service cost detected. The process is stopped to prevent loss of data.')",
+                        "conclusion": "The process is stopped because incorrect service cost data could lead to significant loss of data."
+                    },
+                    "calculation_formula": "service_cost = purchase_price + repair_cost",
+                    "calculation_code": "lambda purchase_price, repair_cost: purchase_price + repair_cost",
+                    "calculation_description": "Service cost is the sum of purchase price and repair cost of the car."
+                }
+            }
+        }
+    },
+    "dimensions": {
+        "dim_seller": {
+            "name": "Seller",
+            "table": "dim_seller",
+            "definition": "This dimension contains data about sellers of cars.",
+            "key_field": {
+                "column": "seller_id",
+                "data_type": "integer"
+            },
+            "sources": [
+                {
+                    "name": "seller",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "name": {
+                    "name": "Seller Name",
+                    "definition": "The official name of the seller as an organization/company/individual",
+                    "unit_of_measurement": null,
+                    "column": "name",
+                    "data_type": "varchar(100)",
+                    "value_restriction": "lambda x: len(x) > 0",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with seller name: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info('[{current_datetime}] Detected potential issue with seller name: NULL value encountered.')",
+                        "conclusion": "Incorrect values for seller name may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "type": {
+                    "name": "Seller type",
+                    "definition": "Type of seller from a legal point of view",
+                    "unit_of_measurement": null,
+                    "column": "type",
+                    "data_type": "seller_type_enum",
+                    "value_restriction": "lambda x: x in ('car_manufacturing_company', 'financial_institution', 'car_rental_company', 'dealership', 'individual')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with seller type: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with seller type: NULL value encountered.')",
+                        "conclusion": "Incorrect values for seller type may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "oltp_id": {
+                    "name": "OLTP id",
+                    "definition": "id of the corresponding record in the OLTP database",
+                    "unit_of_measurement": null,
+                    "column": "oltp_id",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid seller_oltp_id value detected. The seller_oltp_id value must be greater than 0. The process is stopped to prevent OLTP and OLAP database id mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data seller_oltp_id will lead to OLTP and OLAP database id mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "seller",
+                    "name"
+                ],
+                [
+                    "seller",
+                    "type"
+                ]
+            ]
+        },
+        "dim_car": {
+            "name": "Car",
+            "table": "dim_car",
+            "definition": "This dimension contains data about cars.",
+            "key_field": {
+                "column": "vin",
+                "data_type": "varchar(17)"
+            },
+            "sources": [
+                {
+                    "name": "car",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "vin": {
+                    "name": "vin",
+                    "definition": "The VIN of the car.",
+                    "unit_of_measurement": null,
+                    "column": "vin",
+                    "data_type": "varchar(17)",
+                    "value_restriction": "lambda x: re.match('^[A-Z0-9]{17}$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid car vin value detected. The car vin value must contain exactly 17 characters, which can only contain uppercase letters or numbers. The process is stopped to prevent loss of data.')",
+                        "conclusion": "The process is stopped because incorrect car vin data could lead to significant loss of data."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "manufacture_year": {
+                    "name": "Manufacture Year",
+                    "definition": "The year in which the car was manufactured",
+                    "unit_of_measurement": "year",
+                    "column": "manufacture_year",
+                    "data_type": "smallint",
+                    "value_restriction": "lambda x: x >= 1900",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with manufacture_year: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with manufacture_year: NULL value encountered.')",
+                        "conclusion": "Incorrect values for manufacture_year may be less than 1900. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "make": {
+                    "name": "Make",
+                    "definition": "The make or manufacturer of the car.",
+                    "unit_of_measurement": null,
+                    "column": "make",
+                    "data_type": "varchar(255)",
+                    "value_restriction": "lambda x: len(x) > 0",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with make: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with make: NULL value encountered.')",
+                        "conclusion": "Empty values for make are not acceptable. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "model": {
+                    "name": "Model",
+                    "definition": "The model of the car. In the automotive industry, a car model refers to a specific version or variant of a car produced by a manufacturer. Each model usually has unique characteristics, specifications and design elements that distinguish it from other models of the same brand or manufacturer.",
+                    "unit_of_measurement": null,
+                    "column": "model",
+                    "data_type": "varchar(50)",
+                    "value_restriction": "lambda x: len(x) > 0",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with model: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with model: NULL value encountered.')",
+                        "conclusion": "Empty values for model are not acceptable. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "trim": {
+                    "name": "Trim",
+                    "definition": "The trim of the car. Trim levels, also known as trim packages or equipment levels, designate variants of a particular vehicle model with different sets of features, options and accessories. Car manufacturers offer several trim levels to meet a variety of consumer preferences and budgets.",
+                    "unit_of_measurement": null,
+                    "column": "trim",
+                    "data_type": "varchar(100)",
+                    "value_restriction": "lambda x: len(x) > 0",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with trim: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with trim: NULL value encountered.')",
+                        "conclusion": "Empty values for trim are not acceptable. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "body": {
+                    "name": "Body",
+                    "definition": "The body type of the car. Body type refers to the overall shape and design of a vehicle's exterior, including its size, layout and functionality.",
+                    "unit_of_measurement": null,
+                    "column": "body",
+                    "data_type": "varchar(50)",
+                    "value_restriction": "lambda x: re.match('^[A-Za-z0-9 -]+$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with car body: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with car body: NULL value encountered.')",
+                        "conclusion": "Incorrect values for car body may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "transmission": {
+                    "name": "Transmission",
+                    "definition": "Transmission type of the car. The car's transmission is responsible for transferring power from the engine to the wheels.",
+                    "unit_of_measurement": null,
+                    "column": "transmission",
+                    "data_type": "transmission_enum",
+                    "value_restriction": "lambda x: x in ('automatic', 'manual')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with transmission: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with transmission: NULL value encountered.')",
+                        "conclusion": "Incorrect values for transmission may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "color": {
+                    "name": "Color",
+                    "definition": "Color of the car",
+                    "unit_of_measurement": null,
+                    "column": "color",
+                    "data_type": "varchar(50)",
+                    "value_restriction": "lambda x: re.match('^[a-zA-Z-]+$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with color: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with color: NULL value encountered.')",
+                        "conclusion": "Incorrect values for color may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "car",
+                    "make",
+                    "model",
+                    "trim"
+                ],
+                [
+                    "car",
+                    "manufacture_year"
+                ],
+                [
+                    "car",
+                    "body"
+                ],
+                [
+                    "car",
+                    "transmission"
+                ],
+                [
+                    "car",
+                    "color"
+                ]
+            ]
+        },
+        "dim_employee": {
+            "name": "Employee",
+            "table": "dim_employee",
+            "definition": "This dimension contains data about company employees.",
+            "key_field": {
+                "column": "employee_id",
+                "data_type": "integer"
+            },
+            "sources": [
+                {
+                    "name": "employee",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "first_name": {
+                    "name": "First Name",
+                    "definition": "First name of the employee",
+                    "unit_of_measurement": null,
+                    "column": "first_name",
+                    "data_type": "varchar(50)",
+                    "value_restriction": "lambda x: re.match('^[A-Za-z]+$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with first_name: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with first_name: NULL value encountered.')",
+                        "conclusion": "Incorrect values for first_name may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "age": {
+                    "name": "Age",
+                    "definition": "Age of the employee",
+                    "unit_of_measurement": "year",
+                    "column": "age",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: 16 <= x <= 100",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with age: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with age: NULL value encountered.')",
+                        "conclusion": "Incorrect values for age may be outside the range of 16 to 100. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "employee_age = (current_date - employee_birth_date).year",
+                    "calculation_code": "lambda current_date, birth_date: current_date.year - birth_date.year - ((current_date.month, current_date.day) < (birth_date.month, birth_date.day))",
+                    "calculation_description": "Employee age is calculated as the difference in years between the current date and the employee's birth date."
+                },
+                "age_group": {
+                    "name": "Age Group",
+                    "definition": "Age group of the employee",
+                    "unit_of_measurement": null,
+                    "column": "age_group",
+                    "data_type": "age_group_enum",
+                    "value_restriction": "lambda x: x in ('teenager', 'young_adult', 'adult', 'middle_aged_adult', 'senior')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with age_group: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with age_group: NULL value encountered.')",
+                        "conclusion": "Incorrect values for age_group may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "teenager: 16-19 years old; young_adult: 20-29 years old; adult: 30-49 years old; middle_aged_adult: 50-64 years old; senior: 65-100 years old",
+                    "calculation_code": "lambda age: ('teenager' if age >= 16 and age <= 19 else 'young_adult' if age >= 20 and age <= 29 else 'adult' if age >= 30 and age <= 49 else 'middle_aged_adult' if age >= 50 and age <= 64 else 'senior' if age >= 65 and age <= 100 else None)",
+                    "calculation_description": "Age group is categorized based on the employee's age."
+                },
+                "sex": {
+                    "name": "Sex",
+                    "definition": "Sex of the employee",
+                    "unit_of_measurement": null,
+                    "column": "sex",
+                    "data_type": "sex_enum",
+                    "value_restriction": "lambda x: x in ('female', 'male')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with sex: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with sex: NULL value encountered.')",
+                        "conclusion": "Incorrect values for sex may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "salary": {
+                    "name": "Salary",
+                    "definition": "Employee's salary",
+                    "unit_of_measurement": "$",
+                    "column": "salary",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with salary: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with salary: NULL value encountered.')",
+                        "conclusion": "Incorrect values for employee's salary may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "work_experience": {
+                    "name": "Experience",
+                    "definition": "Employee's experience",
+                    "unit_of_measurement": "month",
+                    "column": "work_experience",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x >= 0",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with employee's work experience: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with employee's work experience: NULL value encountered.')",
+                        "conclusion": "Incorrect values for employee's work experience may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "employee_experience = (current_date - hire_date).month",
+                    "calculation_code": "lambda current_date, hire_date: (current_date.year - hire_date.year) * 12 + current_date.month - hire_date.month",
+                    "calculation_description": "The experience of the employee is calculated as the difference in months between the current date and the date of hiring."
+                },
+                "oltp_id": {
+                    "name": "OLTP id",
+                    "definition": "id of the corresponding record in the OLTP database",
+                    "unit_of_measurement": null,
+                    "column": "oltp_id",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid employee_oltp_id value detected. The employee_oltp_id value must be greater than 0. The process is stopped to prevent OLTP and OLAP database id mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data employee_oltp_id will lead to OLTP and OLAP database id mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "employee",
+                    "age",
+                    "age_group"
+                ],
+                [
+                    "employee",
+                    "first_name"
+                ],
+                [
+                    "employee",
+                    "sex"
+                ],
+                [
+                    "employee",
+                    "salary"
+                ],
+                [
+                    "employee",
+                    "work_experience"
+                ]
+            ]
+        },
+        "dim_location": {
+            "name": "Location",
+            "table": "dim_location",
+            "definition": "This dimension contains information about the location of the purchase, repair or sale of a car.",
+            "key_field": {
+                "column": "location_id",
+                "data_type": "integer"
+            },
+            "sources": [
+                {
+                    "name": "address",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "country": {
+                    "name": "Country",
+                    "definition": "Country of purchase, repair or sale of the car.",
+                    "unit_of_measurement": null,
+                    "column": "country",
+                    "data_type": "varchar(64)",
+                    "value_restriction": "lambda x: re.match('^[A-Za-z ]+$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with country name: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with country name: NULL value encountered.')",
+                        "conclusion": "Incorrect values for country name may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "city": {
+                    "name": "City",
+                    "definition": "City of purchase, repair or sale of the car.",
+                    "unit_of_measurement": null,
+                    "column": "city",
+                    "data_type": "varchar(100)",
+                    "value_restriction": "lambda x: re.match('^[A-Za-z ]+$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with city name: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with city name: NULL value encountered.')",
+                        "conclusion": "Incorrect values for city name may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "oltp_id": {
+                    "name": "OLTP id",
+                    "definition": "id of the corresponding record in the OLTP database",
+                    "unit_of_measurement": null,
+                    "column": "oltp_id",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid location_oltp_id value detected. The location_oltp_id value must be greater than 0. The process is stopped to prevent OLTP and OLAP database id mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data location_oltp_id will lead to OLTP and OLAP database id mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "location",
+                    "city",
+                    "country"
+                ],
+                [
+                    "location",
+                    "country"
+                ],
+                [
+                    "location",
+                    "city"
+                ]
+            ]
+        },
+        "dim_date": {
+            "name": "Date",
+            "table": "dim_date",
+            "definition": "This dimension contains information about the date of the purchase, repair or sale of a car.",
+            "key_field": {
+                "column": "date_id",
+                "data_type": "integer"
+            },
+            "sources": [
+                {
+                    "name": "purchase",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                },
+                {
+                    "name": "repair",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                },
+                {
+                    "name": "sale",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "date": {
+                    "name": "Date",
+                    "definition": "Date of purchase, repair or sale of the car.",
+                    "unit_of_measurement": null,
+                    "column": "date",
+                    "data_type": "date",
+                    "value_restriction": "lambda date: date.date() >= datetime.strptime('1900-01-01', '%Y-%m-%d').date()",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[current_datetime] Detected potential issue with date: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[current_datetime] Detected potential issue with date: NULL value encountered.')",
+                        "conclusion": "Incorrect values for date may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "year": {
+                    "name": "Year",
+                    "definition": "Year of purchase, repair or sale of the car.",
+                    "unit_of_measurement": "year",
+                    "column": "year",
+                    "data_type": "smallint",
+                    "value_restriction": "lambda x: x >= 1900",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with year: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with year: NULL value encountered.')",
+                        "conclusion": "Incorrect values for year may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "year = date.year",
+                    "calculation_code": "lambda date: date.year",
+                    "calculation_description": "Extracts the year from the datetime.date object."
+                },
+                "month": {
+                    "name": "Month",
+                    "definition": "Month (of year) of purchase, repair or sale of the car.",
+                    "unit_of_measurement": "month",
+                    "column": "month",
+                    "data_type": "smallint",
+                    "value_restriction": "lambda x: 1<= x <= 12",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with month: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with month: NULL value encountered.')",
+                        "conclusion": "Incorrect values for month may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "month = date.month",
+                    "calculation_code": "lambda date: date.month",
+                    "calculation_description": "Extracts the month from the datetime.date object."
+                },
+                "day": {
+                    "name": "Day",
+                    "definition": "Day (of month) of purchase, repair or sale of the car.",
+                    "unit_of_measurement": "day",
+                    "column": "day",
+                    "data_type": "smallint",
+                    "value_restriction": "lambda x: 1<= x <= 31",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}]Detected potential issue with day: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}]Detected potential issue with day: NULL value encountered.')",
+                        "conclusion": "Incorrect values for day may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "day = date.day",
+                    "calculation_code": "lambda date: date.day",
+                    "calculation_description": "Extracts the day from the datetime.date object."
+                },
+                "week_day": {
+                    "name": "Week day",
+                    "definition": "Day of week of the car purchase, repair or sale.",
+                    "unit_of_measurement": "day",
+                    "column": "week_day",
+                    "data_type": "week_day_enum",
+                    "value_restriction": "lambda x: x in ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with weekday: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with weekday: NULL value encountered.')",
+                        "conclusion": "Incorrect values for weekday may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "weekday = date.weekday",
+                    "calculation_code": "lambda date: date.strftime('%a').lower()",
+                    "calculation_description": "Extracts the weekday from the datetime.date object."
+                },
+                "oltp_id": {
+                    "name": "OLTP VIN",
+                    "definition": "VIN of the corresponding car record in the OLTP database",
+                    "unit_of_measurement": null,
+                    "column": "date_oltp_vin",
+                    "data_type": "varchar(17)",
+                    "value_restriction": "lambda x: re.match('^[A-Z0-9]{17}$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid dim_date.oltp_car_vin value detected for dim_date. The car vin value must contain exactly 17 characters, which can only contain uppercase letters or numbers. The process is stopped to prevent OLTP and OLAP database car vin mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data dim_date.oltp_car_vin will lead to OLTP and OLAP database car vin mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "fact_name": {
+                    "name": "Fact name",
+                    "definition": "The name of the fact that relates to the date",
+                    "unit_of_measurement": null,
+                    "column": "fact_name",
+                    "data_type": "fact_name_enum",
+                    "value_restriction": "lambda x: x in ('purchase', 'repair', 'sale')",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid dim_date fact name value detected. The dim_date fact name value must be greater than 0. The process is stopped to prevent OLTP and OLAP database id mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data dim_date fact name will lead to OLTP and OLAP database id mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "date",
+                    "month",
+                    "year"
+                ],
+                [
+                    "date",
+                    "day"
+                ],
+                [
+                    "date",
+                    "weekday"
+                ]
+            ]
+        },
+        "dim_car_repair_type": {
+            "name": "Car Repair Type",
+            "table": "dim_car_repair_type",
+            "definition": "This dimension contains information about the type of repair carried out on the car.",
+            "key_field": {
+                "column": "repair_type_id",
+                "data_type": "integer"
+            },
+            "sources": [
+                {
+                    "name": "repair_type",
+                    "type": "OLTP_database_table_column",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "repair_type": {
+                    "name": "Repair Type",
+                    "definition": "Type of additional work performed on the car.",
+                    "unit_of_measurement": null,
+                    "column": "repair_type",
+                    "data_type": "repair_type_enum",
+                    "value_restriction": "lambda x: x in ('painting', 'mechanical_repair', 'body_repair', 'electrical_repair')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}]Detected potential issue with repair: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}]Detected potential issue with repair: NULL value encountered.')",
+                        "conclusion": "Incorrect values for repair may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "car_repair_type",
+                    "repair_type"
+                ]
+            ]
+        },
+        "dim_buyer": {
+            "name": "Buyer",
+            "table": "dim_buyer",
+            "definition": "This dimension contains data about buyers of cars.",
+            "key_field": {
+                "column": "buyer_id",
+                "data_type": "integer"
+            },
+            "sources": [
+                {
+                    "name": "buyer",
+                    "type": "OLTP_database_table",
+                    "conversion_rules": "script_code"
+                }
+            ],
+            "attributes": {
+                "first_name": {
+                    "name": "First Name",
+                    "definition": "First name of the buyer",
+                    "unit_of_measurement": null,
+                    "column": "first_name",
+                    "data_type": "varchar(50)",
+                    "value_restriction": "lambda x: re.match('^[A-Za-z]+$', x) is not None",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with first_name: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with first_name: NULL value encountered.')",
+                        "conclusion": "Incorrect values for first_name may not adhere to the required pattern. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "age": {
+                    "name": "Age",
+                    "definition": "Age of the buyer",
+                    "unit_of_measurement": "year",
+                    "column": "age",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: 16 <= x <= 100",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with age: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with age: NULL value encountered.')",
+                        "conclusion": "Incorrect values for age may be outside the range of 16 to 100. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "buyer_age = (current_date - buyer_birth_date).year",
+                    "calculation_code": "lambda current_date, birth_date: current_date.year - birth_date.year - ((current_date.month, current_date.day) < (birth_date.month, birth_date.day))",
+                    "calculation_description": "Buyer age is calculated as the difference in years between the current date and the buyer's birth date."
+                },
+                "age_group": {
+                    "name": "Age Group",
+                    "definition": "Age group of the buyer",
+                    "unit_of_measurement": null,
+                    "column": "age_group",
+                    "data_type": "age_group_enum",
+                    "value_restriction": "lambda x: x in ('teenager', 'young_adult', 'adult', 'middle_aged_adult', 'senior')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with age_group: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with age_group: NULL value encountered.')",
+                        "conclusion": "Incorrect values for age_group may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "teenager: 16-19 years old; young_adult: 20-29 years old; adult: 30-49 years old; middle_aged_adult: 50-64 years old; senior: 65-100 years old",
+                    "calculation_code": "lambda age: ('teenager' if age >= 16 and age <= 19 else 'young_adult' if age >= 20 and age <= 29 else 'adult' if age >= 30 and age <= 49 else 'middle_aged_adult' if age >= 50 and age <= 64 else 'senior' if age >= 65 and age <= 100 else None)",
+                    "calculation_description": "Age group is categorized based on the buyer's age."
+                },
+                "sex": {
+                    "name": "Sex",
+                    "definition": "Sex of the buyer",
+                    "unit_of_measurement": null,
+                    "column": "sex",
+                    "data_type": "sex_enum",
+                    "value_restriction": "lambda x: x in ('female', 'male')",
+                    "error_handling": {
+                        "severity_level": "info",
+                        "error_code": "current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');\nif value is not None: logging.info(f'[{current_datetime}] Detected potential issue with sex: Invalid value detected. Setting to NULL.'); value = None;\nelse: logging.info(f'[{current_datetime}] Detected potential issue with sex: NULL value encountered.')",
+                        "conclusion": "Incorrect values for sex may not adhere to the required format. These values are replaced with NULL for data consistency."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                },
+                "oltp_id": {
+                    "name": "OLTP id",
+                    "definition": "id of the corresponding record in the OLTP database",
+                    "unit_of_measurement": null,
+                    "column": "oltp_id",
+                    "data_type": "integer",
+                    "value_restriction": "lambda x: x > 0",
+                    "error_handling": {
+                        "severity_level": "error",
+                        "error_code": "raise ValueError('Invalid buyer_oltp_id value detected. The buyer_oltp_id value must be greater than 0. The process is stopped to prevent OLTP and OLAP database id mapping errors.')",
+                        "conclusion": "The process is stopped because an incorrect data buyer_oltp_id will lead to OLTP and OLAP database id mapping errors."
+                    },
+                    "calculation_formula": "NOT SPECIFIED",
+                    "calculation_code": "NOT SPECIFIED",
+                    "calculation_description": "NOT SPECIFIED"
+                }
+            },
+            "hierarchies": [
+                [
+                    "buyer",
+                    "age",
+                    "age_group"
+                ],
+                [
+                    "buyer",
+                    "first_name"
+                ],
+                [
+                    "buyer",
+                    "sex"
+                ]
+            ]
+        }
+    },
+    "last_etl": {
+        "datetime": "2024-04-20 12:03:30"
+    },
+    "current_etl": {
+        "initial_data_loading": true
+    }
+}
