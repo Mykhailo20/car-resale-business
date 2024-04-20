@@ -7,17 +7,17 @@ from etl_utils.OLTP_to_OLAP_mapper import *
 from etl_utils.load import *
 
 
-def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
+def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
 
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
 
     print(f"\nSELLER EXTRACT")
     if initial_data_loading:
         print(f"Initial data loading.")
-        seller_data = extract_seller_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'])
+        seller_data = extract_seller_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
     else:
         print(f"Incremental data loading.")
-        seller_data = extract_seller_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'])
+        seller_data = extract_seller_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
         print(f"updated_seller_data = {seller_data}")
 
     oltp_db_conn.close()
@@ -73,11 +73,11 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
 
 
 
-def car_repair_type_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
+def car_repair_type_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
 
     print(f"\nCAR REPAIR TYPE EXTRACT")
-    car_repair_type_data = extract_car_repair_type_data(oltp_db_conn, initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'])
+    car_repair_type_data = extract_car_repair_type_data(oltp_db_conn, initial_data_loading, last_etl_datetime=last_etl_datetime)
     print(f"car_repair_type_data = {car_repair_type_data}")
 
     oltp_db_conn.close()
@@ -118,11 +118,11 @@ def car_repair_type_etl(oltp_config_dict, olap_config_dict, metadata, initial_da
     olap_db_conn.close() 
 
 
-def location_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
+def location_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
 
     print(f"\nLOCATION EXTRACT")
-    location_data = extract_location_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'])
+    location_data = extract_location_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
 
     if not initial_data_loading:
         print(f"Incremental data loading.")
@@ -170,12 +170,12 @@ def location_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
     olap_db_conn.close()
 
 
-def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
+def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
 
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
     print(f"\nPURCHASE EXTRACT")
     
-    purchase_data = extract_purchase_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'], limit_records=100)
+    purchase_data = extract_purchase_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=100)
     """
     if not initial_data_loading:
         print(f"updated_fact_car_purchase_data: {purchase_data}")
@@ -287,11 +287,11 @@ def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
     olap_db_conn.close()  
     
 
-def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
+def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
     print(f"\nREPAIR EXTRACT")
     
-    repair_data = extract_repair_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'], limit_records=10)
+    repair_data = extract_repair_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=10)
     """
     if not initial_data_loading:
         print(f"updated_fact_car_repair_data: {repair_data}")
@@ -407,11 +407,11 @@ def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     olap_db_conn.close() 
 
 
-def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading):
+def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
     print(f"\nSALE EXTRACT")
     
-    sale_data = extract_sale_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=metadata['last_etl']['datetime'], limit_records=10)
+    sale_data = extract_sale_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=10)
     """
     if not initial_data_loading:
         print(f"updated_fact_car_sale_data: {sale_data}")

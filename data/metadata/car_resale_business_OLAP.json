@@ -1254,11 +1254,5 @@
                 ]
             ]
         }
-    },
-    "last_etl": {
-        "datetime": "2024-04-20 12:03:30"
-    },
-    "current_etl": {
-        "initial_data_loading": true
     }
 }
