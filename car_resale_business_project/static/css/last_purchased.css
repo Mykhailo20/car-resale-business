@@ -42,7 +42,7 @@
 
 .car-card {
     display: flex;
-    width: calc(70%);
+    width: calc(75%);
     height: 40vh;
     margin-bottom: 20px;
     border: 1px solid #ccc;
