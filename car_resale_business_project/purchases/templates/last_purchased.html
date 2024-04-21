@@ -34,15 +34,44 @@
     <div class="car-cards">
         <!-- Individual car cards will be dynamically generated here -->
         <div class="car-card">
-            <div class="car-image">
-                <img alt="Car Image">
+            <div class="car-card__left-side">
+                <div class="car-card__left-side__car-image">
+                    <img>
+                </div>
+                <button class="btn btn-outline-success details-btn">Details</button>
             </div>
-            <div class="car-details">
-                <h3>Car Model</h3>
-                <p>Brand: Toyota</p>
-                <p>Year: 2020</p>
-                <button class="details-btn">Details</button>
-            </div>
+            <div class="car-card__right-side">
+                <div class="car-card__right-side__car-details-header">
+                    <h3 class="car-card__right-side__car-details-header__model-trim">Car Model Trim</h3>
+                    <p class="car-card__right-side__car-details-header__vin">car vin</p>
+                    <h3 class="car-card__right-side__car-details-header__price">Price</h3>
+                </div>
+                <hr class="car-card__hr">
+                <div class="car-card__right-side__car-details-body">
+                    <div class="car-card__right-side__car-details-body__items">
+                        <div class="car-card__right-side__car-details-body__items-col">
+                            <div class="car-card__right-side__car-details-body__item">
+                                <img src="../static/images/icons/calendar-icon.png" alt="Icon" width="20px">
+                                <span>Year</span>
+                            </div>
+                            <div class="car-card__right-side__car-details-body__item">
+                                <img src="../static/images/icons/car-mileage-icon.png" alt="Icon" width="20px">
+                                <span>15000 mi</span>
+                            </div>
+                        </div>
+                        <div class="car-card__right-side__car-details-body__items-col">
+                            <div class="car-card__right-side__car-details-body__item">
+                                <img src="../static/images/icons/transmission-icon.png" alt="Icon" width="20px">
+                                <span>Manual</span>
+                            </div>
+                            <div class="car-card__right-side__car-details-body__item">
+                                <img src="../static/images/icons/location-icon.png" alt="Icon" width="20px">
+                                <span>Sacramento</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
         </div>
         
     </div>

@@ -1,7 +1,7 @@
 .page-links {
     display: flex;
     justify-content: flex-start;
-    margin: 25px 5% 25px 20%;
+    margin: 25px 0px 25px 25%;
 }
 
 .link {
@@ -21,7 +21,7 @@
 
 /* Filters */
 .filters {
-    width: 20%;
+    width: 25%;
     margin-right: 20px;
 }
 
@@ -41,27 +41,88 @@
 }
 
 .car-card {
-    width: calc(50% - 10px); /* Adjust as needed */
+    display: flex;
+    width: calc(70%);
+    height: 40vh;
     margin-bottom: 20px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden;
+    border-radius: 10px;
+    background-color: rgba(144, 144, 144, 0.1);
 }
 
-.car-image img {
+.car-card__left-side {
+    width: 45%;
+}
+
+.car-card__left-side__car-image {
+    background-color: #c4c4c4;
+    margin: 2%;
+    width: calc(90%);
+    height: calc(75%);
+}
+.car-card__left-side__car-image img {
     width: 100%;
     height: auto;
 }
 
-.car-details {
+.details-btn {
+    margin: 0px 2%;
+}
+
+.car-card__right-side {
+    width: 60%;
+}
+
+.car-card__right-side__car-details-header {
+    display: flex;
+    flex-direction: column;
     padding: 10px;
 }
 
-.details-btn {
-    background-color: #333;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
+.car-card__right-side__car-details-body__item img {
+    width: 20px; /* Adjust size as needed */
+    height: auto;
+    margin-right: 5px;
+}
+
+.car-card__right-side__car-details-header__model-trim {
+    font-weight: 400;
+    font-size: 24px;
+    color: #1532CA;
+}
+
+.car-card__right-side__car-details-header__vin {
+    font-weight: bold;
+}
+
+.car-card__right-side__car-details-header__price {
+    font-weight: bold;
+    color: #0FAD0C;
+}
+
+.car-card__hr {
+    margin-top: 0px;
+    margin-right: 1%;
+}
+
+.car-card__right-side__car-details-body {
+    margin: 0px 5%;
+}
+
+.car-card__right-side__car-details-body__items {
+    display: flex;
+    flex-direction: row;
+}
+
+.car-card__right-side__car-details-body__items-col{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 50%;
+}
+
+.car-card__right-side__car-details-body__item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5%;
 }
