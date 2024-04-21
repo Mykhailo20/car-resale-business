@@ -1,5 +1,8 @@
 from flask import Blueprint, render_template, request, jsonify
-from datetime import datetime
+from sqlalchemy import desc
+
+from car_resale_business_project import db
+from car_resale_business_project.models import Car, Purchase
 from car_resale_business_project.utils.filter_cars import *
 
 purchases = Blueprint("purchases", __name__, template_folder="templates", static_folder="static")
@@ -18,7 +21,10 @@ def add():
 
 @purchases.route('/last_purchased')
 def last_purchased():
-    return render_template('last_purchased.html')
+    # Fetch the top 5 last purchases sorted by purchase date
+    last_purchases = Purchase.query.order_by(desc(Purchase.purchase_date)).limit(5).all()
+    
+    return render_template('last_purchased.html', last_purchases=last_purchases)
 
 
 @purchases.route('/last_purchased/filter', methods=['POST'])

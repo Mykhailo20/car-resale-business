@@ -22,7 +22,6 @@ class City(db.Model):
     name = db.Column(db.String(100))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
-    addresses = db.relationship('Address', backref='city')
     
 
 class Address(db.Model):
@@ -34,6 +33,8 @@ class Address(db.Model):
     postal_code = db.Column(db.String(15))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+
+    city = db.relationship('City', backref='address', lazy=True)
 
 
 class Person(db.Model):
@@ -97,6 +98,8 @@ class Buyer(db.Model):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+    address = db.relationship('Address', backref='buyer', lazy=True)
+
     def __repr__(self):
         return f"Buyer(person_id={self.person_id}, email='{self.email}', address_id={self.address_id})"
 
@@ -111,6 +114,8 @@ class Seller(db.Model):
     website_url = db.Column(db.String(2048))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+
+    address = db.relationship('Address', backref='seller', lazy=True)
 
 
 class CarMake(db.Model):
@@ -143,8 +148,6 @@ class Color(db.Model):
     hex_code = db.Column(db.String(6))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
-    # Different cars can have the same color
-    cars = db.relationship('Car', backref='color')
 
 
 class Car(db.Model):
@@ -162,6 +165,10 @@ class Car(db.Model):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+    make = db.relationship('CarMake', backref='car', lazy=True)
+    body_type = db.relationship('CarBodyType', backref='car', lazy=True)
+    color = db.relationship('Color', backref='car', lazy=True)
+
     def __repr__(self):
         return f"Car(vin='{self.vin}')"
 
@@ -169,9 +176,9 @@ class Car(db.Model):
 class Purchase(db.Model):
     __tablename__ = 'purchase'
 
-    car_vin = db.Column(db.String(17), primary_key=True)
+    car_vin = db.Column(db.String(17),  db.ForeignKey('car.vin'), primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('seller.seller_id'))
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.employee_id'))
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.person_id'))
     price = db.Column(db.Integer)
     odometer = db.Column(db.Integer)
     condition = db.Column(db.Numeric(2, 1))
@@ -182,9 +189,11 @@ class Purchase(db.Model):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
-    def __repr__(self):
-        return f"Purchase(car_vin='{self.car_vin}')"
-    
+    # Define the relationship with the Car table
+    car = db.relationship('Car', backref='purchase', lazy=True)
+    seller = db.relationship('Seller', backref='purchase', lazy=True)
+    employee = db.relationship('Employee', backref='purchase', lazy=True)
 
-# Add ForeignKeyConstraint to specify the relationship between purchase and car tables
-ForeignKeyConstraint(['purchase.car_vin'], ['car.vin'])
+
+    def __repr__(self):
+        return f"Purchase(car_vin='{self.car_vin}', Car(vin='{self.car.vin}'))"

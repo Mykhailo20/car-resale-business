@@ -32,48 +32,56 @@
         </div>
     </div>
     <div class="car-cards">
-        <!-- Individual car cards will be dynamically generated here -->
-        <div class="car-card">
-            <div class="car-card__left-side">
-                <div class="car-card__left-side__car-image">
-                    <img>
+        {% for purchase in last_purchases %}
+            <div class="car-card">
+                <div class="car-card__left-side">
+                    <div class="car-card__left-side__car-image">
+                        <img>
+                    </div>
+                    <button class="btn btn-outline-success details-btn">Details</button>
                 </div>
-                <button class="btn btn-outline-success details-btn">Details</button>
-            </div>
-            <div class="car-card__right-side">
-                <div class="car-card__right-side__car-details-header">
-                    <h3 class="car-card__right-side__car-details-header__model-trim">Car Model Trim</h3>
-                    <p class="car-card__right-side__car-details-header__vin">car vin</p>
-                    <h3 class="car-card__right-side__car-details-header__price">Price</h3>
-                </div>
-                <hr class="car-card__hr">
-                <div class="car-card__right-side__car-details-body">
-                    <div class="car-card__right-side__car-details-body__items">
-                        <div class="car-card__right-side__car-details-body__items-col">
-                            <div class="car-card__right-side__car-details-body__item">
-                                <img src="../static/images/icons/calendar-icon.png" alt="Icon" width="20px">
-                                <span>Year</span>
+                <div class="car-card__right-side">
+                    <div class="car-card__right-side__car-details-header">
+                        <h3 class="car-card__right-side__car-details-header__model-trim">{{ purchase.car.make.name }} {{ purchase.car.model }} {{ purchase.car.trim }}</h3>
+                        <p class="car-card__right-side__car-details-header__vin">vin: {{ purchase.car.vin }}</p>
+                        <h3 class="car-card__right-side__car-details-header__price">{{ purchase.price }} $</h3>
+                    </div>
+                    <hr class="car-card__hr">
+                    <div class="car-card__right-side__car-details-body">
+                        <div class="car-card__right-side__car-details-body__items">
+                            <div class="car-card__right-side__car-details-body__items-col">
+                                <div class="car-card__right-side__car-details-body__item">
+                                    <img src="../static/images/icons/calendar-icon.png" alt="manufacture-year-icon" width="20px" title="Car Manufacture Year">
+                                    <span>{{ purchase.car.manufacture_year }}</span>
+                                </div>
+                                <div class="car-card__right-side__car-details-body__item">
+                                    <img src="../static/images/icons/car-mileage-icon.png" alt="mileage-icon" width="20px" title="Car Mileage">
+                                    <span>{{ purchase.odometer }} mi</span>
+                                </div>
+                                <div class="car-card__right-side__car-details-body__item">
+                                    <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="Purchase Date">
+                                    <span>{{ purchase.purchase_date }}</span>
+                                </div>
                             </div>
-                            <div class="car-card__right-side__car-details-body__item">
-                                <img src="../static/images/icons/car-mileage-icon.png" alt="Icon" width="20px">
-                                <span>15000 mi</span>
-                            </div>
-                        </div>
-                        <div class="car-card__right-side__car-details-body__items-col">
-                            <div class="car-card__right-side__car-details-body__item">
-                                <img src="../static/images/icons/transmission-icon.png" alt="Icon" width="20px">
-                                <span>Manual</span>
-                            </div>
-                            <div class="car-card__right-side__car-details-body__item">
-                                <img src="../static/images/icons/location-icon.png" alt="Icon" width="20px">
-                                <span>Sacramento</span>
+                            <div class="car-card__right-side__car-details-body__items-col">
+                                <div class="car-card__right-side__car-details-body__item">
+                                    <img src="../static/images/icons/transmission-icon.png" alt="transmission-icon" width="20px" title="Car Transmission">
+                                    <span>{{ purchase.car.transmission }}</span>
+                                </div>
+                                <div class="car-card__right-side__car-details-body__item">
+                                    <img src="../static/images/icons/color-icon.png" alt="color-icon" width="20px" title="Car Color">
+                                    <span>{{ purchase.car.color.name }}</span>
+                                </div>
+                                <div class="car-card__right-side__car-details-body__item">
+                                    <img src="../static/images/icons/location-icon.png" alt="location-icon" width="20px" title="Car Location">
+                                    <span>{{ purchase.seller.address.city.name }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>  
-        </div>
-        
+                </div>  
+            </div>
+        {% endfor %}
     </div>
 </div>
 <script src="../static/js/filters.js"></script>
