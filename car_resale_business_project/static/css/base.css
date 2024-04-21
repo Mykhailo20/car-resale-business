@@ -1,14 +1,20 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.divide-line {
+    
+}
+
 .navbar {
     background-color: #d5d5d5 !important;
 }
 .navbar-brand {
     font-size: 24px;
     font-weight: 600;
-    font-family: 'Poppins', sans-serif;
 }
 .navbar-nav .nav-link {
     font-weight: 400;
-    font-family: 'Poppins', sans-serif;
 }
 .btn-outline-success {
     color: #1532CA;

@@ -1,0 +1,67 @@
+.page-links {
+    display: flex;
+    justify-content: flex-start;
+    margin: 25px 5% 25px 20%;
+}
+
+.link {
+    text-decoration: underline;
+    color: #333;
+    padding: 5px 10px;
+}
+
+.link-active {
+    color: blue;
+    padding: 5px 10px;
+}
+
+.main-content {
+    display: flex;
+}
+
+/* Filters */
+.filters {
+    width: 20%;
+    margin-right: 20px;
+}
+
+.filter {
+    margin: 0px 0px 3% 3%;
+}
+
+.filter label {
+    display: block;
+}
+
+/* Car Cards */
+.car-cards {
+    width: 80%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.car-card {
+    width: calc(50% - 10px); /* Adjust as needed */
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.car-image img {
+    width: 100%;
+    height: auto;
+}
+
+.car-details {
+    padding: 10px;
+}
+
+.details-btn {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}

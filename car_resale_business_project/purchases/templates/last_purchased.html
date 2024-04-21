@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/last_purchased.css">
+<div class="page-links">
+    <a href="#" class="link-active">Last Purchased Cars</a>
+    <a href="#" class="link">Last Sold Cars</a>
+    <a href="#" class="link">Find Car</a>
+</div>
+<hr class="divide-line">
+<div class="main-content">
+    <div class="filters">
+        <div class="filter">
+            <label class="filter__filter-input_label" for="purchase-date">Purchase Date:</label>
+            <input class="filter__filter-input" type="date" id="purchase-date-from" name="purchase-date-from" placeholder="From"> <!-- From Date -->
+            <input class="filter__filter-input" type="date" id="purchase-date-to" name="purchase-date-to" placeholder="To"> <!-- To Date -->
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="seller-name">Seller:</label>
+            <select class="filter__filter-input" id="seller-name" name="seller-name">
+                <option value="" hidden>Seller name</option>
+                <option value="Nissan Seller">Nissan Seller</option>
+                <option value="Kia Rio Seller">Kia Rio Seller</option>
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="location-city">Location:</label>
+            <select class="filter__filter-input" id="location-city" name="location-city">
+                <option value="" hidden>City</option>
+                <option value="Albany">Albany</option>
+                <option value="Sacramento">Sacramento</option>
+            </select>
+        </div>
+    </div>
+    <div class="car-cards">
+        <!-- Individual car cards will be dynamically generated here -->
+        <div class="car-card">
+            <div class="car-image">
+                <img alt="Car Image">
+            </div>
+            <div class="car-details">
+                <h3>Car Model</h3>
+                <p>Brand: Toyota</p>
+                <p>Year: 2020</p>
+                <button class="details-btn">Details</button>
+            </div>
+        </div>
+        
+    </div>
+</div>
+<script src="../static/js/filters.js"></script>
+{% endblock %}
