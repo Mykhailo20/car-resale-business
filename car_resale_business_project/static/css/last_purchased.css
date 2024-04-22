@@ -33,6 +33,10 @@
     display: block;
 }
 
+.filter__filter-input {
+    width: 8vw;
+}
+
 /* Car Cards */
 .car-cards {
     width: 80%;

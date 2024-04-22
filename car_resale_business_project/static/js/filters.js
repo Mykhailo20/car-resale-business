@@ -3,20 +3,20 @@ function handleFilterChange() {
     // Get selected filter values
     var fromDate = document.getElementById("purchase-date-from").value;
     var toDate = document.getElementById("purchase-date-to").value;
-    var seller = document.getElementById("seller-name").value;
+    var manufacture_year = document.getElementById("manufacture-year").value;
     var location = document.getElementById("location-city").value;
 
     // Provide default values for null filters
     fromDate = fromDate || null; // Default to empty string if fromDate is null
     toDate = toDate || null; // Default to empty string if toDate is null
-    seller = seller || "All"; // Default to "All" if seller is null
+    manufacture_year = manufacture_year || "All"; // Default to "All" if seller is null
     location = location || "All"; // Default to "All" if location is null
     
     // Prepare data to send in AJAX request
     var data = {
         fromDate: fromDate,
         toDate: toDate,
-        seller: seller,
+        manufacture_year: manufacture_year,
         location: location
     };
 

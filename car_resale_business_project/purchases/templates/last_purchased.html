@@ -15,19 +15,21 @@
             <input class="filter__filter-input" type="date" id="purchase-date-to" name="purchase-date-to" placeholder="To"> <!-- To Date -->
         </div>
         <div class="filter">
-            <label class="filter__filter-input_label" for="seller-name">Seller:</label>
-            <select class="filter__filter-input" id="seller-name" name="seller-name">
-                <option value="" hidden>Seller name</option>
-                <option value="Nissan Seller">Nissan Seller</option>
-                <option value="Kia Rio Seller">Kia Rio Seller</option>
+            <label class="filter__filter-input_label" for="manufacture-year">Manufacture Year:</label>
+            <select class="filter__filter-input" id="manufacture-year" name="manufacture-year">
+                <option value="" hidden>Year</option>
+                {% for manufacture_year in car_manufacture_years %}
+                    <option value="{{ manufacture_year }}">{{ manufacture_year }}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="filter">
             <label class="filter__filter-input_label" for="location-city">Location:</label>
             <select class="filter__filter-input" id="location-city" name="location-city">
                 <option value="" hidden>City</option>
-                <option value="Albany">Albany</option>
-                <option value="Sacramento">Sacramento</option>
+                {% for city in cities %}
+                <option value="{{ city.name }}">{{ city.name }}</option>
+                {% endfor %}
             </select>
         </div>
     </div>
