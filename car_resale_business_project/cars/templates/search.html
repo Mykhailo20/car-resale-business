@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/search.css">
+<div class="search-page-content">
+    <div class="search-container">
+        <div class="search-container__header-container">
+            <p class="search-form-title">Search Car</p>
+            
+        </div>
+        <hr class="divide-line">
+        <div class="search-box">
+            <form>
+                <div class="vin-form-container">
+                    <div class="vin-form-container__input-part">
+                        <input class="vin-form-container__input" type="text" placeholder="Enter car vin">
+                    </div>
+                    <div class="vin-form-container__button-part">
+                        <button class="btn btn-outline-success search-btn" type="submit">Search</button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+        <div class="filter-form">
+            <form>
+                <!-- Filters Row 1 -->
+                <div class="filter-row">
+                    <select class="filter__filter-input" id="car-brand" name="car-brand">
+                        <option value="" hidden>Brand</option>
+                        <option value="Audi">Audi</option>
+                    </select>
+                    <select class="filter__filter-input" id="car-model" name="car-model">
+                        <option value="" hidden>Model</option>
+                        <option value="A5">A5</option>
+                    </select>
+                </div>
+                <!-- Filters Row 2 -->
+                <div class="filter-row">
+                    <select class="filter__filter-input" id="car-body-type" name="car-body-type">
+                        <option value="" hidden>Body Type</option>
+                        <option value="suv">suv</option>
+                        <option value="sedan">sedan</option>
+                    </select>
+                    <select class="filter__filter-input" id="car-transmission" name="car-transmission">
+                        <option value="" hidden>Trasmission</option>
+                        <option value="manual">manual</option>
+                        <option value="auto">auto</option>
+                    </select>
+                </div>
+                <!-- Filters Row 3 -->
+                <div class="filter-row">
+                    <select class="filter__filter-input" id="seller-name" name="seller-name">
+                        <option value="" hidden>Seller Name</option>
+                        <option value="seller1">seller1</option>
+                        <option value="seller1">seller2</option>
+                    </select>
+                    <select class="filter__filter-input" id="car-city" name="car-city">
+                        <option value="" hidden>City</option>
+                        <option value="Sacramento">Sacramento</option>
+                        <option value="Austin">Austin</option>
+                    </select>
+                </div>
+                <!-- Filters Row 4 -->
+                <div class="filter-row">
+                    <select class="filter__filter-input" id="car-year-from" name="car-year-from">
+                        <option value="" hidden>Year From</option>
+                    </select>
+                    <select class="filter__filter-input" id="car-year-to" name="car-year-to">
+                        <option value="" hidden>Year To</option>
+                    </select>
+                </div>
+                <!-- Filters Row 5 -->
+                <div class="filter-row">
+                    <select class="filter__filter-input" id="car-condition" name="car-condition">
+                        <option value="" hidden>Condition</option>
+                        <option value="1.0-2.0">Bad</option>
+                        <option value="2.0-3.0">Normal</option>
+                        <option value="3.0-4.0">Good</option>
+                        <option value="4.0-5.0">Excellent</option>
+                    </select>
+                    <select class="filter__filter-input" id="car-odometer" name="car-odometer">
+                        <option value="" hidden>Odometer</option>
+                        <option value="0-50000">&lt; 50k </option>
+                        <option value="50000-100000">50k-100k</option>
+                        <option value="100000-200000">100k-200k</option>
+                        <option value="200000-inf">&gt; 200k</option>
+                    </select>
+                </div>
+                <div class="search-btn-div">
+                    <button class="btn btn-outline-success search-btn" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -37,7 +37,7 @@ def last_purchased():
 def last_purchased_filter():
     # Retrieve filter parameters from the AJAX request
     filters = request.json
-    print(f"filters = {filters}")
+
     # Construct the base query
     base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
 

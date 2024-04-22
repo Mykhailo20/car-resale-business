@@ -4,4 +4,4 @@ cars = Blueprint("cars", __name__, template_folder="templates", static_folder="s
 
 @cars.route('/search')
 def search():
-    return "<h1>Car Search Page-Form</h1>"
+    return render_template("search.html")

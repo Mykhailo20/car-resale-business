@@ -3,7 +3,16 @@ body {
 }
 
 .divide-line {
-    
+    border: none;
+    border-top: 1px solid black;
+    height: 1px;
+    margin: 1vh 1vw 3vh;
+}
+
+.search-form-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 1vh;
 }
 
 .navbar {
