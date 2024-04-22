@@ -24,6 +24,16 @@ class Country(db.Model):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+    def to_dict(self):
+        return {
+            'country_id': self.country_id,
+            'name': self.name,
+            'iso': self.iso,
+            'iso3': self.iso3,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
 
 @dataclass
 class City(db.Model):
@@ -40,6 +50,18 @@ class City(db.Model):
     name = db.Column(db.String(100))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+
+    country = db.relationship('Country', backref='city', lazy=True)
+
+    def to_dict(self):
+        country_dict = self.country.to_dict() if self.country else None
+        return {
+            'city_id': self.city_id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'country': country_dict
+        }
 
 
 @dataclass
@@ -62,6 +84,17 @@ class Address(db.Model):
 
     city = db.relationship('City', backref='address', lazy=True)
 
+    def to_dict(self):
+        city_dict = self.city.to_dict() if self.city else None
+        return {
+            'address_id': self.address_id,
+            'street': self.street,
+            'postal_code': self.postal_code,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'city': city_dict
+        }
+
 
 @dataclass
 class Person(db.Model):
@@ -83,6 +116,17 @@ class Person(db.Model):
     sex = db.Column(db.Text)
     email = db.Column(db.String(100))
 
+    def to_dict(self):
+        return {
+            'person_id': self.person_id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'middle_name': self.middle_name,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'sex': self.sex,
+            'email': self.email
+        }
+
 
 @dataclass
 class Position(db.Model):
@@ -99,6 +143,15 @@ class Position(db.Model):
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+
+    def to_dict(self):
+        return {
+            'position_id': self.position_id,
+            'name': self.name,
+            'description': self.description,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 
 @dataclass
@@ -131,6 +184,26 @@ class Employee(db.Model):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+    position = db.relationship('Position', backref='employee', lazy=True)
+
+    def to_dict(self):
+        return {
+            'person_id': self.person_id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'middle_name': self.middle_name,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'sex': self.sex,
+            'email': self.email,
+            'position': self.position.to_dict() if self.position else None,
+            'salary': self.salary,
+            'hire_date': self.hire_date.isoformat() if self.hire_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+
 
 @dataclass
 class Buyer(db.Model):
@@ -160,8 +233,20 @@ class Buyer(db.Model):
 
     address = db.relationship('Address', backref='buyer', lazy=True)
 
-    def __repr__(self):
-        return f"Buyer(person_id={self.person_id}, email='{self.email}', address_id={self.address_id})"
+    def to_dict(self):
+        return {
+            'person_id': self.person_id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'middle_name': self.middle_name,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'sex': self.sex,
+            'email': self.email,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'address': self.address.to_dict() if self.address else None
+        }
+
 
 @dataclass
 class Seller(db.Model):
@@ -187,6 +272,18 @@ class Seller(db.Model):
 
     address = db.relationship('Address', backref='seller', lazy=True)
 
+    def to_dict(self):
+        return {
+            'seller_id': self.seller_id,
+            'name': self.name,
+            'type': self.type,
+            'email': self.email,
+            'website_url': self.website_url,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'address': self.address.to_dict() if self.address else None
+        }
+
 
 @dataclass
 class CarMake(db.Model):
@@ -200,6 +297,14 @@ class CarMake(db.Model):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+    def to_dict(self):
+        return {
+            'car_make_id': self.car_make_id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
 
 @dataclass
 class CarBodyType(db.Model):
@@ -207,13 +312,22 @@ class CarBodyType(db.Model):
 
     car_body_type_id: int
     name: str
-    descripton: str
+    description: str
 
     car_body_type_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    descripton = db.Column(db.Text)
+    description = db.Column(db.Text)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+
+    def to_dict(self):
+        return {
+            'car_body_type_id': self.car_body_type_id,
+            'name': self.name,
+            'description': self.description,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 
 @dataclass
@@ -229,6 +343,15 @@ class Color(db.Model):
     hex_code = db.Column(db.String(6))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+
+    def to_dict(self):
+        return {
+            'color_id': self.color_id,
+            'name': self.name,
+            'hex_code': self.hex_code,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 
 @dataclass
@@ -261,6 +384,21 @@ class Car(db.Model):
     body_type = db.relationship('CarBodyType', backref='car', lazy=True)
     color = db.relationship('Color', backref='car', lazy=True)
 
+    def to_dict(self):
+        return {
+            'vin': self.vin,
+            'manufacture_year': self.manufacture_year,
+            'make': self.make.to_dict() if self.make else None,
+            'model': self.model,
+            'trim': self.trim,
+            'body_type': self.body_type.to_dict() if self.body_type else None,
+            'transmission': self.transmission,
+            'color': self.color.to_dict() if self.color else None,
+            'description': self.description,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
 
 @dataclass
 class Purchase(db.Model):
@@ -291,6 +429,25 @@ class Purchase(db.Model):
     updated_at = db.Column(db.DateTime)
 
     # Define the relationship with the Car table
-    car = db.relationship('Car', backref='purchase', lazy=True)
+    car = db.relationship('Car', backref='purchase')
     seller = db.relationship('Seller', backref='purchase', lazy=True)
     employee = db.relationship('Employee', backref='purchase', lazy=True)
+
+    def to_dict(self):
+        return {
+            'car_vin': self.car_vin,
+            'seller_id': self.seller_id,
+            'employee_id': self.employee_id,
+            'price': self.price,
+            'odometer': self.odometer,
+            'condition': float(self.condition) if self.condition is not None else None,
+            'description': self.description,
+            'car_image': self.car_image,
+            'content_type': self.content_type,
+            'purchase_date': self.purchase_date.isoformat() if self.purchase_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'car': self.car.to_dict() if self.car else None,
+            'seller': self.seller.to_dict() if self.seller else None,
+            'employee': self.employee.to_dict() if self.employee else None,
+        }
