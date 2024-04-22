@@ -5,93 +5,105 @@
     <div class="search-container">
         <div class="search-container__header-container">
             <p class="search-form-title">Search Car</p>
-            
         </div>
         <hr class="divide-line">
         <div class="search-box">
-            <form>
+            <form method="POST">
+                {{ car_vin_form.hidden_tag() }}
+                {{ car_vin_form.identifier(hidden=True, value='car_vin_form') }}
                 <div class="vin-form-container">
                     <div class="vin-form-container__input-part">
-                        <input class="vin-form-container__input" type="text" placeholder="Enter car vin">
+                        {{ car_vin_form.car_vin(class="vin-form-container__input", placeholder="Enter car vin") }}
                     </div>
                     <div class="vin-form-container__button-part">
-                        <button class="btn btn-outline-success search-btn" type="submit">Search</button>
+                        {{ car_vin_form.submit(class="btn btn-outline-success search-btn") }}
                     </div>
                 </div>
-                
             </form>
         </div>
-        <div class="filter-form">
-            <form>
+        <div class="filter-form-container">
+            <form method="POST">
+                {{ car_filters_form.hidden_tag() }}
+                {{ car_filters_form.identifier(hidden=True, value='car_filters_form') }}
                 <!-- Filters Row 1 -->
                 <div class="filter-row">
-                    <select class="filter__filter-input" id="car-brand" name="car-brand">
-                        <option value="" hidden>Brand</option>
-                        <option value="Audi">Audi</option>
-                    </select>
-                    <select class="filter__filter-input" id="car-model" name="car-model">
-                        <option value="" hidden>Model</option>
-                        <option value="A5">A5</option>
-                    </select>
+                    {{ car_filters_form.brand(class="filter__filter-input", id="car-filter-brand") }}
+                    {{ car_filters_form.model(class="filter__filter-input", id="car-filter-model") }}
                 </div>
                 <!-- Filters Row 2 -->
                 <div class="filter-row">
-                    <select class="filter__filter-input" id="car-body-type" name="car-body-type">
-                        <option value="" hidden>Body Type</option>
-                        <option value="suv">suv</option>
-                        <option value="sedan">sedan</option>
-                    </select>
-                    <select class="filter__filter-input" id="car-transmission" name="car-transmission">
-                        <option value="" hidden>Trasmission</option>
-                        <option value="manual">manual</option>
-                        <option value="auto">auto</option>
-                    </select>
+                    {{ car_filters_form.body_type(class="filter__filter-input", id="car-filter-body_type") }}
+                    {{ car_filters_form.transmission(class="filter__filter-input", id="car-filter-transmission") }}
                 </div>
                 <!-- Filters Row 3 -->
                 <div class="filter-row">
-                    <select class="filter__filter-input" id="seller-name" name="seller-name">
-                        <option value="" hidden>Seller Name</option>
-                        <option value="seller1">seller1</option>
-                        <option value="seller1">seller2</option>
-                    </select>
-                    <select class="filter__filter-input" id="car-city" name="car-city">
-                        <option value="" hidden>City</option>
-                        <option value="Sacramento">Sacramento</option>
-                        <option value="Austin">Austin</option>
-                    </select>
+                    {{ car_filters_form.seller_name(class="filter__filter-input", id="car-filter-seller-name")}} 
+                    {{ car_filters_form.city(class="filter__filter-input", id="car-filter-city")}}
                 </div>
                 <!-- Filters Row 4 -->
                 <div class="filter-row">
-                    <select class="filter__filter-input" id="car-year-from" name="car-year-from">
-                        <option value="" hidden>Year From</option>
-                    </select>
-                    <select class="filter__filter-input" id="car-year-to" name="car-year-to">
-                        <option value="" hidden>Year To</option>
-                    </select>
+                    {{ car_filters_form.manufacture_year(class="filter__filter-input", id="car-filter-manufacture-year")}}
+                    {{ car_filters_form.condition(class="filter__filter-input", id="car-filter-condition")}}
                 </div>
                 <!-- Filters Row 5 -->
                 <div class="filter-row">
-                    <select class="filter__filter-input" id="car-condition" name="car-condition">
-                        <option value="" hidden>Condition</option>
-                        <option value="1.0-2.0">Bad</option>
-                        <option value="2.0-3.0">Normal</option>
-                        <option value="3.0-4.0">Good</option>
-                        <option value="4.0-5.0">Excellent</option>
-                    </select>
-                    <select class="filter__filter-input" id="car-odometer" name="car-odometer">
-                        <option value="" hidden>Odometer</option>
-                        <option value="0-50000">&lt; 50k </option>
-                        <option value="50000-100000">50k-100k</option>
-                        <option value="100000-200000">100k-200k</option>
-                        <option value="200000-inf">&gt; 200k</option>
-                    </select>
+                    {{ car_filters_form.odometer(class="filter__filter-input", id="car-filter-odometer") }}
+                    {{ car_filters_form.car_search_choice(class="filter__filter-input", id="car-filter-choice") }} 
                 </div>
                 <div class="search-btn-div">
-                    <button class="btn btn-outline-success search-btn" type="submit">Search</button>
+                    {{ car_filters_form.submit(class="btn btn-outline-success search-btn") }}
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    var brandSelect = document.getElementById('car-filter-brand');
+    var noneOption = brandSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
 
+    var modelSelect = document.getElementById('car-filter-model');
+    var noneOption = modelSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    var bodyTypeSelect = document.getElementById('car-filter-body_type');
+    var noneOption = bodyTypeSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    var transmissionSelect = document.getElementById('car-filter-transmission');
+    var noneOption = transmissionSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    // car-filter-seller-name
+    var sellerSelect = document.getElementById('car-filter-seller-name');
+    var noneOption = sellerSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    // car-filter-city
+    var citySelect = document.getElementById('car-filter-city');
+    var noneOption = citySelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    // car-filter-manufacture-year
+    var manufactureYearSelect = document.getElementById('car-filter-manufacture-year');
+    var noneOption = manufactureYearSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    // car-filter-condition
+    var conditionSelect = document.getElementById('car-filter-condition');
+    var noneOption = conditionSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    // car-filter-odometer
+    var odometerSelect = document.getElementById('car-filter-odometer');
+    var noneOption = odometerSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+
+    // car-filter-choice
+    var filterChoiceSelect = document.getElementById('car-filter-choice');
+    var noneOption = filterChoiceSelect.querySelector('option[value="__None"]');
+    noneOption.setAttribute('hidden', 'hidden');
+});
+</script>
 {% endblock %}

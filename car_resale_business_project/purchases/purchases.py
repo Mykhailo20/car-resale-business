@@ -22,7 +22,6 @@ def last_purchased():
     # Fetch distinct manufacture years
     car_manufacture_years = Car.query.with_entities(Car.manufacture_year).distinct().all()
     car_manufacture_years = [year[0] for year in car_manufacture_years]
-    print(f"car_manufacture_years = {car_manufacture_years}")
 
     # Fetch distinct cities
     cities = db.session.query(City).distinct(City.name).all()
