@@ -31,7 +31,7 @@ function handleFilterChange() {
             // Request successful, update car cards with fetched data
             var responseData = JSON.parse(xhr.responseText);
             console.log("responseData = ", responseData);
-            updateCarCards(responseData);
+            updateCarCards(responseData['purchasesData'], responseData['mainPage'], responseData['pages'], responseData['urls']);
         }
     };
     xhr.send(JSON.stringify(data));
@@ -44,7 +44,7 @@ filters.forEach(function(filter) {
 });
 
 
-function updateCarCards(purchasesData, mainPage) {
+function updateCarCards(purchasesData, mainPage, pages, urls) {
     var carCardsContainer = document.querySelector('.car-cards');
     var carCards = document.querySelectorAll('.car-card');
     carCards.forEach(function(card) {
@@ -58,7 +58,6 @@ function updateCarCards(purchasesData, mainPage) {
         </div>`;
         return; // Exit the function early
     }
-
     purchasesData.forEach(function(purchase) {
         var carCardHTML = `
             <div class="car-card">
@@ -111,4 +110,36 @@ function updateCarCards(purchasesData, mainPage) {
             </div>`;
         carCardsContainer.innerHTML += carCardHTML;
     });
+
+    // Generate pagination buttons
+    var paginationContainer = document.querySelector('.car-cards-pagination');
+    paginationContainer.innerHTML = ''; // Clear the pagination container
+
+    if (pages) {
+        if (pages.has_prev) {
+            paginationContainer.innerHTML += `
+            <div class="car-cards-pagination__item">
+                <a href="${mainPage ? urls['last_purchased'] : urls['search_results']}" class="btn btn-outline-success btn-sm">Next</a>
+            </div>`;
+        }
+
+        pages.forEach(function(page_num) {
+            if (page_num) {
+                if (page_num === 1) {
+                    paginationContainer.innerHTML += `
+                    <div class="car-cards-pagination__item">
+                        <a href="${mainPage ? urls['last_purchased'][page_num] : urls['search_results'][page_num]}" class="btn btn-success btn-sm">${page_num}</a>
+                    </div>`;
+                } else {
+                    paginationContainer.innerHTML += `
+                    <div class="car-cards-pagination__item">
+                        <a href="${mainPage ? urls['last_purchased'][page_num] : urls['search_results'][page_num]}" class="btn btn-outline-success btn-sm">${page_num}</a>
+                    </div>`;
+                }
+            } else {
+                paginationContainer.innerHTML += `
+                <div class="car-cards-pagination__item">...</div>`;
+            }
+        });
+    }
 }
