@@ -39,8 +39,9 @@
 
 /* Car Cards */
 .car-cards {
-    width: 80%;
+    width: 100%;
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
 }
 
@@ -52,6 +53,12 @@
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: rgba(144, 144, 144, 0.1);
+}
+
+.car-cards-pagination-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .car-card__left-side {
@@ -145,4 +152,16 @@
     font-weight: bold;
     font-size: 24px;
     margin-bottom: 0px;
+}
+
+.car-cards-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 75%;
+    margin-bottom: 1vh;
+}
+
+.car-cards-pagination__item {
+    margin-right: 2px;
 }

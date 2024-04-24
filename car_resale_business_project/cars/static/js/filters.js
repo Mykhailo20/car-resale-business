@@ -44,9 +44,12 @@ filters.forEach(function(filter) {
 });
 
 
-function updateCarCards(purchasesData) {
+function updateCarCards(purchasesData, mainPage) {
     var carCardsContainer = document.querySelector('.car-cards');
-    carCardsContainer.innerHTML = ''; // Clear the car cards container
+    var carCards = document.querySelectorAll('.car-card');
+    carCards.forEach(function(card) {
+        card.remove();
+    });
 
     if (purchasesData.length === 0) {
         carCardsContainer.innerHTML = `
@@ -106,7 +109,6 @@ function updateCarCards(purchasesData) {
                     </div>
                 </div>
             </div>`;
-        
         carCardsContainer.innerHTML += carCardHTML;
     });
 }

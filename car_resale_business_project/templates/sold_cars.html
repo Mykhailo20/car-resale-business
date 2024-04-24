@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="../static/css/last_purchased.css">
 <div class="page-links">
     {% if main_page == True %}
-        <a href="{{ url_for('cars.last_purchased') }}" class="link">Last Purchased Cars</a>
+        <a href="{{ url_for('index') }}" class="link">Last Purchased Cars</a> <!--index - To reset the filters -->
         <a href="{{ url_for('cars.last_sold') }}" class="link-active">Last Sold Cars</a>
     {% else %}
         <a href="{{ url_for('cars.search_results', search_place_choice='cars_in_storage') }}" class="link">Cars in Storage</a>

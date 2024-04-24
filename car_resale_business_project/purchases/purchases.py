@@ -6,7 +6,7 @@ from sqlalchemy import desc
 from car_resale_business_project import db
 from car_resale_business_project.models import Car, Purchase, Seller, Address, City
 from car_resale_business_project.utils.filter_cars import *
-from car_resale_business_project.config.website_config import LAST_PURCHASED_CARS_NUMBER
+from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 
 purchases = Blueprint("purchases", __name__, template_folder="templates", static_folder="static")

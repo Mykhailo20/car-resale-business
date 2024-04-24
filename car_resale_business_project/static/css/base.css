@@ -32,6 +32,13 @@ body {
 .btn-outline-success:hover {
     background-color: #1532CA;
 }
+.btn-success {
+    background-color: #1532CA;
+}
+.btn-success:hover {
+    background-color: #1532CA;
+}
+
 
 #navbar__search-form__search-input {
     border-width: 2px;
