@@ -14,11 +14,13 @@ function handleFilterChange() {
     
     // Prepare data to send in AJAX request
     var data = {
-        fromDate: fromDate,
-        toDate: toDate,
+        from_date: fromDate,
+        to_date: toDate,
         manufacture_year: manufacture_year,
-        location: location
+        city: location
     };
+
+    console.log('Send AJAX request to last_purchased/filter with filters ', data);
 
     // Make AJAX request
     var xhr = new XMLHttpRequest();
@@ -28,6 +30,7 @@ function handleFilterChange() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             // Request successful, update car cards with fetched data
             var responseData = JSON.parse(xhr.responseText);
+            console.log("responseData = ", responseData);
             updateCarCards(responseData);
         }
     };

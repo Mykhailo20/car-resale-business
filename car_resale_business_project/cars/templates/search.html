@@ -33,16 +33,31 @@
                 <!-- Filters Row 2 -->
                 <div class="filter-row">
                     {{ car_filters_form.body_type(class="filter__filter-input", id="car-filter-body_type") }}
-                    {{ car_filters_form.transmission(class="filter__filter-input", id="car-filter-transmission") }}
+                    <select class="filter__filter-input" id="car-filter-transmission" name="transmission">
+                        <option value="__None" hidden>Trasmission</option>
+                        {% for transmission in car_filters['transmission'] %}
+                            <option value="{{ transmission }}">{{ transmission }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <!-- Filters Row 3 -->
                 <div class="filter-row">
-                    {{ car_filters_form.seller_name(class="filter__filter-input", id="car-filter-seller-name")}} 
+                    <select class="filter__filter-input" id="car-filter-seller-name" name="transmission">
+                        <option value="__None" hidden>Seller</option>
+                        {% for seller_name in car_filters['seller_name'] %}
+                            <option value="{{ seller_name }}">{{ seller_name }}</option>
+                        {% endfor %}
+                    </select>
                     {{ car_filters_form.city(class="filter__filter-input", id="car-filter-city")}}
                 </div>
                 <!-- Filters Row 4 -->
                 <div class="filter-row">
-                    {{ car_filters_form.manufacture_year(class="filter__filter-input", id="car-filter-manufacture-year")}}
+                    <select class="filter__filter-input" id="car-filter-manufacture_year" name="manufacture_year">
+                        <option value="__None" hidden>Manufacture Year</option>
+                        {% for manufacture_year in car_filters['manufacture_year'] %}
+                            <option value="{{ manufacture_year }}">{{ manufacture_year }}</option>
+                        {% endfor %}
+                    </select>
                     {{ car_filters_form.condition(class="filter__filter-input", id="car-filter-condition")}}
                 </div>
                 <!-- Filters Row 5 -->

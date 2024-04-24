@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request, jsonify
+from flask import redirect, url_for, request, jsonify, session
 from sqlalchemy import func
 
 from car_resale_business_project import app
@@ -7,7 +7,9 @@ from car_resale_business_project.models import Car, CarMake
 
 @app.route('/')
 def index():
-    return redirect(url_for('purchases.last_purchased'))
+    session.clear()
+    print(f"main page -> clear session: session = {session}")
+    return redirect(url_for('cars.last_purchased'))
 
 
 @app.route('/get_car_brand_models/<make_id>')

@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var bodyTypeSelect = document.getElementById('car-filter-body_type');
     var noneOption = bodyTypeSelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
-
+    /*
     var transmissionSelect = document.getElementById('car-filter-transmission');
     var noneOption = transmissionSelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
@@ -19,17 +19,20 @@ window.addEventListener('DOMContentLoaded', function() {
     var sellerSelect = document.getElementById('car-filter-seller-name');
     var noneOption = sellerSelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
+    */
 
     // car-filter-city
     var citySelect = document.getElementById('car-filter-city');
     var noneOption = citySelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
 
+    /*
     // car-filter-manufacture-year
     var manufactureYearSelect = document.getElementById('car-filter-manufacture-year');
     var noneOption = manufactureYearSelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
-
+    */
+   
     // car-filter-condition
     var conditionSelect = document.getElementById('car-filter-condition');
     var noneOption = conditionSelect.querySelector('option[value="__None"]');
