@@ -2,8 +2,13 @@
 {% block content %}
 <link rel="stylesheet" href="../static/css/last_purchased.css">
 <div class="page-links">
-    <a href="#" class="link-active">Last Purchased Cars</a>
-    <a href="#" class="link">Last Sold Cars</a>
+    {% if main_page == True %}
+        <a href="{{ url_for('cars.last_purchased') }}" class="link-active">Last Purchased Cars</a>
+        <a href="{{ url_for('cars.last_sold') }}" class="link">Last Sold Cars</a>
+    {% else %}
+        <a href="{{ url_for('cars.search_results', search_place_choice='cars_in_storage') }}" class="link-active">Cars in Storage</a>
+        <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold') }}" class="link">Sold Cars</a>
+    {% endif %}
     <a href="{{ url_for('cars.search') }}" class="link">Find Car</a>
 </div>
 <hr class="divide-line">
@@ -19,7 +24,7 @@
             <select class="filter__filter-input" id="manufacture-year" name="manufacture-year">
                 <option value="" hidden>Year</option>
                 <option value="All">All</option>
-                {% for manufacture_year in car_manufacture_years %}
+                {% for manufacture_year in filter_values_dict['car_manufacture_years'] %}
                     <option value="{{ manufacture_year }}">{{ manufacture_year }}</option>
                 {% endfor %}
             </select>
@@ -29,14 +34,14 @@
             <select class="filter__filter-input" id="location-city" name="location-city">
                 <option value="" hidden>City</option>
                 <option value="All">All</option>
-                {% for city in cities %}
-                <option value="{{ city.name }}">{{ city.name }}</option>
+                {% for city in filter_values_dict['cities'] %}
+                    <option value="{{ city.name }}">{{ city.name }}</option>
                 {% endfor %}
             </select>
         </div>
     </div>
     <div class="car-cards">
-        {% for purchase in last_purchases %}
+        {% for purchase in purchased_cars %}
             <div class="car-card">
                 <div class="car-card__left-side">
                     <div class="car-card__left-side__car-image">

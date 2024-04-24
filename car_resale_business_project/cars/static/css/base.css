@@ -1,0 +1,38 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.divide-line {
+    border: none;
+    border-top: 1px solid black;
+    height: 1px;
+    margin: 1vh 1vw 3vh;
+}
+
+.search-form-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 1vh;
+}
+
+.navbar {
+    background-color: #d5d5d5 !important;
+}
+.navbar-brand {
+    font-size: 24px;
+    font-weight: 600;
+}
+.navbar-nav .nav-link {
+    font-weight: 400;
+}
+.btn-outline-success {
+    color: #1532CA;
+    border-color: #1532CA;
+}
+.btn-outline-success:hover {
+    background-color: #1532CA;
+}
+
+#navbar__search-form__search-input {
+    border-width: 2px;
+}

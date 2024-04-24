@@ -42,11 +42,12 @@ window.addEventListener('DOMContentLoaded', function() {
     var odometerSelect = document.getElementById('car-filter-odometer');
     var noneOption = odometerSelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
-
+    /*
     // car-filter-choice
     var filterChoiceSelect = document.getElementById('car-filter-choice');
     var noneOption = filterChoiceSelect.querySelector('option[value="__None"]');
     noneOption.setAttribute('hidden', 'hidden');
+    */
 });
 
 document.addEventListener("DOMContentLoaded", function() {

@@ -8,7 +8,6 @@ from car_resale_business_project.models import Car, CarMake
 @app.route('/')
 def index():
     session.clear()
-    print(f"main page -> clear session: session = {session}")
     return redirect(url_for('cars.last_purchased'))
 
 

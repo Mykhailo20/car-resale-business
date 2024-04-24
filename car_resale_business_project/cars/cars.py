@@ -4,38 +4,37 @@ from sqlalchemy import desc
 from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
 from car_resale_business_project.cars.utils.filters import *
-from car_resale_business_project.models import Car, Seller, Purchase, Address, City
+from car_resale_business_project.models import Car, Seller, Purchase, Sale
 from car_resale_business_project.config.website_config import LAST_PURCHASED_CARS_NUMBER
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
 
+
 @cars.route('/last_purchased')
 def last_purchased():
 
-    # Fetch distinct manufacture years
-    car_manufacture_years = Car.query.with_entities(Car.manufacture_year).distinct().all()
-    car_manufacture_years = [year[0] for year in car_manufacture_years]
-
-    # Fetch distinct cities
-    cities = db.session.query(City).distinct(City.name).all()
-
     # Fetch the top 5 last purchases sorted by purchase date
     last_purchases = Purchase.query.order_by(desc(Purchase.purchase_date)).limit(LAST_PURCHASED_CARS_NUMBER).all()
-    
-    return render_template('last_purchased.html', car_manufacture_years=car_manufacture_years, cities=cities, last_purchases=last_purchases)
+    filter_values_dict = get_filter_values()
+
+    return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=last_purchases, main_page=True)
+
 
 @cars.route('/last_purchased/filter', methods=['POST'])
 def last_purchased_filter():
 
     filters = request.json
-    filter_operations = get_filter_operations()
+    filter_operations = get_purchase_filter_operations()
     for filter_name, filter_value in filters.items():
+        if filter_name == 'csrf_token':
+            continue
         session[filter_name] = filter_value
+
+    print(f"/last_purchased/filter: session = {session}")
 
     base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
     # Apply filters directly in the database query
     for filter_name, filter_value in session.items():
-        print(f"filter_name = {filter_name}; filter_value={filter_value}")
         if filter_value and filter_value != 'All':
             filter_operation = filter_operations.get(filter_name)
             if filter_operation:
@@ -47,14 +46,17 @@ def last_purchased_filter():
     # Execute the query and fetch the results
     filtered_purchases = base_query.all()
     filtered_purchases_dict = [purchase.to_dict() for purchase in filtered_purchases]
-    # print(f"filtered_purchases_dict = {filtered_purchases_dict}")
 
     return jsonify(filtered_purchases_dict)
 
 
+@cars.route('/last_sold')
+def last_sold():
+    return render_template('sold_cars.html', main_page=True)
+
+
 @cars.route('/search', methods=['GET', 'POST'])
 def search():
-
     session.clear()
     car_vin_form = SearchByVinForm()
     car_filters_form = SearchByFiltersForm()
@@ -66,18 +68,16 @@ def search():
     
     if car_filters_form.identifier.data == "car_filters_form" and request.method == 'POST': # It is not quite correct
         form_data = request.form.to_dict()
-        print(f"form_data = {form_data}")
         # Extract filters from the form
         filters = {}
         for key, value in form_data.items():
-            if key in ['csrf_token', 'identifier', 'submit']:
+            if key in ['csrf_token', 'identifier', 'submit', 'car_search_choice']:
                 continue
 
             if value != '__None':
                 filters[key] = value
 
-        print("Filters:", filters)
-        return redirect(url_for('cars.search_results', **filters))
+        return redirect(url_for('cars.search_results', search_place_choice=form_data['car_search_choice'], **filters))
         # return f"<h1>Cars Search Result</h1><p>You searched for form_data.get('brand') form_data.get('model')</p>"
 
     car_filters = {}
@@ -97,18 +97,26 @@ def search():
     return render_template("search.html", car_vin_form=car_vin_form, car_filters_form=car_filters_form, car_filters=car_filters)
 
 
-@cars.route('/search_results', methods=['GET'])
-def search_results():
+@cars.route('/search_results/<search_place_choice>', methods=['GET'])
+def search_results(search_place_choice):
+
     # Retrieve filter parameters from the AJAX request
     filters = request.args
-    filter_operations = get_filter_operations()
+
+    base_query = Purchase.query.filter(Purchase.car_vin.not_in(Sale.query.with_entities(Sale.car_vin))).order_by(desc(Purchase.purchase_date))
+    filter_operations = get_purchase_filter_operations()
+
+    # Check if the "car_search_choice" filter is set to "cars_sold"
+    if search_place_choice == 'cars_sold':
+        base_query = Sale.query.order_by(desc(Sale.sale_date))
+        filter_operations = get_sale_filter_operations()
+
     for filter_name, filter_value in filters.items():
+        if filter_name == 'csrf_token':
+            continue
         session[filter_name] = filter_value
 
     print(f"/search_results: session = {session}")
-
-    # Construct the base query
-    base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
 
     # Apply filters directly in the database query
     for filter_name, filter_value in session.items():
@@ -119,12 +127,12 @@ def search_results():
 
     base_query = base_query.limit(LAST_PURCHASED_CARS_NUMBER)
 
-    filtered_purchases = base_query.all()
-    # Fetch distinct manufacture years
-    car_manufacture_years = Car.query.with_entities(Car.manufacture_year).distinct().all()
-    car_manufacture_years = [year[0] for year in car_manufacture_years]
+    filtered_transaction_records = base_query.all()
 
-    # Fetch distinct cities
-    cities = db.session.query(City).distinct(City.name).all()
+    print(f"search_place_choice = {search_place_choice}")
+    print(f"filtered_transaction_records = {filtered_transaction_records}")
 
-    return render_template('last_purchased.html', car_manufacture_years=car_manufacture_years, cities=cities, last_purchases=filtered_purchases)
+    filter_values_dict = get_filter_values()
+    if search_place_choice == 'cars_in_storage':
+        return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=filtered_transaction_records, main_page=False)
+    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, sold_cars=filtered_transaction_records, main_page=False)

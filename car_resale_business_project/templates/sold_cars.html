@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/last_purchased.css">
+<div class="page-links">
+    {% if main_page == True %}
+        <a href="{{ url_for('cars.last_purchased') }}" class="link">Last Purchased Cars</a>
+        <a href="{{ url_for('cars.last_sold') }}" class="link-active">Last Sold Cars</a>
+    {% else %}
+        <a href="{{ url_for('cars.search_results', search_place_choice='cars_in_storage') }}" class="link">Cars in Storage</a>
+        <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold') }}" class="link-active">Sold Cars</a>
+    {% endif %}
+    <a href="{{ url_for('cars.search') }}" class="link">Find Car</a>
+</div>
+<hr class="divide-line">
+<h1>This is the page for sold cars</h1>
+<script src="../static/js/filters.js"></script>
+{% endblock %}

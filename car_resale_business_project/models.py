@@ -451,3 +451,59 @@ class Purchase(db.Model):
             'seller': self.seller.to_dict() if self.seller else None,
             'employee': self.employee.to_dict() if self.employee else None,
         }
+    
+
+@dataclass
+class Sale(db.Model):
+    __tablename__ = 'sale'
+
+    car_vin: str
+    buyer_id: int
+    employee_id: int
+    mmr: int
+    price: int
+    odometer: int
+    condition : float
+    description: str
+    car_image: bytes
+    content_type: str
+    sale_date: date
+
+    car_vin = db.Column(db.String(17),  db.ForeignKey('car.vin'), primary_key=True)
+    buyer_id = db.Column(db.Integer, db.ForeignKey('buyer.person_id'))
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.person_id'))
+    mmr = db.Column(db.Integer)
+    price = db.Column(db.Integer)
+    odometer = db.Column(db.Integer)
+    condition = db.Column(db.Numeric(2, 1))
+    description = db.Column(db.Text)
+    car_image =  db.Column(BYTEA)
+    content_type = db.Column(db.String(10))
+    sale_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime)
+    updated_at = db.Column(db.DateTime)
+
+    # Define the relationship with the Car table
+    car = db.relationship('Car', backref='sale')
+    buyer = db.relationship('Buyer', backref='sale', lazy=True)
+    employee = db.relationship('Employee', backref='sale', lazy=True)
+
+    def to_dict(self):
+        return {
+            'car_vin': self.car_vin,
+            'buyer_id': self.buyer_id,
+            'employee_id': self.employee_id,
+            'mmr': self.mmr,
+            'price': self.price,
+            'odometer': self.odometer,
+            'condition': float(self.condition) if self.condition is not None else None,
+            'description': self.description,
+            'car_image': self.car_image,
+            'content_type': self.content_type,
+            'sale_date': self.sale_date.isoformat() if self.sale_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'car': self.car.to_dict() if self.car else None,
+            'buyer': self.buyer.to_dict() if self.buyer else None,
+            'employee': self.employee.to_dict() if self.employee else None,
+        }

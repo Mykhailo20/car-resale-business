@@ -39,13 +39,20 @@ class SearchByFiltersForm(FlaskForm):
                                   ("200000-inf", "> 200k")
                                 ]
                             )
-    
+    """
     car_search_choice = SelectField(choices=
                                 [
                                   ("__None", "Search Choice"),
                                   ("all", "All"),
-                                  ("storage", "Cars in Storage"),
-                                  ("sold", "Sold Cars")
+                                  ("cars_in_storage", "Cars in Storage"),
+                                  ("cars_sold", "Sold Cars")
                                 ]
+                            )
+    """
+    car_search_choice = SelectField(choices=
+                                [
+                                  ("cars_in_storage", "Cars in Storage"),
+                                  ("cars_sold", "Sold Cars")
+                                ], default=("cars_in_storage", "Cars in Storage")
                             )
     submit = SubmitField("Search")
