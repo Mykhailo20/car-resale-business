@@ -13,7 +13,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{oltp_config_dict['user']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-
 from car_resale_business_project.purchases.purchases import purchases
 from car_resale_business_project.cars.cars import cars
 

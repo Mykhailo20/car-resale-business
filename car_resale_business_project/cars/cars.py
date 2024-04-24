@@ -4,7 +4,7 @@ from sqlalchemy import desc
 from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
 from car_resale_business_project.cars.utils.filters import *
-from car_resale_business_project.models import Car, Seller, Purchase, Sale
+from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale
 from car_resale_business_project.config.website_config import LAST_PURCHASED_CARS_NUMBER
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
@@ -60,7 +60,6 @@ def search():
     session.clear()
     car_vin_form = SearchByVinForm()
     car_filters_form = SearchByFiltersForm()
-
     if car_vin_form.identifier.data == "car_vin_form" and request.method == 'POST': # It is not quite correct
         car_vin = car_vin_form.car_vin.data
         return redirect(url_for('cars.search_results', **{'car_vin': car_vin}))
@@ -80,6 +79,21 @@ def search():
         return redirect(url_for('cars.search_results', search_place_choice=form_data['car_search_choice'], **filters))
         # return f"<h1>Cars Search Result</h1><p>You searched for form_data.get('brand') form_data.get('model')</p>"
 
+    if request.form.get('identifier') == 'navbar_search_form' and request.method == 'POST': # It is not quite correct
+        search_field_value = request.form.get('navbar_search_field')
+        # Split the search field value into brand and model
+        search_values = search_field_value.split(' ', 1)
+        brand = search_values[0]
+        model = None
+        brand = CarMake.query.filter_by(name=brand).first()
+        if len(search_values) == 2:
+            model = search_values[1]
+        filters = {
+            'brand': brand.car_make_id if brand else -1, # # It is not quite correct
+            'model': model
+        }
+        return redirect(url_for('cars.search_results', search_place_choice='cars_sold', **filters))
+        
     car_filters = {}
 
     car_transmissions = Car.query.with_entities(Car.transmission).distinct().all()
@@ -128,6 +142,8 @@ def search_results(search_place_choice):
     base_query = base_query.limit(LAST_PURCHASED_CARS_NUMBER)
 
     filtered_transaction_records = base_query.all()
+
+    print(f"filtered_transaction_records = {filtered_transaction_records}")
 
     filter_values_dict = get_filter_values()
     if search_place_choice == 'cars_in_storage':

@@ -37,8 +37,9 @@
                         <a class="nav-link" href="#">Cubes Export</a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="d-flex" method='POST' action="{{ url_for('cars.search') }}">
+                    <input hidden="" id="navbar-search-form-identifier" name="identifier" type="text" value="navbar_search_form">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="navbar_search_field">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>
