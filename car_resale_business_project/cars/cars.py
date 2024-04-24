@@ -129,9 +129,6 @@ def search_results(search_place_choice):
 
     filtered_transaction_records = base_query.all()
 
-    print(f"search_place_choice = {search_place_choice}")
-    print(f"filtered_transaction_records = {filtered_transaction_records}")
-
     filter_values_dict = get_filter_values()
     if search_place_choice == 'cars_in_storage':
         return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=filtered_transaction_records, main_page=False)

@@ -48,6 +48,14 @@ function updateCarCards(purchasesData) {
     var carCardsContainer = document.querySelector('.car-cards');
     carCardsContainer.innerHTML = ''; // Clear the car cards container
 
+    if (purchasesData.length === 0) {
+        carCardsContainer.innerHTML = `
+        <div class="no-cars-found-message">
+            <p>No cars were found for the specified parameters</p>
+        </div>`;
+        return; // Exit the function early
+    }
+
     purchasesData.forEach(function(purchase) {
         var carCardHTML = `
             <div class="car-card">

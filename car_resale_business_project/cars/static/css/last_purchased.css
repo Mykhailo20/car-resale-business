@@ -130,3 +130,19 @@
     align-items: center;
     margin-bottom: 5%;
 }
+
+.no-cars-found-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color:  rgba(144, 144, 144, 0.1);
+    width: calc(75%);
+    height: 10vh;
+    border-radius: 10px;
+}
+
+.no-cars-found-message p {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 0px;
+}
