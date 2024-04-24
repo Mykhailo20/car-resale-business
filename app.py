@@ -1,8 +1,8 @@
-from flask import redirect, url_for, request, render_template
+from flask import redirect, url_for, request, jsonify
+from sqlalchemy import func
 
 from car_resale_business_project import app
-from car_resale_business_project.models import Car
-
+from car_resale_business_project.models import Car, CarMake
 
 
 @app.route('/')
@@ -10,12 +10,15 @@ def index():
     return redirect(url_for('purchases.last_purchased'))
 
 
-@app.route('/get_car_brand_models')
-def get_car_brand_models():
-    make_id = request.args.get("brand", type=int)
+@app.route('/get_car_brand_models/<make_id>')
+def get_car_brand_models(make_id):
+    if make_id is None:
+        return "Make not found", 404
     car_unique_models = Car.query.filter_by(make_id=make_id).distinct(Car.model).all()
-    print(f"car_unique_models = {car_unique_models}")
-    return render_template("car_model_options.html", cars=car_unique_models)
+    # Serialize the list of car models to JSON
+    car_models_json = [{"model": car.model} for car in car_unique_models]
+    # Return the JSON response
+    return jsonify(car_models=car_models_json)
 
 
 

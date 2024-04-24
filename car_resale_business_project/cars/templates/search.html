@@ -22,13 +22,13 @@
             </form>
         </div>
         <div class="filter-form-container">
-            <form method="POST">
+            <form method="POST" id="filter-form-container__filter-form">
                 {{ car_filters_form.hidden_tag() }}
                 {{ car_filters_form.identifier(hidden=True, value='car_filters_form') }}
                 <!-- Filters Row 1 -->
                 <div class="filter-row">
                     {{ car_filters_form.brand(class="filter__filter-input", id="car-filter-brand") }}
-                    {{ car_filters_form.model(class="filter__filter-input", id="car-filter-model") }}
+                    {{ car_filters_form.model(class="filter__filter-input", id="car-filter-model", disabled="true") }}
                 </div>
                 <!-- Filters Row 2 -->
                 <div class="filter-row">
@@ -57,53 +57,5 @@
         </div>
     </div>
 </div>
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-    var brandSelect = document.getElementById('car-filter-brand');
-    var noneOption = brandSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    var modelSelect = document.getElementById('car-filter-model');
-    var noneOption = modelSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    var bodyTypeSelect = document.getElementById('car-filter-body_type');
-    var noneOption = bodyTypeSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    var transmissionSelect = document.getElementById('car-filter-transmission');
-    var noneOption = transmissionSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    // car-filter-seller-name
-    var sellerSelect = document.getElementById('car-filter-seller-name');
-    var noneOption = sellerSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    // car-filter-city
-    var citySelect = document.getElementById('car-filter-city');
-    var noneOption = citySelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    // car-filter-manufacture-year
-    var manufactureYearSelect = document.getElementById('car-filter-manufacture-year');
-    var noneOption = manufactureYearSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    // car-filter-condition
-    var conditionSelect = document.getElementById('car-filter-condition');
-    var noneOption = conditionSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    // car-filter-odometer
-    var odometerSelect = document.getElementById('car-filter-odometer');
-    var noneOption = odometerSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-
-    // car-filter-choice
-    var filterChoiceSelect = document.getElementById('car-filter-choice');
-    var noneOption = filterChoiceSelect.querySelector('option[value="__None"]');
-    noneOption.setAttribute('hidden', 'hidden');
-});
-</script>
+<script src="../static/js/search_car.js"></script>
 {% endblock %}
