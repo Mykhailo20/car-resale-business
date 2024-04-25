@@ -16,16 +16,63 @@
     <div class="filters">
         <div class="filter">
             <label class="filter__filter-input_label" for="purchase-date-from">Purchase Date:</label>
-            <input class="filter__filter-input" type="date" id="purchase-date-from" name="purchase-date-from" placeholder="From"> <!-- From Date -->
-            <input class="filter__filter-input" type="date" id="purchase-date-to" name="purchase-date-to" placeholder="To"> <!-- To Date -->
+            <input class="filter__filter-input" type="date" id="purchase-date-from" name="purchase-date-from" placeholder="From" value="{% if session.get('purchase_date_from') %}{{ session['purchase_date_from'] }}{% endif %}">
+            <input class="filter__filter-input" type="date" id="purchase-date-to" name="purchase-date-to" placeholder="To" value="{% if session.get('purchase_date_from') %}{{ session['purchase_date_to'] }}{% endif %}">
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-brand">Brand:</label>
+            <select class="filter__filter-input" id="car-brand" name="car-brand">
+                <option value="" hidden>Brand</option>
+                <option value="All" {% if session.get('purchase_brand', '') == 'All' %} selected {% endif %}>All</option>
+                {% for car_brand in filter_values_dict['car_brands'] %}
+                    <option value="{{ car_brand['brand_id'] }}" {% if session.get('purchase_brand', '')|int == car_brand['brand_id'] %} selected {% endif %}>{{ car_brand['brand_name'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-model">Model:</label>
+            {% if session.get('purchase_brand', '') != '' %}
+                <select class="filter__filter-input" id="car-model" name="car-model">
+                    <option value="" hidden>Model</option>
+                    <option value="All" {% if session.get('purchase_model', '') == 'All' %} selected {% endif %}>All</option>
+                    {% for car_model in filter_values_dict['car_models'] %}
+                        <option value="{{ car_model }}" {% if session.get('purchase_model', '') == car_model %} selected {% endif %}>{{ car_model }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <select class="filter__filter-input" id="car-model" name="car-model" disabled title="First select the brand">
+                    <option value="" hidden>Model</option>
+                </select>
+            {% endif %}
+            
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-body-type">Body Type:</label>
+            <select class="filter__filter-input" id="car-body-type" name="car-body-type">
+                <option value="" hidden>Body</option>
+                <option value="All" {% if session.get('purchase_body_type', '') == 'All' %} selected {% endif %}>All</option>
+                {% for car_body_type in filter_values_dict['car_body_types'] %}
+                    <option value="{{ car_body_type['body_type_id'] }}" {% if session.get('purchase_body_type', '')|int == car_body_type['body_type_id'] %} selected {% endif %}>{{ car_body_type['body_type_name'] }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="filter">
             <label class="filter__filter-input_label" for="manufacture-year">Manufacture Year:</label>
             <select class="filter__filter-input" id="manufacture-year" name="manufacture-year">
                 <option value="" hidden>Year</option>
-                <option value="All">All</option>
+                <option value="All" {% if session.get('purchase_manufacture_year', '') == 'All' %} selected {% endif %}>All</option>
                 {% for manufacture_year in filter_values_dict['car_manufacture_years'] %}
-                    <option value="{{ manufacture_year }}">{{ manufacture_year }}</option>
+                    <option value="{{ manufacture_year }}" {% if session.get('purchase_manufacture_year', '')|int == manufacture_year %} selected {% endif %}>{{ manufacture_year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-transmission">Transmission:</label>
+            <select class="filter__filter-input" id="car-transmission" name="car-transmission">
+                <option value="" hidden>Transmission</option>
+                <option value="All" {% if session.get('purchase_transmission', '') == 'All' %} selected {% endif %}>All</option>
+                {% for car_transmission in filter_values_dict['car_transmissions'] %}
+                    <option value="{{ car_transmission }}" {% if session.get('purchase_transmission', '') == car_transmission %} selected {% endif %}>{{ car_transmission }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -33,11 +80,14 @@
             <label class="filter__filter-input_label" for="location-city">Location:</label>
             <select class="filter__filter-input" id="location-city" name="location-city">
                 <option value="" hidden>City</option>
-                <option value="All">All</option>
+                <option value="All" {% if session.get('purchase_city', '') == 'All' %} selected {% endif %}>All</option>
                 {% for city in filter_values_dict['cities'] %}
-                    <option value="{{ city.name }}">{{ city.name }}</option>
+                    <option value="{{ city.name }}" {% if session.get('purchase_city', '') == city.name %} selected {% endif %}>{{ city.name }}</option>
                 {% endfor %}
             </select>
+        </div>
+        <div class="filter">
+            <button id="reset-filters-btn" class="btn btn-outline-success">Reset</button>
         </div>
     </div>
     <div class="car-cards-pagination-container">

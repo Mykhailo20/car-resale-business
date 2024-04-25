@@ -27,7 +27,7 @@ def last_purchased():
                 base_query = base_query.filter(filter_operation(filter_value))
 
     last_purchases = base_query.paginate(page=session['page'], per_page=CAR_CARDS_PER_PAGE)
-    filter_values_dict = get_filter_values()
+    filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
     return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=last_purchases, main_page=True)
 
 
@@ -123,7 +123,7 @@ def search_results_last_purchased_filter():
     return jsonify(
         {
             "purchasesData": filtered_purchases_dict,
-            "mainPage": False,
+            "mainPage": True,
             "pages": pages,
             "urls": urls
         })
@@ -168,24 +168,12 @@ def search():
         if len(search_values) == 2:
             model = search_values[1]
         filters = {
-            'brand': brand.car_make_id if brand else -1, # # It is not quite correct
-            'model': model
+            'purchase_brand': brand.car_make_id if brand else -1, # # It is not quite correct
+            'purchase_model': model
         }
         return redirect(url_for('cars.search_results', search_place_choice='cars_sold', **filters))
         
-    car_filters = {}
-
-    car_transmissions = Car.query.with_entities(Car.transmission).distinct().all()
-    car_transmissions = [year[0] for year in car_transmissions]
-    car_filters['transmission'] = car_transmissions
-
-    seller_names = Seller.query.with_entities(Seller.name).distinct().all()
-    seller_names = [name[0] for name in seller_names]
-    car_filters['seller_name'] = seller_names
-
-    car_manufacture_years = Car.query.with_entities(Car.manufacture_year).distinct().all()
-    car_manufacture_years = [year[0] for year in car_manufacture_years]
-    car_filters['manufacture_year'] = car_manufacture_years
+    car_filters = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
 
     return render_template("search.html", car_vin_form=car_vin_form, car_filters_form=car_filters_form, car_filters=car_filters)
 
@@ -209,6 +197,7 @@ def search_results(search_place_choice):
     for filter_name, filter_value in filters.items():
         if filter_name in ['csrf_token']:
             continue
+        filter_name = 'sale_' + filter_name if (search_place_choice == 'cars_sold') else 'purchase_' + filter_name
         session[filter_name] = filter_value
 
     print(f"/search_results: session = {session}")
@@ -224,7 +213,10 @@ def search_results(search_place_choice):
 
     print(f"filtered_transaction_records = {filtered_transaction_records}")
 
-    filter_values_dict = get_filter_values()
+    filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
     if search_place_choice == 'cars_in_storage':
+        print(f"search_place_choice == 'cars_in_storage':")
+        print(f"filter_values_dict = {filter_values_dict}")
+        print(f"session = {session}")
         return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=filtered_transaction_records, main_page=False)
     return render_template('sold_cars.html', filter_values_dict=filter_values_dict, sold_cars=filtered_transaction_records, main_page=False)

@@ -1,23 +1,44 @@
 // Function to handle filter change
-function handleFilterChange() {
+function handleFilterChange(event) {
+    /*if (source === 'car-brand') {
+        // Reset the model select element
+        document.getElementById('car-model').value = '';
+    }*/
+    var element = event?.target;
+    if (element && (element.id === 'car-brand')) {
+        // Reset the model select element
+        document.getElementById('car-model').value = '';
+    }
+    
     // Get selected filter values
     var fromDate = document.getElementById("purchase-date-from").value;
     var toDate = document.getElementById("purchase-date-to").value;
-    var manufacture_year = document.getElementById("manufacture-year").value;
+    var brand = document.getElementById("car-brand").value;
+    var model = document.getElementById("car-model").value;
+    var bodyType = document.getElementById("car-body-type").value;
+    var manufactureYear = document.getElementById("manufacture-year").value;
+    var transmission = document.getElementById("car-transmission").value;
     var location = document.getElementById("location-city").value;
 
     // Provide default values for null filters
-    fromDate = fromDate || null; // Default to empty string if fromDate is null
-    toDate = toDate || null; // Default to empty string if toDate is null
-    manufacture_year = manufacture_year || "All"; // Default to "All" if seller is null
-    location = location || "All"; // Default to "All" if location is null
+    fromDate = fromDate || null;
+    toDate = toDate || null;
+    brand = brand || null;
+    bodyType = bodyType || null;
+    manufactureYear = manufactureYear || "All";
+    transmission = transmission || "All";
+    location = location || "All"; 
     
     // Prepare data to send in AJAX request
     var data = {
-        from_date: fromDate,
-        to_date: toDate,
-        manufacture_year: manufacture_year,
-        city: location
+        purchase_date_from: fromDate,
+        purchase_date_to: toDate,
+        purchase_brand: brand,
+        purchase_model: model,
+        purchase_body_type: bodyType,
+        purchase_manufacture_year: manufactureYear,
+        purchase_transmission: transmission,
+        purchase_city: location
     };
 
     console.log('Send AJAX request to last_purchased/filter with filters ', data);
@@ -38,9 +59,16 @@ function handleFilterChange() {
 }
 
 // Add event listeners to filters
-var filters = document.querySelectorAll('.filter__filter-input');
+/*var filters = document.querySelectorAll('.filter__filter-input');
 filters.forEach(function(filter) {
     filter.addEventListener('change', handleFilterChange);
+});*/
+
+var filters = document.querySelectorAll('.filter__filter-input');
+filters.forEach(function(filter) {
+    filter.addEventListener('change', function(event) {
+        handleFilterChange(event); // Pass the event to handleFilterChange function
+    });
 });
 
 
@@ -55,7 +83,7 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
     noCarsMsg.forEach(function(msg) {
         msg.remove();
     });
-    
+
     // Generate pagination buttons
     var paginationContainer = document.querySelector('.car-cards-pagination');
     paginationContainer.innerHTML = ''; // Clear the pagination container
@@ -148,3 +176,144 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
         });
     }
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Find the brand select element
+    var brandSelect = document.getElementById('car-brand');
+    
+    // Add event listener for change event
+    brandSelect.addEventListener('change', function() {
+        //handleFilterChange('car-brand');
+
+        var selectedBrand = this.value;
+        // Send AJAX request to fetch models for the selected brand
+        console.log('send ajax request to get car models for ', selectedBrand);
+        var xhrModels = new XMLHttpRequest();
+        xhrModels.open("GET", "/get_car_brand_models/" + selectedBrand, true);
+        xhrModels.onreadystatechange = function() {
+            if (xhrModels.readyState === 4) {
+                if (xhrModels.status === 200) {
+                    // Clear existing options
+                    var modelSelect = document.getElementById('car-model');
+                    
+                    // Remove all options
+                    modelSelect.innerHTML = `
+                        <option value="" hidden>Model</option>
+                        <option value="All">All</option>
+                    `;
+                    
+                    // Parse the response JSON
+                    var responseModels = JSON.parse(xhrModels.responseText);
+                    var carModels = responseModels.car_models;
+
+                    // Add new options based on the response
+                    carModels.forEach(function(model) {
+                        var option = document.createElement('option');
+                        option.value = model.model;
+                        option.textContent = model.model;
+                        modelSelect.appendChild(option);
+                    });
+                    
+                    // Enable the model select field
+                    modelSelect.disabled = false;
+                    modelSelect.title = '';
+                } else {
+                    console.error('Error fetching models:', xhrModels.statusText);
+                }
+            }
+        };
+        xhrModels.send();
+
+        // After fetching models, also fetch body types
+        console.log('send ajax request to get car body types for ', selectedBrand);
+        var xhrBodyTypes = new XMLHttpRequest();
+        xhrBodyTypes.open("GET", "/get_car_brand_body_types/" + selectedBrand, true);
+        xhrBodyTypes.onreadystatechange = function() {
+            if (xhrBodyTypes.readyState === 4) {
+                if (xhrBodyTypes.status === 200) {
+                    // Parse the response JSON
+                    var responseBodyTypes = JSON.parse(xhrBodyTypes.responseText);
+                    var carBodyTypes = responseBodyTypes.car_body_types;
+                    console.log("responseBodyTypes = ", carBodyTypes);
+
+                    var bodyTypeSelect = document.getElementById('car-body-type');
+                    // Remove all options
+                    bodyTypeSelect.innerHTML = `
+                        <option value="" hidden>Body</option>
+                        <option value="All">All</option>
+                    `;
+                    carBodyTypes.forEach(function(body_type) {
+                        var option = document.createElement('option');
+                        option.value = body_type.body_type_id;
+                        option.textContent = body_type.body_type_name;
+                        bodyTypeSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Error fetching body types:', xhrBodyTypes.statusText);
+                }
+            }
+        };
+        xhrBodyTypes.send();
+    });
+
+    // Find the model select element
+    var modelSelect = document.getElementById('car-model');
+
+    // Add event listener for change event
+    modelSelect.addEventListener('change', function() {
+        var selectedBrand = document.getElementById('car-brand').value;
+        var selectedModel = this.value;
+
+        // Send AJAX request to fetch body types for the selected brand and model
+        console.log('send ajax request to get body types for brand:', selectedBrand, 'and model:', selectedModel);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/get_car_brand_model_body_types/" + selectedBrand + "/" + selectedModel, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    // Parse the response JSON
+                    var responseBodyTypes = JSON.parse(xhr.responseText);
+                    var carBodyTypes = responseBodyTypes.car_body_types;
+                    console.log("responseBodyTypes = ", carBodyTypes);
+
+                    var bodyTypeSelect = document.getElementById('car-body-type');
+                    // Remove all options
+                    bodyTypeSelect.innerHTML = `
+                        <option value="" hidden>Body</option>
+                        <option value="All">All</option>
+                    `;
+                    carBodyTypes.forEach(function(body_type) {
+                        var option = document.createElement('option');
+                        option.value = body_type.body_type_id;
+                        option.textContent = body_type.body_type_name;
+                        bodyTypeSelect.appendChild(option);
+                    });
+                    console.log('Body types for brand:', selectedBrand, 'and model:', selectedModel, 'are:', carBodyTypes);
+                } else {
+                    console.error('Error fetching body types:', xhr.statusText);
+                }
+            }
+        };
+        xhr.send();
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Find the reset filters button
+    var resetFiltersBtn = document.getElementById('reset-filters-btn');
+    
+    // Add event listener for click event
+    resetFiltersBtn.addEventListener('click', function() {
+        // Reset all filter values
+        document.getElementById('purchase-date-from').value = '';
+        document.getElementById('purchase-date-to').value = '';
+        document.getElementById('car-brand').value = '';
+        document.getElementById('car-model').value = '';
+        document.getElementById('car-body-type').value = '';
+        document.getElementById('manufacture-year').value = '';
+        document.getElementById('car-transmission').value = '';
+        document.getElementById('location-city').value = ''; 
+
+        handleFilterChange();
+    });
+});
