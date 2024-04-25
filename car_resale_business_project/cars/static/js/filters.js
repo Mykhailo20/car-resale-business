@@ -50,11 +50,19 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
     carCards.forEach(function(card) {
         card.remove();
     });
+    var noCarsMsg = document.querySelectorAll('.no-cars-found-message');
+    noCarsMsg.forEach(function(msg) {
+        msg.remove();
+    });
+
+    // Generate pagination buttons
+    var paginationContainer = document.querySelector('.car-cards-pagination');
+    paginationContainer.innerHTML = ''; // Clear the pagination container
 
     if (purchasesData.length === 0) {
         carCardsContainer.innerHTML = `
         <div class="no-cars-found-message">
-            <p>No cars were found for the specified parameters</p>
+            <p>No car was found for the specified parameters</p>
         </div>`;
         return; // Exit the function early
     }
@@ -111,11 +119,7 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
         carCardsContainer.innerHTML += carCardHTML;
     });
 
-    // Generate pagination buttons
-    var paginationContainer = document.querySelector('.car-cards-pagination');
-    paginationContainer.innerHTML = ''; // Clear the pagination container
-
-    if (pages) {
+    if (pages.length > 1) {
         if (pages.has_prev) {
             paginationContainer.innerHTML += `
             <div class="car-cards-pagination__item">
