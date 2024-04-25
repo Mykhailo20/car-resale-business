@@ -177,7 +177,8 @@ def search():
     car_filters_form = SearchByFiltersForm()
     if car_vin_form.identifier.data == "car_vin_form" and request.method == 'POST': # It is not quite correct
         car_vin = car_vin_form.car_vin.data
-        return redirect(url_for('cars.search_results', **{'car_vin': car_vin}))
+        print(f"car_vin_form.identifier.data == 'car_vin_form': session = {session}")
+        return redirect(url_for('cars.search_results', search_place_choice='cars_sold', **{'car_vin': car_vin}))
     
     if car_filters_form.identifier.data == "car_filters_form" and request.method == 'POST': # It is not quite correct
         form_data = request.form.to_dict()

@@ -1,5 +1,9 @@
 // Function to handle filter change
 function handleFilterChange(event) {
+    /*if (source === 'car-brand') {
+        // Reset the model select element
+        document.getElementById('car-model').value = '';
+    }*/
     var element = event?.target;
     if (element && (element.id === 'car-brand')) {
         // Reset the model select element
@@ -27,6 +31,7 @@ function handleFilterChange(event) {
     
     // Prepare data to send in AJAX request
     var data = {
+        purchase_car_vin: '',
         purchase_date_from: fromDate,
         purchase_date_to: toDate,
         purchase_brand: brand,
@@ -53,6 +58,12 @@ function handleFilterChange(event) {
     };
     xhr.send(JSON.stringify(data));
 }
+
+// Add event listeners to filters
+/*var filters = document.querySelectorAll('.filter__filter-input');
+filters.forEach(function(filter) {
+    filter.addEventListener('change', handleFilterChange);
+});*/
 
 var filters = document.querySelectorAll('.filter__filter-input');
 filters.forEach(function(filter) {

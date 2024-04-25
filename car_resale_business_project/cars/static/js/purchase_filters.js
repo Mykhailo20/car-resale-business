@@ -31,6 +31,7 @@ function handleFilterChange(event) {
     
     // Prepare data to send in AJAX request
     var data = {
+        purchase_car_vin: '',
         purchase_date_from: fromDate,
         purchase_date_to: toDate,
         purchase_brand: brand,

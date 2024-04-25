@@ -97,99 +97,99 @@
                     <p>No car was found for the specified parameters</p>
                 </div>
             {% else %}
-                {% if transaction_cars.total > transaction_cars.per_page %}
-                    {% for transaction in transaction_cars.items %}
-                        <div class="car-card">
-                            <div class="car-card__left-side">
-                                <div class="car-card__left-side__car-image">
-                                    <img>
-                                </div>
-                                <button class="btn btn-outline-success details-btn">Details</button>
+                {% for transaction in transaction_cars.items %}
+                    <div class="car-card">
+                        <div class="car-card__left-side">
+                            <div class="car-card__left-side__car-image">
+                                <img>
                             </div>
-                            <div class="car-card__right-side">
-                                <div class="car-card__right-side__car-details-header">
-                                    <h3 class="car-card__right-side__car-details-header__model-trim">{{ transaction.car.make.name }} {{ transaction.car.model }} {{ transaction.car.trim }}</h3>
-                                    <p class="car-card__right-side__car-details-header__vin">vin: {{ transaction.car.vin }}</p>
-                                    <h3 class="car-card__right-side__car-details-header__price">{{ transaction.price }} $</h3>
-                                </div>
-                                <hr class="car-card__hr">
-                                <div class="car-card__right-side__car-details-body">
-                                    <div class="car-card__right-side__car-details-body__items">
-                                        <div class="car-card__right-side__car-details-body__items-col">
-                                            <div class="car-card__right-side__car-details-body__item">
-                                                <img src="../static/images/icons/calendar-icon.png" alt="manufacture-year-icon" width="20px" title="Car Manufacture Year">
-                                                <span>{{ transaction.car.manufacture_year }}</span>
-                                            </div>
-                                            <div class="car-card__right-side__car-details-body__item">
-                                                <img src="../static/images/icons/car-mileage-icon.png" alt="mileage-icon" width="20px" title="Car Mileage">
-                                                <span>{{ transaction.odometer }} mi</span>
-                                            </div>
-                                            <div class="car-card__right-side__car-details-body__item">
-                                                <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="Sale Date">
-                                                <span>{{ transaction.sale_date }}</span>
-                                            </div>
+                            <button class="btn btn-outline-success details-btn">Details</button>
+                        </div>
+                        <div class="car-card__right-side">
+                            <div class="car-card__right-side__car-details-header">
+                                <h3 class="car-card__right-side__car-details-header__model-trim">{{ transaction.car.make.name }} {{ transaction.car.model }} {{ transaction.car.trim }}</h3>
+                                <p class="car-card__right-side__car-details-header__vin">vin: {{ transaction.car.vin }}</p>
+                                <h3 class="car-card__right-side__car-details-header__price">{{ transaction.price }} $</h3>
+                            </div>
+                            <hr class="car-card__hr">
+                            <div class="car-card__right-side__car-details-body">
+                                <div class="car-card__right-side__car-details-body__items">
+                                    <div class="car-card__right-side__car-details-body__items-col">
+                                        <div class="car-card__right-side__car-details-body__item">
+                                            <img src="../static/images/icons/calendar-icon.png" alt="manufacture-year-icon" width="20px" title="Car Manufacture Year">
+                                            <span>{{ transaction.car.manufacture_year }}</span>
                                         </div>
-                                        <div class="car-card__right-side__car-details-body__items-col">
-                                            <div class="car-card__right-side__car-details-body__item">
-                                                <img src="../static/images/icons/transmission-icon.png" alt="transmission-icon" width="20px" title="Car Transmission">
-                                                <span>{{ transaction.car.transmission }}</span>
-                                            </div>
-                                            <div class="car-card__right-side__car-details-body__item">
-                                                <img src="../static/images/icons/color-icon.png" alt="color-icon" width="20px" title="Car Color">
-                                                <span>{{ transaction.car.color.name }}</span>
-                                            </div>
-                                            <div class="car-card__right-side__car-details-body__item">
-                                                <img src="../static/images/icons/location-icon.png" alt="location-icon" width="20px" title="Car Location">
-                                                <span>{{ transaction.buyer.address.city.name }}</span>
-                                            </div>
+                                        <div class="car-card__right-side__car-details-body__item">
+                                            <img src="../static/images/icons/car-mileage-icon.png" alt="mileage-icon" width="20px" title="Car Mileage">
+                                            <span>{{ transaction.odometer }} mi</span>
+                                        </div>
+                                        <div class="car-card__right-side__car-details-body__item">
+                                            <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="Sale Date">
+                                            <span>{{ transaction.sale_date }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="car-card__right-side__car-details-body__items-col">
+                                        <div class="car-card__right-side__car-details-body__item">
+                                            <img src="../static/images/icons/transmission-icon.png" alt="transmission-icon" width="20px" title="Car Transmission">
+                                            <span>{{ transaction.car.transmission }}</span>
+                                        </div>
+                                        <div class="car-card__right-side__car-details-body__item">
+                                            <img src="../static/images/icons/color-icon.png" alt="color-icon" width="20px" title="Car Color">
+                                            <span>{{ transaction.car.color.name }}</span>
+                                        </div>
+                                        <div class="car-card__right-side__car-details-body__item">
+                                            <img src="../static/images/icons/location-icon.png" alt="location-icon" width="20px" title="Car Location">
+                                            <span>{{ transaction.buyer.address.city.name }}</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>  
-                        </div>
-                    {% endfor %}
-                {% endif %}
+                            </div>
+                        </div>  
+                    </div>
+                {% endfor %}
             {% endif %}
         </div>
         <div class="car-cards-pagination">
-            {% if transaction_cars.has_prev %}
-            <div class="car-cards-pagination__item">
-                {% if main_page == True %}
-                    <a href="{{ url_for('cars.last_sold', page=transaction_cars.prev_num) }}" class="btn btn-outline-success btn-sm">Prev</a>
-                {% else %}
-                    <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=transaction_cars.prev_num) }}" class="btn btn-outline-success btn-sm">Prev</a>
+            {% if transaction_cars.total > transaction_cars.per_page %}
+                {% if transaction_cars.has_prev %}
+                <div class="car-cards-pagination__item">
+                    {% if main_page == True %}
+                        <a href="{{ url_for('cars.last_sold', page=transaction_cars.prev_num) }}" class="btn btn-outline-success btn-sm">Prev</a>
+                    {% else %}
+                        <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=transaction_cars.prev_num) }}" class="btn btn-outline-success btn-sm">Prev</a>
+                    {% endif %}
+                </div>
                 {% endif %}
-            </div>
-            {% endif %}
-            {% for page_num in transaction_cars.iter_pages() %}
-            <div class="car-cards-pagination__item">
-                {% if page_num %}
-                    {% if transaction_cars.page == page_num %}
-                        {% if main_page == True %}
-                            <a href="{{ url_for('cars.last_sold', page=page_num) }}" class="btn btn-success btn-sm">{{ page_num }}</a>
+                {% for page_num in transaction_cars.iter_pages() %}
+                <div class="car-cards-pagination__item">
+                    {% if page_num %}
+                        {% if transaction_cars.page == page_num %}
+                            {% if main_page == True %}
+                                <a href="{{ url_for('cars.last_sold', page=page_num) }}" class="btn btn-success btn-sm">{{ page_num }}</a>
+                            {% else %}
+                                <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=page_num) }}" class="btn btn-success btn-sm">{{ page_num }}</a>
+                            {% endif %}
                         {% else %}
-                            <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=page_num) }}" class="btn btn-success btn-sm">{{ page_num }}</a>
+                            {% if main_page == True %}
+                                <a href="{{ url_for('cars.last_sold', page=page_num) }}"  class="btn btn-outline-success btn-sm">{{ page_num }}</a>
+                            {% else %}
+                                <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=page_num) }}"  class="btn btn-outline-success btn-sm">{{ page_num }}</a>
+                            {% endif %}
                         {% endif %}
                     {% else %}
-                        {% if main_page == True %}
-                            <a href="{{ url_for('cars.last_sold', page=page_num) }}"  class="btn btn-outline-success btn-sm">{{ page_num }}</a>
-                        {% else %}
-                            <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=page_num) }}"  class="btn btn-outline-success btn-sm">{{ page_num }}</a>
-                        {% endif %}
+                        ...
                     {% endif %}
-                {% else %}
-                    ...
+                </div>  
+                {% endfor %}
+                {% if transaction_cars.has_next %}
+                <div class="car-cards-pagination__item">
+                    {% if main_page == True %}
+                        <a href="{{ url_for('cars.last_sold', page=transaction_cars.next_num) }}" class="btn btn-outline-success btn-sm">Next</a>
+                    {% else %}
+                        <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=transaction_cars.next_num) }}" class="btn btn-outline-success btn-sm">Next</a>
+                    {% endif %} 
+                </div>
                 {% endif %}
-            </div>  
-            {% endfor %}
-            {% if transaction_cars.has_next %}
-            <div class="car-cards-pagination__item">
-                {% if main_page == True %}
-                    <a href="{{ url_for('cars.last_sold', page=transaction_cars.next_num) }}" class="btn btn-outline-success btn-sm">Next</a>
-                {% else %}
-                    <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=transaction_cars.next_num) }}" class="btn btn-outline-success btn-sm">Next</a>
-                {% endif %} 
-            </div>
             {% endif %}
         </div>
     </div>

@@ -35,7 +35,7 @@
                     {{ car_filters_form.body_type(class="filter__filter-input", id="car-filter-body_type") }}
                     <select class="filter__filter-input" id="car-filter-transmission" name="transmission">
                         <option value="__None" hidden>Trasmission</option>
-                        {% for transmission in car_filters['transmission'] %}
+                        {% for transmission in car_filters['car_transmissions'] %}
                             <option value="{{ transmission }}">{{ transmission }}</option>
                         {% endfor %}
                     </select>
@@ -54,7 +54,7 @@
                 <div class="filter-row">
                     <select class="filter__filter-input" id="car-filter-manufacture_year" name="manufacture_year">
                         <option value="__None" hidden>Manufacture Year</option>
-                        {% for manufacture_year in car_filters['manufacture_year'] %}
+                        {% for manufacture_year in car_filters['car_manufacture_years'] %}
                             <option value="{{ manufacture_year }}">{{ manufacture_year }}</option>
                         {% endfor %}
                     </select>
