@@ -15,7 +15,10 @@ def index():
 def get_car_brand_models(make_id):
     if make_id is None:
         return "Make not found", 404
-    car_unique_models = Car.query.filter_by(make_id=make_id).distinct(Car.model).all()
+    if make_id == 'All':
+        car_unique_models = Car.query.distinct(Car.model).all()
+    else:
+        car_unique_models = Car.query.filter_by(make_id=make_id).distinct(Car.model).all()
     # Serialize the list of car models to JSON
     car_models_json = [{"model": car.model} for car in car_unique_models]
     # Return the JSON response
@@ -26,7 +29,10 @@ def get_car_brand_models(make_id):
 def get_car_brand_body_types(make_id):
     if make_id is None:
         return "Make not found", 404
-    car_unique_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name).join(Car).filter(Car.make_id == make_id).distinct().all()
+    if make_id == 'All':
+        car_unique_body_types = CarBodyType.query.distinct(CarBodyType.car_body_type_id, CarBodyType.name).all()
+    else:
+        car_unique_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name).join(Car).filter(Car.make_id == make_id).distinct().all()
 
     # Serialize the list of car models to JSON
     car_body_types_json = [{"body_type_id": body_type.car_body_type_id, "body_type_name": body_type.name} for body_type in car_unique_body_types]
@@ -38,7 +44,10 @@ def get_car_brand_body_types(make_id):
 def get_car_brand_manufacture_years(make_id):
     if make_id is None:
         return "Make not found", 404
-    car_unique_manufacture_years = Car.query.filter_by(make_id=make_id).distinct(Car.manufacture_year).all()
+    if make_id == 'All':
+        car_unique_manufacture_years = Car.query.distinct(Car.manufacture_year).all()
+    else:
+        car_unique_manufacture_years = Car.query.filter_by(make_id=make_id).distinct(Car.manufacture_year).all()
 
     # Serialize the list of car models to JSON
     car_manufacture_years_json = [{"manufacture_year": car.manufacture_year} for car in car_unique_manufacture_years]
@@ -53,11 +62,21 @@ def get_car_brand_model_body_types(make_id, model_name):
     
     if model_name is None:
         return "Model not found", 404
-    car_unique_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name)\
-                    .join(Car)\
-                    .filter(Car.make_id == make_id)\
-                    .filter(Car.model == model_name)\
-                    .distinct().all()
+    
+    if make_id == 'All':
+        car_unique_body_types = CarBodyType.query.distinct(CarBodyType.car_body_type_id, CarBodyType.name).all()
+    elif (make_id != 'All') and (model_name == 'All'):
+        car_unique_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name)\
+                        .join(Car)\
+                        .filter(Car.make_id == make_id)\
+                        .distinct().all()
+    else:
+        car_unique_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name)\
+                        .join(Car)\
+                        .filter(Car.make_id == make_id)\
+                        .filter(Car.model == model_name)\
+                        .distinct().all()
+        
     # Serialize the list of car models to JSON
     car_body_types_json = [{"body_type_id": body_type.car_body_type_id, "body_type_name": body_type.name} for body_type in car_unique_body_types]
     # Return the JSON response

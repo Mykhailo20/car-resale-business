@@ -12,6 +12,187 @@
     <a href="{{ url_for('cars.search') }}" class="link">Find Car</a>
 </div>
 <hr class="divide-line">
-<h1>This is the page for sold cars</h1>
-<script src="../static/js/filters.js"></script>
+<div class="main-content">
+    <div class="filters">
+        <div class="filter">
+            <label class="filter__filter-input_label" for="date-from">Sale Date:</label>
+            <input class="filter__filter-input" type="date" id="date-from" name="date-from" placeholder="From" value="{% if session.get('sale_date_from') %}{{ session['sale_date_from'] }}{% endif %}">
+            <input class="filter__filter-input" type="date" id="date-to" name="date-to" placeholder="To" value="{% if session.get('sale_date_from') %}{{ session['sale_date_to'] }}{% endif %}">
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-brand">Brand:</label>
+            <select class="filter__filter-input" id="car-brand" name="car-brand">
+                <option value="" hidden>Brand</option>
+                <option value="All" {% if session.get('sale_brand', '') == 'All' %} selected {% endif %}>All</option>
+                {% for car_brand in filter_values_dict['car_brands'] %}
+                    <option value="{{ car_brand['brand_id'] }}" {% if session.get('sale_brand', '')|int == car_brand['brand_id'] %} selected {% endif %}>{{ car_brand['brand_name'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-model">Model:</label>
+            {% if session.get('purchase_brand', '') != '' %}
+                <select class="filter__filter-input" id="car-model" name="car-model">
+                    <option value="" hidden>Model</option>
+                    <option value="All" {% if session.get('sale_model', '') == 'All' %} selected {% endif %}>All</option>
+                    {% for car_model in filter_values_dict['car_models'] %}
+                        <option value="{{ car_model }}" {% if session.get('sale_model', '') == car_model %} selected {% endif %}>{{ car_model }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <select class="filter__filter-input" id="car-model" name="car-model" disabled title="First select the brand">
+                    <option value="" hidden>Model</option>
+                </select>
+            {% endif %}
+            
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-body-type">Body Type:</label>
+            <select class="filter__filter-input" id="car-body-type" name="car-body-type">
+                <option value="" hidden>Body</option>
+                <option value="All" {% if session.get('sale_body_type', '') == 'All' %} selected {% endif %}>All</option>
+                {% for car_body_type in filter_values_dict['car_body_types'] %}
+                    <option value="{{ car_body_type['body_type_id'] }}" {% if session.get('sale_body_type', '')|int == car_body_type['body_type_id'] %} selected {% endif %}>{{ car_body_type['body_type_name'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="manufacture-year">Manufacture Year:</label>
+            <select class="filter__filter-input" id="manufacture-year" name="manufacture-year">
+                <option value="" hidden>Year</option>
+                <option value="All" {% if session.get('sale_manufacture_year', '') == 'All' %} selected {% endif %}>All</option>
+                {% for manufacture_year in filter_values_dict['car_manufacture_years'] %}
+                    <option value="{{ manufacture_year }}" {% if session.get('sale_manufacture_year', '')|int == manufacture_year %} selected {% endif %}>{{ manufacture_year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="car-transmission">Transmission:</label>
+            <select class="filter__filter-input" id="car-transmission" name="car-transmission">
+                <option value="" hidden>Transmission</option>
+                <option value="All" {% if session.get('sale_transmission', '') == 'All' %} selected {% endif %}>All</option>
+                {% for car_transmission in filter_values_dict['car_transmissions'] %}
+                    <option value="{{ car_transmission }}" {% if session.get('sale_transmission', '') == car_transmission %} selected {% endif %}>{{ car_transmission }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label class="filter__filter-input_label" for="location-city">Location:</label>
+            <select class="filter__filter-input" id="location-city" name="location-city">
+                <option value="" hidden>City</option>
+                <option value="All" {% if session.get('sale_city', '') == 'All' %} selected {% endif %}>All</option>
+                {% for city in filter_values_dict['cities'] %}
+                    <option value="{{ city.name }}" {% if session.get('sale_city', '') == city.name %} selected {% endif %}>{{ city.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <button id="reset-filters-btn" class="btn btn-outline-success">Reset</button>
+        </div>
+    </div>
+    <div class="car-cards-pagination-container">
+        <div class="car-cards">
+            {% if transaction_cars.items|length == 0 %}
+                <div class="no-cars-found-message">
+                    <p>No car was found for the specified parameters</p>
+                </div>
+            {% else %}
+                {% if transaction_cars.total > transaction_cars.per_page %}
+                    {% for transaction in transaction_cars.items %}
+                        <div class="car-card">
+                            <div class="car-card__left-side">
+                                <div class="car-card__left-side__car-image">
+                                    <img>
+                                </div>
+                                <button class="btn btn-outline-success details-btn">Details</button>
+                            </div>
+                            <div class="car-card__right-side">
+                                <div class="car-card__right-side__car-details-header">
+                                    <h3 class="car-card__right-side__car-details-header__model-trim">{{ transaction.car.make.name }} {{ transaction.car.model }} {{ transaction.car.trim }}</h3>
+                                    <p class="car-card__right-side__car-details-header__vin">vin: {{ transaction.car.vin }}</p>
+                                    <h3 class="car-card__right-side__car-details-header__price">{{ transaction.price }} $</h3>
+                                </div>
+                                <hr class="car-card__hr">
+                                <div class="car-card__right-side__car-details-body">
+                                    <div class="car-card__right-side__car-details-body__items">
+                                        <div class="car-card__right-side__car-details-body__items-col">
+                                            <div class="car-card__right-side__car-details-body__item">
+                                                <img src="../static/images/icons/calendar-icon.png" alt="manufacture-year-icon" width="20px" title="Car Manufacture Year">
+                                                <span>{{ transaction.car.manufacture_year }}</span>
+                                            </div>
+                                            <div class="car-card__right-side__car-details-body__item">
+                                                <img src="../static/images/icons/car-mileage-icon.png" alt="mileage-icon" width="20px" title="Car Mileage">
+                                                <span>{{ transaction.odometer }} mi</span>
+                                            </div>
+                                            <div class="car-card__right-side__car-details-body__item">
+                                                <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="Sale Date">
+                                                <span>{{ transaction.sale_date }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="car-card__right-side__car-details-body__items-col">
+                                            <div class="car-card__right-side__car-details-body__item">
+                                                <img src="../static/images/icons/transmission-icon.png" alt="transmission-icon" width="20px" title="Car Transmission">
+                                                <span>{{ transaction.car.transmission }}</span>
+                                            </div>
+                                            <div class="car-card__right-side__car-details-body__item">
+                                                <img src="../static/images/icons/color-icon.png" alt="color-icon" width="20px" title="Car Color">
+                                                <span>{{ transaction.car.color.name }}</span>
+                                            </div>
+                                            <div class="car-card__right-side__car-details-body__item">
+                                                <img src="../static/images/icons/location-icon.png" alt="location-icon" width="20px" title="Car Location">
+                                                <span>{{ transaction.buyer.address.city.name }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="car-cards-pagination">
+            {% if transaction_cars.has_prev %}
+            <div class="car-cards-pagination__item">
+                {% if main_page == True %}
+                    <a href="{{ url_for('cars.last_sold', page=transaction_cars.prev_num) }}" class="btn btn-outline-success btn-sm">Prev</a>
+                {% else %}
+                    <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=transaction_cars.prev_num) }}" class="btn btn-outline-success btn-sm">Prev</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% for page_num in transaction_cars.iter_pages() %}
+            <div class="car-cards-pagination__item">
+                {% if page_num %}
+                    {% if transaction_cars.page == page_num %}
+                        {% if main_page == True %}
+                            <a href="{{ url_for('cars.last_sold', page=page_num) }}" class="btn btn-success btn-sm">{{ page_num }}</a>
+                        {% else %}
+                            <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=page_num) }}" class="btn btn-success btn-sm">{{ page_num }}</a>
+                        {% endif %}
+                    {% else %}
+                        {% if main_page == True %}
+                            <a href="{{ url_for('cars.last_sold', page=page_num) }}"  class="btn btn-outline-success btn-sm">{{ page_num }}</a>
+                        {% else %}
+                            <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=page_num) }}"  class="btn btn-outline-success btn-sm">{{ page_num }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    ...
+                {% endif %}
+            </div>  
+            {% endfor %}
+            {% if transaction_cars.has_next %}
+            <div class="car-cards-pagination__item">
+                {% if main_page == True %}
+                    <a href="{{ url_for('cars.last_sold', page=transaction_cars.next_num) }}" class="btn btn-outline-success btn-sm">Next</a>
+                {% else %}
+                    <a href="{{ url_for('cars.search_results', search_place_choice='cars_sold', page=transaction_cars.next_num) }}" class="btn btn-outline-success btn-sm">Next</a>
+                {% endif %} 
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script src="../static/js/sold_filters.js"></script>
 {% endblock %}

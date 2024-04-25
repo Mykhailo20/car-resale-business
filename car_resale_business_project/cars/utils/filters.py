@@ -1,5 +1,8 @@
+from flask import session
+
 from car_resale_business_project import db
 from car_resale_business_project.models import *
+from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 
 def get_filter_values(brand_id=None, model_name=None):
@@ -78,17 +81,45 @@ def get_purchase_filter_operations():
 def get_sale_filter_operations():
     # Define filter operations
     filter_operations = {
-        'car_vin': lambda value: Sale.car.has(vin=value),
-        'brand': lambda value: Sale.car.has(make_id=int(value)),
-        'model': lambda value: Sale.car.has(model=value),
-        'body_type': lambda value: Sale.car.has(body_type_id=int(value)),
-        'transmission': lambda value: Sale.car.has(transmission=value),
-        'city': lambda value: Sale.buyer.has(Buyer.address.has(Address.city.has(name=value))),
-        'manufacture_year': lambda value: Sale.car.has(manufacture_year=value),
-        'condition': lambda value: Sale.car.has(Car.condition.between(*map(float, value.split('-')))),
-        'odometer': lambda value: Sale.car.has(Car.odometer.between(*map(int, value.split('-')))),
-        'from_date': lambda value: Sale.purchase_date >= value,
-        'to_date': lambda value: Sale.purchase_date <= value
+        'sale_car_vin': lambda value: Sale.car.has(vin=value),
+        'sale_brand': lambda value: Sale.car.has(make_id=int(value)),
+        'sale_model': lambda value: Sale.car.has(model=value),
+        'sale_body_type': lambda value: Sale.car.has(body_type_id=int(value)),
+        'sale_transmission': lambda value: Sale.car.has(transmission=value),
+        'sale_city': lambda value: Sale.buyer.has(Buyer.address.has(Address.city.has(name=value))),
+        'sale_manufacture_year': lambda value: Sale.car.has(manufacture_year=value),
+        'sale_condition': lambda value: Sale.car.has(Car.condition.between(*map(float, value.split('-')))),
+        'sale_odometer': lambda value: Sale.car.has(Car.odometer.between(*map(int, value.split('-')))),
+        'sale_date_from': lambda value: Sale.sale_date >= value,
+        'sale_date_to': lambda value: Sale.sale_date <= value
     }
 
     return filter_operations
+
+
+def renew_session_filters(filters):
+    for filter_name, filter_value in filters.items():
+        if filter_name == 'csrf_token':
+            continue
+        session[filter_name] = filter_value
+
+
+def construct_query(base_query, transaction_name, page=1):
+    if transaction_name == 'Purchase':
+        filter_operations = get_purchase_filter_operations()
+    elif transaction_name == 'Sale':
+        filter_operations = get_sale_filter_operations()
+
+    # Apply filters directly in the database query
+    for filter_name, filter_value in session.items():
+        if filter_value and filter_value != 'All':
+            if (filter_name == 'purchase_model') or (filter_name == 'sale_model'):
+                print(f"inside filter_value != 'All': filter_name = {filter_name}; filter_value = {filter_value}")
+            filter_operation = filter_operations.get(filter_name)
+            if filter_operation:
+                base_query = base_query.filter(filter_operation(filter_value))
+
+    # Limit the number of results
+    base_query = base_query.paginate(page=page, per_page=CAR_CARDS_PER_PAGE)
+    return base_query
+

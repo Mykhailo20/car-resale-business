@@ -5,7 +5,7 @@ from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
 from car_resale_business_project.cars.utils.filters import *
 from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale
-from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE, CAR_LAST_TRANSACTIONS_PAGES_NUMBER
+from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
 
@@ -14,62 +14,35 @@ cars = Blueprint("cars", __name__, template_folder="templates", static_folder="s
 def last_purchased():
 
     page = request.args.get('page', 1, type=int)
-    session['page'] = page
-    filter_operations = get_purchase_filter_operations()
-
     base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
-
-    # Apply filters directly in the database query
-    for filter_name, filter_value in session.items():
-        if filter_value and filter_value != 'All':
-            filter_operation = filter_operations.get(filter_name)
-            if filter_operation:
-                base_query = base_query.filter(filter_operation(filter_value))
-
-    last_purchases = base_query.paginate(page=session['page'], per_page=CAR_CARDS_PER_PAGE)
+    last_purchases = construct_query(base_query=base_query, transaction_name='Purchase', page=page)
     filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
+
     return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=last_purchases, main_page=True)
 
 
 @cars.route('/last_purchased/filter', methods=['POST'])
 def last_purchased_filter():
-
     filters = request.json
-    filter_operations = get_purchase_filter_operations()
-    for filter_name, filter_value in filters.items():
-        if filter_name == 'csrf_token':
-            continue
-        session[filter_name] = filter_value
-
+    renew_session_filters(filters)
     print(f"/last_purchased/filter: session = {session}")
 
     base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
-    # Apply filters directly in the database query
-    for filter_name, filter_value in session.items():
-        if filter_value and filter_value != 'All':
-            filter_operation = filter_operations.get(filter_name)
-            if filter_operation:
-                base_query = base_query.filter(filter_operation(filter_value))
-
-    # Limit the number of results
-    # base_query = base_query.paginate(page=session['page'], per_page=CAR_CARDS_PER_PAGE)
-    base_query = base_query.paginate(page=1, per_page=CAR_CARDS_PER_PAGE)
+    base_query = construct_query(base_query=base_query, transaction_name='Purchase', page=1)
+    # Execute the query and fetch the results
+    filtered_purchases = [purchase for purchase in base_query.items]
+    filtered_purchases_dict = [purchase.to_dict() for purchase in filtered_purchases]
 
     pages = list(base_query.iter_pages())
     urls = {
         'last_purchased': {},
         'search_results': {}
     }
-
     for page_num in pages:
         if page_num is None:
             continue
         urls['last_purchased'][page_num] = url_for('cars.last_purchased', page=page_num)
         urls['search_results'][page_num] = url_for('cars.search_results', search_place_choice='cars_in_storage', page=page_num)
-
-    # Execute the query and fetch the results
-    filtered_purchases = [purchase for purchase in base_query.items]
-    filtered_purchases_dict = [purchase.to_dict() for purchase in filtered_purchases]
 
     return jsonify(
         {
@@ -82,48 +55,32 @@ def last_purchased_filter():
 
 @cars.route('search_results/last_purchased/filter', methods=['POST'])
 def search_results_last_purchased_filter():
-
     filters = request.json
-    filter_operations = get_purchase_filter_operations()
-    for filter_name, filter_value in filters.items():
-        if filter_name == 'csrf_token':
-            continue
-        session[filter_name] = filter_value
+    renew_session_filters(filters)
+    print(f"search_results/last_purchased/filter: session = {session}")
 
-    print(f"/last_purchased/filter: session = {session}")
-
-    base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
-    # Apply filters directly in the database query
-    for filter_name, filter_value in session.items():
-        if filter_value and filter_value != 'All':
-            filter_operation = filter_operations.get(filter_name)
-            if filter_operation:
-                base_query = base_query.filter(filter_operation(filter_value))
-
-    # Limit the number of results
-    # base_query = base_query.paginate(page=session['page'], per_page=CAR_CARDS_PER_PAGE)
-    base_query = base_query.paginate(page=1, per_page=CAR_CARDS_PER_PAGE)
+    # base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
+    base_query = Purchase.query.filter(Purchase.car_vin.not_in(Sale.query.with_entities(Sale.car_vin))).order_by(desc(Purchase.purchase_date))
+    base_query = construct_query(base_query=base_query, transaction_name='Purchase', page=1)
+    # Execute the query and fetch the results
+    filtered_purchases = [purchase for purchase in base_query.items]
+    filtered_purchases_dict = [purchase.to_dict() for purchase in filtered_purchases]
 
     pages = list(base_query.iter_pages())
     urls = {
         'last_purchased': {},
         'search_results': {}
     }
-
     for page_num in pages:
         if page_num is None:
             continue
         urls['last_purchased'][page_num] = url_for('cars.last_purchased', page=page_num)
         urls['search_results'][page_num] = url_for('cars.search_results', search_place_choice='cars_in_storage', page=page_num)
 
-    # Execute the query and fetch the results
-    filtered_purchases = [purchase for purchase in base_query.items]
-    filtered_purchases_dict = [purchase.to_dict() for purchase in filtered_purchases]
-
     return jsonify(
         {
             "purchasesData": filtered_purchases_dict,
-            "mainPage": True,
+            "mainPage": False,
             "pages": pages,
             "urls": urls
         })
@@ -131,7 +88,86 @@ def search_results_last_purchased_filter():
 
 @cars.route('/last_sold')
 def last_sold():
-    return render_template('sold_cars.html', main_page=True)
+    page = request.args.get('page', 1, type=int)
+    filter_operations = get_sale_filter_operations()
+
+    base_query = Sale.query.order_by(desc(Sale.sale_date))
+
+    # Apply filters directly in the database query
+    for filter_name, filter_value in session.items():
+        if filter_value and filter_value != 'All':
+            filter_operation = filter_operations.get(filter_name)
+            if filter_operation:
+                base_query = base_query.filter(filter_operation(filter_value))
+
+    last_sales = base_query.paginate(page=page, per_page=CAR_CARDS_PER_PAGE)
+    filter_values_dict = get_filter_values(session.get('sale_brand', None), session.get('sale_model', None))
+    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=last_sales, main_page=True)
+
+
+@cars.route('/last_sold/filter', methods=['POST'])
+def last_sold_filter():
+    filters = request.json
+    renew_session_filters(filters)
+    print(f"/last_sold/filter: session = {session}")
+
+    base_query = Sale.query.order_by(desc(Sale.sale_date))
+    base_query = construct_query(base_query=base_query, transaction_name='Sale', page=1)
+    # Execute the query and fetch the results
+    filtered_sales = [sale for sale in base_query.items]
+    filtered_sales_dict = [sale.to_dict() for sale in filtered_sales]
+
+    pages = list(base_query.iter_pages())
+    urls = {
+        'last_transaction': {},
+        'search_results': {}
+    }
+    for page_num in pages:
+        if page_num is None:
+            continue
+        urls['last_transaction'][page_num] = url_for('cars.last_sold', page=page_num)
+        urls['search_results'][page_num] = url_for('cars.search_results', search_place_choice='cars_sold', page=page_num)
+
+    return jsonify(
+        {
+            "transactionName": "Sale",
+            "transactionData": filtered_sales_dict,
+            "mainPage": True,
+            "pages": pages,
+            "urls": urls
+        })
+
+@cars.route('search_results/last_sold/filter', methods=['POST'])
+def search_results_last_sold_filter():
+    filters = request.json
+    renew_session_filters(filters)
+    print(f"search_results/last_sold/filter: session = {session}")
+
+    base_query = Sale.query.order_by(desc(Sale.sale_date))
+    base_query = construct_query(base_query=base_query, transaction_name='Sale', page=1)
+    # Execute the query and fetch the results
+    filtered_sales = [sale for sale in base_query.items]
+    filtered_sales_dict = [sale.to_dict() for sale in filtered_sales]
+
+    pages = list(base_query.iter_pages())
+    urls = {
+        'last_transaction': {},
+        'search_results': {}
+    }
+    for page_num in pages:
+        if page_num is None:
+            continue
+        urls['last_transaction'][page_num] = url_for('cars.last_sold', page=page_num)
+        urls['search_results'][page_num] = url_for('cars.search_results', search_place_choice='cars_sold', page=page_num)
+
+    return jsonify(
+        {
+            "transactionName": "Sale",
+            "transactionData": filtered_sales_dict,
+            "mainPage": False,
+            "pages": pages,
+            "urls": urls
+        })
 
 
 @cars.route('/search', methods=['GET', 'POST'])
@@ -142,11 +178,9 @@ def search():
     if car_vin_form.identifier.data == "car_vin_form" and request.method == 'POST': # It is not quite correct
         car_vin = car_vin_form.car_vin.data
         return redirect(url_for('cars.search_results', **{'car_vin': car_vin}))
-        # return f"<h1>Cars Search Result (car_vin form)</h1><p>You searched for {car_vin}</p>"
     
     if car_filters_form.identifier.data == "car_filters_form" and request.method == 'POST': # It is not quite correct
         form_data = request.form.to_dict()
-        # Extract filters from the form
         filters = {}
         for key, value in form_data.items():
             if key in ['csrf_token', 'identifier', 'submit', 'car_search_choice']:
@@ -156,7 +190,6 @@ def search():
                 filters[key] = value
 
         return redirect(url_for('cars.search_results', search_place_choice=form_data['car_search_choice'], **filters))
-        # return f"<h1>Cars Search Result</h1><p>You searched for form_data.get('brand') form_data.get('model')</p>"
 
     if request.form.get('identifier') == 'navbar_search_form' and request.method == 'POST': # It is not quite correct
         search_field_value = request.form.get('navbar_search_field')
@@ -168,11 +201,11 @@ def search():
         if len(search_values) == 2:
             model = search_values[1]
         filters = {
-            'purchase_brand': brand.car_make_id if brand else -1, # # It is not quite correct
-            'purchase_model': model
+            'brand': brand.car_make_id if brand else -1, # # It is not quite correct
+            'model': model
         }
         return redirect(url_for('cars.search_results', search_place_choice='cars_sold', **filters))
-        
+        # return redirect(url_for('cars.search_results.last_sold.filter', **filters))
     car_filters = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
 
     return render_template("search.html", car_vin_form=car_vin_form, car_filters_form=car_filters_form, car_filters=car_filters)
@@ -185,38 +218,25 @@ def search_results(search_place_choice):
     # Retrieve filter parameters from the AJAX request
     filters = request.args
 
-    # base_query = Purchase.query.filter(Purchase.car_vin.not_in(Sale.query.with_entities(Sale.car_vin))).order_by(desc(Purchase.purchase_date))
-    base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
-    filter_operations = get_purchase_filter_operations()
-
+    base_query = Purchase.query.filter(Purchase.car_vin.not_in(Sale.query.with_entities(Sale.car_vin))).order_by(desc(Purchase.purchase_date))
+    # base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
+    transaction_name = 'Purchase'
     # Check if the "car_search_choice" filter is set to "cars_sold"
     if search_place_choice == 'cars_sold':
         base_query = Sale.query.order_by(desc(Sale.sale_date))
-        filter_operations = get_sale_filter_operations()
+        transaction_name = 'Sale'
 
     for filter_name, filter_value in filters.items():
         if filter_name in ['csrf_token']:
             continue
-        filter_name = 'sale_' + filter_name if (search_place_choice == 'cars_sold') else 'purchase_' + filter_name
+        filter_name = 'sale_' + filter_name if search_place_choice == 'cars_sold' else 'purchase_' + filter_name
         session[filter_name] = filter_value
 
-    print(f"/search_results: session = {session}")
-
-    # Apply filters directly in the database query
-    for filter_name, filter_value in session.items():
-        if filter_value and filter_value != 'All':
-            filter_operation = filter_operations.get(filter_name)
-            if filter_operation:
-                base_query = base_query.filter(filter_operation(filter_value))
-
-    filtered_transaction_records = base_query.paginate(page=page, per_page=CAR_CARDS_PER_PAGE)
-
+    print(f"/search_results/{search_place_choice}: session = {session}")
+    filtered_transaction_records = construct_query(base_query, transaction_name, page=page)
     print(f"filtered_transaction_records = {filtered_transaction_records}")
 
     filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
     if search_place_choice == 'cars_in_storage':
-        print(f"search_place_choice == 'cars_in_storage':")
-        print(f"filter_values_dict = {filter_values_dict}")
-        print(f"session = {session}")
         return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=filtered_transaction_records, main_page=False)
-    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, sold_cars=filtered_transaction_records, main_page=False)
+    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=filtered_transaction_records, main_page=False)

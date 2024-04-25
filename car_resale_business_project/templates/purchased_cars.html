@@ -15,9 +15,9 @@
 <div class="main-content">
     <div class="filters">
         <div class="filter">
-            <label class="filter__filter-input_label" for="purchase-date-from">Purchase Date:</label>
-            <input class="filter__filter-input" type="date" id="purchase-date-from" name="purchase-date-from" placeholder="From" value="{% if session.get('purchase_date_from') %}{{ session['purchase_date_from'] }}{% endif %}">
-            <input class="filter__filter-input" type="date" id="purchase-date-to" name="purchase-date-to" placeholder="To" value="{% if session.get('purchase_date_from') %}{{ session['purchase_date_to'] }}{% endif %}">
+            <label class="filter__filter-input_label" for="date-from">Purchase Date:</label>
+            <input class="filter__filter-input" type="date" id="date-from" name="date-from" placeholder="From" value="{% if session.get('purchase_date_from') %}{{ session['purchase_date_from'] }}{% endif %}">
+            <input class="filter__filter-input" type="date" id="date-to" name="date-to" placeholder="To" value="{% if session.get('purchase_date_from') %}{{ session['purchase_date_to'] }}{% endif %}">
         </div>
         <div class="filter">
             <label class="filter__filter-input_label" for="car-brand">Brand:</label>
@@ -196,5 +196,5 @@
     </div>
     
 </div>
-<script src="../static/js/filters.js"></script>
+<script src="../static/js/purchase_filters.js"></script>
 {% endblock %}

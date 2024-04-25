@@ -1,9 +1,5 @@
 // Function to handle filter change
 function handleFilterChange(event) {
-    /*if (source === 'car-brand') {
-        // Reset the model select element
-        document.getElementById('car-model').value = '';
-    }*/
     var element = event?.target;
     if (element && (element.id === 'car-brand')) {
         // Reset the model select element
@@ -11,8 +7,8 @@ function handleFilterChange(event) {
     }
     
     // Get selected filter values
-    var fromDate = document.getElementById("purchase-date-from").value;
-    var toDate = document.getElementById("purchase-date-to").value;
+    var fromDate = document.getElementById("date-from").value;
+    var toDate = document.getElementById("date-to").value;
     var brand = document.getElementById("car-brand").value;
     var model = document.getElementById("car-model").value;
     var bodyType = document.getElementById("car-body-type").value;
@@ -31,38 +27,32 @@ function handleFilterChange(event) {
     
     // Prepare data to send in AJAX request
     var data = {
-        purchase_date_from: fromDate,
-        purchase_date_to: toDate,
-        purchase_brand: brand,
-        purchase_model: model,
-        purchase_body_type: bodyType,
-        purchase_manufacture_year: manufactureYear,
-        purchase_transmission: transmission,
-        purchase_city: location
+        sale_date_from: fromDate,
+        sale_date_to: toDate,
+        sale_brand: brand,
+        sale_model: model,
+        sale_body_type: bodyType,
+        sale_manufacture_year: manufactureYear,
+        sale_transmission: transmission,
+        sale_city: location
     };
 
-    console.log('Send AJAX request to last_purchased/filter with filters ', data);
+    console.log('Send AJAX request to last_sold/filter with filters ', data);
 
     // Make AJAX request
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "last_purchased/filter", true);
+    xhr.open("POST", "last_sold/filter", true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             // Request successful, update car cards with fetched data
             var responseData = JSON.parse(xhr.responseText);
             console.log("responseData = ", responseData);
-            updateCarCards(responseData['purchasesData'], responseData['mainPage'], responseData['pages'], responseData['urls']);
+            updateCarCards(responseData['transactionName'], responseData['transactionData'], responseData['mainPage'], responseData['pages'], responseData['urls']);
         }
     };
     xhr.send(JSON.stringify(data));
 }
-
-// Add event listeners to filters
-/*var filters = document.querySelectorAll('.filter__filter-input');
-filters.forEach(function(filter) {
-    filter.addEventListener('change', handleFilterChange);
-});*/
 
 var filters = document.querySelectorAll('.filter__filter-input');
 filters.forEach(function(filter) {
@@ -72,7 +62,7 @@ filters.forEach(function(filter) {
 });
 
 
-function updateCarCards(purchasesData, mainPage, pages, urls) {
+function updateCarCards(transaction_name, transactionData, mainPage, pages, urls) {
     var carCardsContainer = document.querySelector('.car-cards');
     var carCards = document.querySelectorAll('.car-card');
     carCards.forEach(function(card) {
@@ -88,14 +78,24 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
     var paginationContainer = document.querySelector('.car-cards-pagination');
     paginationContainer.innerHTML = ''; // Clear the pagination container
 
-    if (purchasesData.length === 0) {
+    if (transactionData.length === 0) {
         carCardsContainer.innerHTML = `
         <div class="no-cars-found-message">
             <p>No cars were found for the specified parameters</p>
         </div>`;
         return; // Exit the function early
     }
-    purchasesData.forEach(function(purchase) {
+    transactionData.forEach(function(transaction) {
+        var transaction_date = '';
+        var transaction_city = '';
+        if(transaction_name === 'Purchase') {
+            transaction_date = transaction.purchase_date;
+            transaction_city = transaction.seller.address.city.name;
+        } else if(transaction_name === 'Sale') {
+            transaction_date = transaction.sale_date;
+            transaction_city = transaction.buyer.address.city.name;
+        }
+        
         var carCardHTML = `
             <div class="car-card">
                 <div class="car-card__left-side">
@@ -106,9 +106,9 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
                 </div>
                 <div class="car-card__right-side">
                     <div class="car-card__right-side__car-details-header">
-                        <h3 class="car-card__right-side__car-details-header__model-trim">${purchase.car.make.name} ${purchase.car.model} ${purchase.car.trim}</h3>
-                        <p class="car-card__right-side__car-details-header__vin">vin: ${purchase.car.vin}</p>
-                        <h3 class="car-card__right-side__car-details-header__price">${purchase.price} $</h3>
+                        <h3 class="car-card__right-side__car-details-header__model-trim">${transaction.car.make.name} ${transaction.car.model} ${transaction.car.trim}</h3>
+                        <p class="car-card__right-side__car-details-header__vin">vin: ${transaction.car.vin}</p>
+                        <h3 class="car-card__right-side__car-details-header__price">${transaction.price} $</h3>
                     </div>
                     <hr class="car-card__hr">
                     <div class="car-card__right-side__car-details-body">
@@ -116,29 +116,29 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
                             <div class="car-card__right-side__car-details-body__items-col">
                                 <div class="car-card__right-side__car-details-body__item">
                                     <img src="../static/images/icons/calendar-icon.png" alt="manufacture-year-icon" width="20px" title="Car Manufacture Year">
-                                    <span>${purchase.car.manufacture_year}</span>
+                                    <span>${transaction.car.manufacture_year}</span>
                                 </div>
                                 <div class="car-card__right-side__car-details-body__item">
                                     <img src="../static/images/icons/car-mileage-icon.png" alt="mileage-icon" width="20px" title="Car Mileage">
-                                    <span>${purchase.odometer} mi</span>
+                                    <span>${transaction.odometer} mi</span>
                                 </div>
                                 <div class="car-card__right-side__car-details-body__item">
-                                    <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="Purchase Date">
-                                    <span>${purchase.purchase_date}</span>
+                                    <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="${transaction_name} Date">
+                                    <span>${transaction_date}</span>
                                 </div>
                             </div>
                             <div class="car-card__right-side__car-details-body__items-col">
                                 <div class="car-card__right-side__car-details-body__item">
                                     <img src="../static/images/icons/transmission-icon.png" alt="transmission-icon" width="20px" title="Car Transmission">
-                                    <span>${purchase.car.transmission}</span>
+                                    <span>${transaction.car.transmission}</span>
                                 </div>
                                 <div class="car-card__right-side__car-details-body__item">
                                     <img src="../static/images/icons/color-icon.png" alt="color-icon" width="20px" title="Car Color">
-                                    <span>${purchase.car.color.name}</span>
+                                    <span>${transaction.car.color.name}</span>
                                 </div>
                                 <div class="car-card__right-side__car-details-body__item">
                                     <img src="../static/images/icons/location-icon.png" alt="location-icon" width="20px" title="Car Location">
-                                    <span>${purchase.seller.address.city.name}</span>
+                                    <span>${transaction_city}</span>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +152,7 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
         if (pages.has_prev) {
             paginationContainer.innerHTML += `
             <div class="car-cards-pagination__item">
-                <a href="${mainPage ? urls['last_purchased'] : urls['search_results']}" class="btn btn-outline-success btn-sm">Next</a>
+                <a href="${mainPage ? urls['last_transaction'] : urls['search_results']}" class="btn btn-outline-success btn-sm">Next</a>
             </div>`;
         }
 
@@ -161,12 +161,12 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
                 if (page_num === 1) {
                     paginationContainer.innerHTML += `
                     <div class="car-cards-pagination__item">
-                        <a href="${mainPage ? urls['last_purchased'][page_num] : urls['search_results'][page_num]}" class="btn btn-success btn-sm">${page_num}</a>
+                        <a href="${mainPage ? urls['last_transaction'][page_num] : urls['search_results'][page_num]}" class="btn btn-success btn-sm">${page_num}</a>
                     </div>`;
                 } else {
                     paginationContainer.innerHTML += `
                     <div class="car-cards-pagination__item">
-                        <a href="${mainPage ? urls['last_purchased'][page_num] : urls['search_results'][page_num]}" class="btn btn-outline-success btn-sm">${page_num}</a>
+                        <a href="${mainPage ? urls['last_transaction'][page_num] : urls['search_results'][page_num]}" class="btn btn-outline-success btn-sm">${page_num}</a>
                     </div>`;
                 }
             } else {
@@ -305,8 +305,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Add event listener for click event
     resetFiltersBtn.addEventListener('click', function() {
         // Reset all filter values
-        document.getElementById('purchase-date-from').value = '';
-        document.getElementById('purchase-date-to').value = '';
+        document.getElementById('date-from').value = '';
+        document.getElementById('date-to').value = '';
         document.getElementById('car-brand').value = '';
         document.getElementById('car-model').value = '';
         document.getElementById('car-body-type').value = '';
