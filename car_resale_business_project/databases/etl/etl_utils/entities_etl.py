@@ -19,6 +19,7 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
         print(f"Incremental data loading.")
         seller_data = extract_seller_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
         print(f"updated_seller_data = {seller_data}")
+        print(f"len(updated_seller_data) = {len(seller_data)}")
 
     oltp_db_conn.close()
     seller_columns = [
@@ -176,10 +177,11 @@ def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
     print(f"\nPURCHASE EXTRACT")
     
     purchase_data = extract_purchase_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=100)
-    """
+    
     if not initial_data_loading:
         print(f"updated_fact_car_purchase_data: {purchase_data}")
-        """
+        print(f"len(updated_fact_car_purchase_data): {len(purchase_data)}")
+        
     oltp_db_conn.close()
 
     purchase_columns = [
@@ -272,7 +274,8 @@ def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
 
                     if prev_work_experience != olap_purchase_obj.employee_dim.work_experience:
                         load_fact_car_purchase(olap_db_conn, [olap_purchase_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
-
+                    else:
+                        load_fact_car_purchase(olap_db_conn, [olap_purchase_obj], insert_new_employee=False, initial_data_loading=initial_data_loading)
             elif (prev_year != row['p_purchase_year']) or (prev_month != row['p_purchase_month']):
                 load_fact_car_purchase(olap_db_conn, [olap_purchase_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
             else:

@@ -255,12 +255,20 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
 
                     -- If the record exists, perform the update operation
                     IF oltp_car_vin_exists THEN
+                        WITH insert_dim_employee AS (
+                            INSERT INTO dim_employee(first_name, age, age_group, sex, salary, work_experience, employee_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s)
+                            RETURNING employee_id
+                        )
                         UPDATE fact_car_purchase
-                        SET price = %s,
+                        SET employee_id=(SELECT employee_id FROM insert_dim_employee),
+                            price = %s,
                             car_years = %s,
                             odometer = %s,
                             condition = %s,
-                            employee_experience = %s;
+                            employee_experience = %s
+                        WHERE car_vin = %s;
                     ELSE
                         -- Otherwise, perform the insert operation
                         WITH insert_dim_car AS (
@@ -301,11 +309,20 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                 data = [
                 (
                     car_purchase.car_dim.vin,
+
+                    car_purchase.employee_dim.first_name,
+                    car_purchase.employee_dim.age,
+                    car_purchase.employee_dim.age_group,
+                    car_purchase.employee_dim.sex,
+                    car_purchase.employee_dim.salary,
+                    car_purchase.employee_dim.work_experience,
+                    car_purchase.employee_dim.oltp_id,
                     car_purchase.price,
                     car_purchase.car_years,
                     car_purchase.odometer,
                     car_purchase.condition,
                     car_purchase.employee_experience,
+                    car_purchase.car_dim.vin,
 
                     car_purchase.car_dim.vin,
                     car_purchase.car_dim.manufacture_year,
@@ -357,7 +374,8 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                             car_years = %s,
                             odometer = %s,
                             condition = %s,
-                            employee_experience = %s;
+                            employee_experience = %s
+                        WHERE car_vin = %s;
                     ELSE
                         WITH insert_dim_car AS (
                             INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
@@ -396,6 +414,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                     car_purchase.odometer,
                     car_purchase.condition,
                     car_purchase.employee_experience,
+                    car_purchase.car_dim.vin,
 
                     car_purchase.car_dim.vin,
                     car_purchase.car_dim.manufacture_year,
@@ -725,7 +744,8 @@ def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_lo
                 for car_sale in car_purchases
             ]
     else:
-        print(f"fact_car_purchase incremental data loading")
+        print(f"fact_car_sale incremental data loading")
+        """"""
         if insert_new_employee:
             query = """
                 DO
@@ -828,4 +848,4 @@ def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_lo
 
     if len(data) == 1:
         data = data[0]
-    insert_data(conn, query, data, 'fact_car_sale')
+    # insert_data(conn, query, data, 'fact_car_sale')
