@@ -499,9 +499,9 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                         (%s, %s, %s)
                     RETURNING location_id
                 ), insert_dim_date AS (
-                    INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
+                    INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name, fact_oltp_id)
                     VALUES
-                        (%s, %s, %s, %s, %s, %s, %s)
+                        (%s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING date_id
                 )
 
@@ -540,6 +540,7 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                     car_repair.date_dim.week_day,
                     car_repair.date_dim.oltp_id,
                     car_repair.date_dim.fact_name,
+                    car_repair.oltp_id,
 
                     car_repair.car_vin,
 
@@ -559,9 +560,9 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                         (%s, %s, %s)
                     RETURNING location_id
                 ), insert_dim_date AS (
-                    INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
+                    INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name, fact_oltp_id)
                     VALUES
-                        (%s, %s, %s, %s, %s, %s, %s)
+                        (%s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING date_id
                 )
 
@@ -592,6 +593,7 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                     car_repair.date_dim.week_day,
                     car_repair.date_dim.oltp_id,
                     car_repair.date_dim.fact_name,
+                    car_repair.oltp_id,
 
                     car_repair.car_vin,
                     car_repair.employee_dim.oltp_id,
@@ -606,7 +608,217 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
             ]
     else:
         print("fact_car_repair incremental data loading")
+        if insert_new_employee:
+            query = """
+                DO
+                $$
+                DECLARE
+                    oltp_car_vin_exists BOOLEAN;
+                BEGIN
+                    -- Check if the record with the specified oltp_id exists
+                    SELECT TRUE INTO oltp_car_vin_exists FROM fact_car_repair WHERE car_vin = %s AND repair_oltp_id = %s;
 
+                    -- If the record exists, perform the update operation
+                    IF oltp_car_vin_exists THEN
+                        WITH insert_dim_employee AS (
+                            INSERT INTO dim_employee(first_name, age, age_group, sex, salary, work_experience, employee_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s)
+                            RETURNING employee_id
+                        ), update_dim_date AS (
+                            UPDATE dim_date
+                            SET date=%s, 
+                            year=%s, 
+                            month=%s, 
+                            day=%s, 
+                            week_day=%s
+                            WHERE 
+                                date_oltp_vin = %s 
+                                AND fact_name = 'repair'
+                                AND fact_oltp_id = %s
+                        )
+                        UPDATE fact_car_repair
+                        SET employee_id=(SELECT employee_id FROM insert_dim_employee),
+                            cost=%s,
+                            condition_delta=%s
+                        WHERE 
+                            car_vin = %s
+                            AND repair_oltp_id = %s;
+                    ELSE
+                        -- Otherwise, perform the insert operation
+                        WITH insert_dim_employee AS (
+                            INSERT INTO dim_employee(first_name, age, age_group, sex, salary, work_experience, employee_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s)
+                            RETURNING employee_id
+                        ), insert_dim_date AS (
+                            INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name, fact_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s, %s)
+                            RETURNING date_id
+                        )
+
+                        INSERT INTO fact_car_repair(
+                            car_vin, employee_id, location_id, date_id, repair_type_id,
+                            cost, condition_delta
+                        )
+                        VALUES
+                            (
+                                %s,
+                                (SELECT employee_id FROM insert_dim_employee),
+                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s AND is_valid = 1),
+                                (SELECT date_id FROM insert_dim_date),
+                                (SELECT repair_type_id FROM dim_car_repair_type WHERE repair_type=%s),
+                                %s, %s
+                            );
+                    END IF;
+                END
+                $$;
+            """
+            data = [
+                (
+                    car_repair.car_vin,
+                    car_repair.oltp_id,
+
+                    car_repair.employee_dim.first_name,
+                    car_repair.employee_dim.age,
+                    car_repair.employee_dim.age_group,
+                    car_repair.employee_dim.sex,
+                    car_repair.employee_dim.salary,
+                    car_repair.employee_dim.work_experience,
+                    car_repair.employee_dim.oltp_id,
+
+                    car_repair.date_dim.date,
+                    car_repair.date_dim.year,
+                    car_repair.date_dim.month,
+                    car_repair.date_dim.day,
+                    car_repair.date_dim.week_day,
+                    car_repair.car_vin,
+                    car_repair.oltp_id,
+
+                    car_repair.cost,
+                    car_repair.condition_delta,
+                    car_repair.car_vin,
+                    car_repair.oltp_id,
+
+                    car_repair.employee_dim.first_name,
+                    car_repair.employee_dim.age,
+                    car_repair.employee_dim.age_group,
+                    car_repair.employee_dim.sex,
+                    car_repair.employee_dim.salary,
+                    car_repair.employee_dim.work_experience,
+                    car_repair.employee_dim.oltp_id,
+                    car_repair.date_dim.date,
+                    car_repair.date_dim.year,
+                    car_repair.date_dim.month,
+                    car_repair.date_dim.day,
+                    car_repair.date_dim.week_day,
+                    car_repair.date_dim.oltp_id,
+                    car_repair.date_dim.fact_name,
+                    car_repair.oltp_id,
+
+                    car_repair.car_vin,
+                    car_repair.location_dim.oltp_id,
+                    car_repair.car_repair_type_dim.repair_type,
+                    car_repair.cost,
+                    car_repair.condition_delta
+                )
+                for car_repair in car_repairs
+            ]
+        
+        else:
+            query = """
+                DO
+                $$
+                DECLARE
+                    oltp_car_vin_exists BOOLEAN;
+                BEGIN
+                    -- Check if the record with the specified oltp_id exists
+                    SELECT TRUE INTO oltp_car_vin_exists FROM fact_car_repair WHERE car_vin = %s AND repair_oltp_id = %s;
+
+                    -- If the record exists, perform the update operation
+                    IF oltp_car_vin_exists THEN
+                        WITH update_dim_date AS (
+                            UPDATE dim_date
+                            SET date=%s, 
+                            year=%s, 
+                            month=%s, 
+                            day=%s, 
+                            week_day=%s
+                            WHERE 
+                                date_oltp_vin = %s 
+                                AND fact_name = 'repair'
+                                AND fact_oltp_id = %s
+                        )
+                        UPDATE fact_car_repair
+                        SET
+                            cost=%s,
+                            condition_delta=%s
+                        WHERE 
+                            car_vin = %s
+                            AND repair_oltp_id = %s;
+                    ELSE
+                        -- Otherwise, perform the insert operation
+                        WITH insert_dim_date AS (
+                            INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name, fact_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s, %s)
+                            RETURNING date_id
+                        )
+
+                        INSERT INTO fact_car_repair(
+                            car_vin, employee_id, location_id, date_id, repair_type_id,
+                            cost, condition_delta
+                        )
+                        VALUES
+                            (
+                                %s,
+                                (SELECT employee_id FROM dim_employee WHERE employee_oltp_id=%s AND is_valid = 1),
+                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s AND is_valid = 1),
+                                (SELECT date_id FROM insert_dim_date),
+                                (SELECT repair_type_id FROM dim_car_repair_type WHERE repair_type=%s),
+                                %s, %s
+                            );
+                    END IF;
+                END
+                $$;
+            """
+            data = [
+                (
+                    car_repair.car_vin,
+                    car_repair.oltp_id,
+                    
+                    car_repair.date_dim.date,
+                    car_repair.date_dim.year,
+                    car_repair.date_dim.month,
+                    car_repair.date_dim.day,
+                    car_repair.date_dim.week_day,
+                    car_repair.car_vin,
+                    car_repair.oltp_id,
+
+                    car_repair.cost,
+                    car_repair.condition_delta,
+                    car_repair.car_vin,
+                    car_repair.oltp_id,
+ 
+                    car_repair.date_dim.date,
+                    car_repair.date_dim.year,
+                    car_repair.date_dim.month,
+                    car_repair.date_dim.day,
+                    car_repair.date_dim.week_day,
+                    car_repair.date_dim.oltp_id,
+                    car_repair.date_dim.fact_name,
+                    car_repair.oltp_id,
+
+                    car_repair.car_vin,
+                    car_repair.employee_dim.oltp_id,
+                    car_repair.location_dim.oltp_id,
+                    car_repair.car_repair_type_dim.repair_type,
+                    car_repair.cost,
+                    car_repair.condition_delta
+                )
+                for car_repair in car_repairs
+            ]
     if len(data) == 1:
         data = data[0]
     insert_data(conn, query, data, 'fact_car_repair')

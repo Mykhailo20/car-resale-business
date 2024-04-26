@@ -295,10 +295,11 @@ def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     print(f"\nREPAIR EXTRACT")
     
     repair_data = extract_repair_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=10)
-    """
+
     if not initial_data_loading:
         print(f"updated_fact_car_repair_data: {repair_data}")
-        """
+        print(f"len(updated_fact_car_repair_data): {len(repair_data)}")
+
     oltp_db_conn.close()
     print(f"len(repair_data) = {len(repair_data)}")
     # print(f"repair_data = {repair_data}")
@@ -320,7 +321,8 @@ def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     repair_df['r_repair_year'] = repair_df['r_repair_date'].dt.year
 
     repair_df = repair_df.sort_values(by=['e_oltp_id', 'r_repair_date'])
-    print(f"repair_df.head(5) = \n{repair_df.head(5)}")
+    if len(repair_df) > 0:
+        print(f"repair_df.head(5) = \n{repair_df.head(5)}")
     
     unique_employee_oltp_ids = set(repair_df['e_oltp_id'].to_list())
     print(f"unique_employee_oltp_ids = {unique_employee_oltp_ids}")
@@ -346,8 +348,8 @@ def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
 
                 else:
                     """
-                        It is necessary to understand whether to insert a new record in the dim_employee table or not in case of new records in the fact_car_purchase table:
-                        1) If an employee with the specified employee_oltp_id already exists in the dim_employee table and his experience matches the work experience (fact_car_purchase.employee_experience) in the current fact_car_purchase object, then there is no need to insert a new record into the dim_employee table.
+                        It is necessary to understand whether to insert a new record in the dim_employee table or not in case of new records in the fact_car_repair table:
+                        1) If an employee with the specified employee_oltp_id already exists in the dim_employee table and his experience matches the work experience (dim_employee.employee_experience) in the current dim_employee object, then there is no need to insert a new record into the dim_employee table.
                         2) Otherwise (if there are no records in the dim_employee table with the specified employee_oltp_id or his experience is different, then we need to insert a new record in the dim_employee table).
                     """
                     query = """
@@ -363,13 +365,11 @@ def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
 
                             -- If the record exists, retrieve the corresponding employee_id
                             IF employee_exists THEN
-                                SELECT employee_id INTO employee_id_local FROM dim_employee 
-                                WHERE employee_oltp_id = %s AND is_valid = 1;
                                 
                                 CREATE TEMPORARY TABLE temp_table AS
-                                -- Select the employee_experience from the fact_car_purchase table
-                                SELECT employee_experience FROM fact_car_purchase 
-                                WHERE employee_id = employee_id_local;
+                                -- Select the work_experience from the dim_employee table
+                                SELECT work_experience FROM dim_employee 
+                                WHERE employee_oltp_id = %s AND is_valid = 1;
                             ELSE
                                 CREATE TEMPORARY TABLE temp_table AS
                                 SELECT -1;
@@ -379,29 +379,23 @@ def repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
 
                         SELECT * FROM temp_table;
                     """
-                    """
                     with olap_db_conn.cursor() as cur:
                         cur.execute(query, (olap_repair_obj.employee_dim.oltp_id, olap_repair_obj.employee_dim.oltp_id))
                         # Fetch the results
                         data = cur.fetchall()
                     
                     prev_work_experience = data[0][0]
-                    print(f"fact_car_purchase incremental data loading: data (employee work_experience) = {data}")
-                    print(f"work_experience = {prev_work_experience}")
-                    print(f"current work_experience = {olap_repair_obj.employee_dim.work_experience}")
 
                     if prev_work_experience != olap_repair_obj.employee_dim.work_experience:
-                        print(f"{prev_work_experience} != {olap_repair_obj.employee_dim.work_experience}")
-                        # Temporary condition
-                        if prev_work_experience != -1:
-                            load_fact_car_purchase(olap_db_conn, [olap_repair_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
-                """
+                        load_fact_car_repair(olap_db_conn, [olap_repair_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
+                    else:
+                        load_fact_car_repair(olap_db_conn, [olap_repair_obj], insert_new_employee=False, initial_data_loading=initial_data_loading)
+
             elif (prev_year != row['r_repair_year']) or (prev_month != row['r_repair_month']):
                 load_fact_car_repair(olap_db_conn, [olap_repair_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
             else:
                 load_fact_car_repair(olap_db_conn, [olap_repair_obj], insert_new_employee=False, initial_data_loading=initial_data_loading)
 
-            # print(f"olap_purchase_obj = {olap_purchase_obj}\n")
             prev_year = row['r_repair_year']
             prev_month = row['r_repair_month']
             index += 1
@@ -415,10 +409,11 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
     print(f"\nSALE EXTRACT")
     
     sale_data = extract_sale_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=10)
-    """
+
     if not initial_data_loading:
         print(f"updated_fact_car_sale_data: {sale_data}")
-    """
+        print(f"len(updated_fact_car_sale_data): {len(sale_data)}")
+
     oltp_db_conn.close()
     
     sale_columns = [
