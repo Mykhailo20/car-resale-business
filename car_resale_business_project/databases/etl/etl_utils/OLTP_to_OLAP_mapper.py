@@ -143,7 +143,7 @@ def OLTP_to_OLAP_repair_type(df_row, car_repair_type_metadata, prefix='c'):
         'repair_type': df_row[f'{prefix}_repair_type']
     }
     res_dict = OLTP_to_OLAP_dim(car_repair_type_metadata, attributes_dict)
-    return CarRepairType(repair_type=res_dict['repair_type'])
+    return CarRepairTypeDim(repair_type=res_dict['repair_type'])
 
 
 

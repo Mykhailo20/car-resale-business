@@ -261,24 +261,22 @@ def extract_sale_data(conn, initial_data_loading, last_etl_datetime, limit_recor
             e.birth_date, e.sex, 
             e.email, pos.name, e.salary, e.hire_date,
             s.mmr, s.price, s.odometer, s.condition, s.sale_date,
-            COALESCE(r.cost, 0) AS repair_cost,  -- Use COALESCE to return 0 if repair.cost is NULL
+            COALESCE(total_repair_cost, 0) AS repair_cost,  -- Use COALESCE to return 0 if total_repair_cost is NULL
             p.price, p.purchase_date
-
         FROM sale s
-
         JOIN car c ON s.car_vin = c.vin
-
         JOIN buyer b ON s.buyer_id = b.person_id
-
         JOIN address addr ON b.address_id = addr.address_id
         JOIN city ON addr.city_id = city.city_id
         JOIN country ON city.country_id = country.country_id
-
         JOIN employee e ON s.employee_id = e.person_id
         JOIN position pos ON e.position_id = pos.position_id
-
         JOIN purchase p ON s.car_vin = p.car_vin
-        LEFT JOIN repair r ON s.car_vin = r.car_vin;
+        LEFT JOIN (
+            SELECT car_vin, SUM(cost) AS total_repair_cost
+            FROM repair
+            GROUP BY car_vin
+        ) r ON s.car_vin = r.car_vin;
     """
 
     with conn.cursor() as cur:

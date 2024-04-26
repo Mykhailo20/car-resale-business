@@ -58,11 +58,11 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
         end_index = min(start_index + batch_size, total_records)
         seller_batch_data = olap_sellers_list[start_index:end_index]
         seller_location_batch_data = olap_sellers_locations_list[start_index:end_index]
-        # load_seller_dim(conn=olap_db_conn, seller_dims=seller_batch_data, initial_data_loading=initial_data_loading)
+        load_seller_dim(conn=olap_db_conn, seller_dims=seller_batch_data, initial_data_loading=initial_data_loading)
         print(f"load_seller_dim: len(seller_batch_data) = {len(seller_batch_data)}\nseller_batch_data = {seller_batch_data}")
         if initial_data_loading:
             print(f"\nload_seller_dim -> load_dim_location: len(seller_location_batch_data)={len(seller_location_batch_data)}\nseller_location_batch_data={seller_location_batch_data}")
-            # load_location_dim(conn=olap_db_conn, location_dims=seller_location_batch_data, initial_data_loading=initial_data_loading)
+            load_location_dim(conn=olap_db_conn, location_dims=seller_location_batch_data)
 
         start_index += batch_size
         break
@@ -108,6 +108,7 @@ def car_repair_type_etl(oltp_config_dict, olap_config_dict, metadata, initial_da
 
         end_index = min(start_index + batch_size, total_records)
         repair_type_batch_data = olap_repair_types_list[start_index:end_index]
+        print(f"load_car_repair_type_dim")
         load_car_repair_type_dim(conn=olap_db_conn, repair_types=repair_type_batch_data, initial_data_loading=initial_data_loading)
 
         start_index += batch_size
@@ -459,7 +460,7 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
 
             if index == 0:
                 if initial_data_loading:
-                    # print(f"fact_car_sale initial data loading")
+                    print(f"fact_car_sale initial data loading")
 
                     # Insert the first record into dim_emloyee table and other tables
                     load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)

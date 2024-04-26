@@ -38,7 +38,9 @@ def create_seller(row):
         seller_id=row['s_oltp_id'],
         name=row['s_name'],
         type=row['s_type'],
-        address=address
+        address=address,
+        email=None,
+        website_url=None
     )
 
 
@@ -78,7 +80,9 @@ def create_purchase(row, car=None):
     purchase = Purchase(
         car=car,
         seller_id=row['s_id'],
+        seller_name=None,
         address_id=row['p_address_id'],
+        city=None,
         employee=employee,
         price=row['p_price'],
         odometer=row['p_odometer'],
@@ -98,12 +102,14 @@ def create_repair(row, car=None):
     employee = create_employee(row)
     address = create_address(row, prefix='r')
     repair = Repair(
-        car=car,
+        repair_id=row['r_oltp_id'],
+        car_vin=row['c_vin'],
         employee=employee,
         address=address,
         repair_type=row['r_type'],
         cost=row['r_cost'],
         condition=row['r_condition'],
+        purchase_condition=float(row['p_condition']),
         description=None,
         repair_date=row['r_date']
     )
@@ -111,13 +117,12 @@ def create_repair(row, car=None):
 
 
 # Create instances of the Purchase class from the DataFrame data
-def create_sale(row, car=None):
-    if car is None:
-        car = create_car(row)
+def create_sale(row):
     buyer=create_buyer(row)
     employee = create_employee(row)
     sale = Sale(
-        car=car,
+        car_vin=row['c_vin'],
+        car_manufacture_year=row['c_manufacture_year'],
         buyer=buyer,
         employee=employee,
         mmr=row['s_mmr'],
@@ -127,6 +132,9 @@ def create_sale(row, car=None):
         description=None,
         car_image=None,
         car_image_content_type=None,
-        sale_date=row['s_date']
+        sale_date=row['s_date'],
+        purchase_price=row['p_price'],
+        repair_cost=row['repair_cost'],
+        purchase_date=row['purchase_date']
     )
     return sale

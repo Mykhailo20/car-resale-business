@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import psycopg2 as pg2
 
-from car_resale_business_project.config.db_config import get_oltp_fill_demonstration_config, get_olap_fill_demonstration_config
+from car_resale_business_project.config.db_config import get_oltp_etl_test_config, get_olap_etl_test_config
 from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME
 from car_resale_business_project.config.data_formats import *
 from car_resale_business_project.databases.etl.etl_utils.extract import *
@@ -19,8 +19,8 @@ from car_resale_business_project.databases.etl.etl_utils.entities_etl import *
 def perform_etl():
     logging_filename = 'car_resale_business_project/logging/etl_logging.log'
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
-    oltp_config_dict = get_oltp_fill_demonstration_config()
-    olap_config_dict = get_olap_fill_demonstration_config()
+    oltp_config_dict = get_oltp_etl_test_config()
+    olap_config_dict = get_olap_etl_test_config()
     # Record the ETL start time in the log file
     logging.info(f"ETL process started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     with open(OLAP_METADATA_FILENAME) as file:
@@ -35,10 +35,11 @@ def perform_etl():
     try:
         if initial_data_loading:
             print(f"Initial data loading")
-            # seller_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
-            # purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
-            # repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
-            # sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
+            car_repair_type_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
+            seller_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
+            purchase_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
+            repair_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
+            sale_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
         else:
             # seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
             # location_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)

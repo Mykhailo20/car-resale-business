@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from car_resale_business_project.databases.classes.OLTP.employee import Employee
+from car_resale_business_project.databases.classes.OLTP.car import Car
 from car_resale_business_project.databases.classes.OLTP.address import Address
 
 

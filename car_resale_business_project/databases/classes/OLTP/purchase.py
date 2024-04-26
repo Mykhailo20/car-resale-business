@@ -8,7 +8,6 @@ from car_resale_business_project.databases.classes.OLTP.car import Car
 
 @dataclass
 class Purchase:
-    purchase_id: str
     car: Car
     seller_id: int
     seller_name: str
