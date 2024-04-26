@@ -1,29 +1,17 @@
 import logging
 from datetime import datetime, date
 
-from classes.OLTP.purchase import Purchase
-from classes.OLTP.seller import Seller
-from classes.OLAP.seller_dim import SellerDim
+from car_resale_business_project.databases.classes.OLTP.purchase import Purchase
+from car_resale_business_project.databases.classes.OLTP.seller import Seller
+from car_resale_business_project.databases.classes.OLTP.car import Car
+from car_resale_business_project.databases.classes.OLTP.employee import Employee
+from car_resale_business_project.databases.classes.OLTP.address import Address
 
-from classes.OLAP.buyer_dim import BuyerDim
+from car_resale_business_project.databases.classes.OLAP.dimensions import *
+from car_resale_business_project.databases.classes.OLAP.facts import *
 
-from classes.OLTP.car import Car
-from classes.OLAP.car_dim import CarDim
-
-from classes.OLTP.employee import Employee
-from classes.OLAP.employee_dim import EmployeeDim
-
-from classes.OLTP.address import Address
-from classes.OLAP.location_dim import LocationDim
-
-from classes.OLAP.date_dim import DateDim
-
-from classes.OLAP.purchase_fact import CarPurchaseFact
-from classes.OLAP.repair_fact import *
-from classes.OLAP.sale_fact import CarSaleFact
-
-from etl_utils.metadata_for_etl import calculate_and_check_value
-from etl_utils.create_OLTP_class_instances import *
+from car_resale_business_project.databases.etl.etl_utils.metadata_for_etl import calculate_and_check_value
+from car_resale_business_project.databases.etl.etl_utils.create_OLTP_class_instances import *
 
 
 def OLTP_to_OLAP_dim(dim_metadata, dim_attrs_dict):

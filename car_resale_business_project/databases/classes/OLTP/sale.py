@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from datetime import date
 
-from classes.OLTP.employee import Employee
-from classes.OLTP.buyer import Buyer
-from classes.OLTP.car import Car
+from car_resale_business_project.databases.classes.OLTP.employee import Employee
+from car_resale_business_project.databases.classes.OLTP.buyer import Buyer
+from car_resale_business_project.databases.classes.OLTP.car import Car
 
 
 @dataclass

@@ -8,19 +8,19 @@ import numpy as np
 import pandas as pd
 import psycopg2 as pg2
 
-from config.db_config import get_oltp_test_config, get_olap_test_config, test_db_connection
-from config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME
-from config.data_formats import *
-from etl_utils.extract import *
+from car_resale_business_project.config.db_config import get_oltp_fill_demonstration_config, get_olap_fill_demonstration_config
+from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME
+from car_resale_business_project.config.data_formats import *
+from car_resale_business_project.databases.etl.etl_utils.extract import *
 
-from etl_utils.etl import *
+from car_resale_business_project.databases.etl.etl_utils.entities_etl import *
 
     
-def main():
-    logging_filename = 'logging/etl_logging.log'
+def perform_etl():
+    logging_filename = 'car_resale_business_project/logging/etl_logging.log'
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
-    oltp_config_dict = get_oltp_test_config()
-    olap_config_dict = get_olap_test_config()
+    oltp_config_dict = get_oltp_fill_demonstration_config()
+    olap_config_dict = get_olap_fill_demonstration_config()
     # Record the ETL start time in the log file
     logging.info(f"ETL process started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     with open(OLAP_METADATA_FILENAME) as file:
@@ -35,7 +35,7 @@ def main():
     try:
         if initial_data_loading:
             print(f"Initial data loading")
-            seller_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
+            # seller_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
             # purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
             # repair_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
             # sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime)
@@ -64,6 +64,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    perform_etl()
 
 

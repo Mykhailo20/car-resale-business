@@ -1,13 +1,11 @@
-import pandas as pd
-
-from classes.OLTP.car import Car
-from classes.OLTP.address import Address
-from classes.OLTP.employee import Employee
-from classes.OLTP.seller import Seller
-from classes.OLTP.buyer import Buyer
-from classes.OLTP.purchase import Purchase
-from classes.OLTP.repair import Repair
-from classes.OLTP.sale import Sale
+from car_resale_business_project.databases.classes.OLTP.car import Car
+from car_resale_business_project.databases.classes.OLTP.address import Address
+from car_resale_business_project.databases.classes.OLTP.employee import Employee
+from car_resale_business_project.databases.classes.OLTP.seller import Seller
+from car_resale_business_project.databases.classes.OLTP.buyer import Buyer
+from car_resale_business_project.databases.classes.OLTP.purchase import Purchase
+from car_resale_business_project.databases.classes.OLTP.repair import Repair
+from car_resale_business_project.databases.classes.OLTP.sale import Sale
 
 
 # Define functions to create instances of Car, Seller, Employee, and Address classes

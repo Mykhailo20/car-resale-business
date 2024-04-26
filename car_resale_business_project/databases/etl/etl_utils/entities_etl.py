@@ -1,10 +1,10 @@
-from etl_utils.extract import *
+from car_resale_business_project.databases.etl.etl_utils.extract import *
 
-from etl_utils.transform import *
-from etl_utils.create_OLTP_class_instances import *
-from etl_utils.OLTP_to_OLAP_mapper import *
+from car_resale_business_project.databases.etl.etl_utils.transform import *
+from car_resale_business_project.databases.etl.etl_utils.create_OLTP_class_instances import *
+from car_resale_business_project.databases.etl.etl_utils.OLTP_to_OLAP_mapper import *
 
-from etl_utils.load import *
+from car_resale_business_project.databases.etl.etl_utils.load import *
 
 
 def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
@@ -70,7 +70,6 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     data_insertion_duration = time.time() - data_insertion_start_time
     print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
     olap_db_conn.close() 
-
 
 
 def car_repair_type_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):

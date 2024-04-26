@@ -20,7 +20,5 @@ class Car:
             raise ValueError("Invalid VIN format")
 
         # Validate manufacture_year
-        """
         if self.manufacture_year < 1900:
             raise ValueError("Manufacture year must be greater than or equal to 1900")
-        """

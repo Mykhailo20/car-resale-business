@@ -3,6 +3,7 @@ from sqlalchemy import func
 
 from car_resale_business_project import app, db
 from car_resale_business_project.models import Car, CarMake, CarBodyType
+from car_resale_business_project.databases.etl.perform_etl import perform_etl
 
 
 @app.route('/')
@@ -84,5 +85,6 @@ def get_car_brand_model_body_types(make_id, model_name):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    perform_etl()
 
