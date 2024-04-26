@@ -260,6 +260,16 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                             VALUES
                                 (%s, %s, %s, %s, %s, %s, %s)
                             RETURNING employee_id
+                        ), update_dim_date AS (
+                            UPDATE dim_date
+                            SET date=%s, 
+                            year=%s, 
+                            month=%s, 
+                            day=%s, 
+                            week_day=%s
+                            WHERE 
+                                date_oltp_vin = %s 
+                                AND fact_name = 'purchase'
                         )
                         UPDATE fact_car_purchase
                         SET employee_id=(SELECT employee_id FROM insert_dim_employee),
@@ -305,57 +315,64 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                 END
                 $$;
             """
-            if insert_new_employee:
-                data = [
-                (
-                    car_purchase.car_dim.vin,
+            data = [
+            (
+                car_purchase.car_dim.vin,
 
-                    car_purchase.employee_dim.first_name,
-                    car_purchase.employee_dim.age,
-                    car_purchase.employee_dim.age_group,
-                    car_purchase.employee_dim.sex,
-                    car_purchase.employee_dim.salary,
-                    car_purchase.employee_dim.work_experience,
-                    car_purchase.employee_dim.oltp_id,
-                    car_purchase.price,
-                    car_purchase.car_years,
-                    car_purchase.odometer,
-                    car_purchase.condition,
-                    car_purchase.employee_experience,
-                    car_purchase.car_dim.vin,
+                car_purchase.employee_dim.first_name,
+                car_purchase.employee_dim.age,
+                car_purchase.employee_dim.age_group,
+                car_purchase.employee_dim.sex,
+                car_purchase.employee_dim.salary,
+                car_purchase.employee_dim.work_experience,
+                car_purchase.employee_dim.oltp_id,
 
-                    car_purchase.car_dim.vin,
-                    car_purchase.car_dim.manufacture_year,
-                    car_purchase.car_dim.make,
-                    car_purchase.car_dim.model,
-                    car_purchase.car_dim.trim,
-                    car_purchase.car_dim.body_type,
-                    car_purchase.car_dim.transmission,
-                    car_purchase.car_dim.color,
-                    car_purchase.employee_dim.first_name,
-                    car_purchase.employee_dim.age,
-                    car_purchase.employee_dim.age_group,
-                    car_purchase.employee_dim.sex,
-                    car_purchase.employee_dim.salary,
-                    car_purchase.employee_dim.work_experience,
-                    car_purchase.employee_dim.oltp_id,
-                    car_purchase.date_dim.date,
-                    car_purchase.date_dim.year,
-                    car_purchase.date_dim.month,
-                    car_purchase.date_dim.day,
-                    car_purchase.date_dim.week_day,
-                    car_purchase.date_dim.oltp_id,
-                    car_purchase.date_dim.fact_name,
-                    car_purchase.seller_id,
-                    car_purchase.location_id,
-                    car_purchase.price,
-                    car_purchase.car_years,
-                    car_purchase.odometer,
-                    car_purchase.condition,
-                    car_purchase.employee_experience
-                )
-                for car_purchase in car_purchases
-            ]
+                car_purchase.date_dim.date,
+                car_purchase.date_dim.year,
+                car_purchase.date_dim.month,
+                car_purchase.date_dim.day,
+                car_purchase.date_dim.week_day,
+                car_purchase.car_dim.vin,
+
+                car_purchase.price,
+                car_purchase.car_years,
+                car_purchase.odometer,
+                car_purchase.condition,
+                car_purchase.employee_experience,
+                car_purchase.car_dim.vin,
+
+                car_purchase.car_dim.vin,
+                car_purchase.car_dim.manufacture_year,
+                car_purchase.car_dim.make,
+                car_purchase.car_dim.model,
+                car_purchase.car_dim.trim,
+                car_purchase.car_dim.body_type,
+                car_purchase.car_dim.transmission,
+                car_purchase.car_dim.color,
+                car_purchase.employee_dim.first_name,
+                car_purchase.employee_dim.age,
+                car_purchase.employee_dim.age_group,
+                car_purchase.employee_dim.sex,
+                car_purchase.employee_dim.salary,
+                car_purchase.employee_dim.work_experience,
+                car_purchase.employee_dim.oltp_id,
+                car_purchase.date_dim.date,
+                car_purchase.date_dim.year,
+                car_purchase.date_dim.month,
+                car_purchase.date_dim.day,
+                car_purchase.date_dim.week_day,
+                car_purchase.date_dim.oltp_id,
+                car_purchase.date_dim.fact_name,
+                car_purchase.seller_id,
+                car_purchase.location_id,
+                car_purchase.price,
+                car_purchase.car_years,
+                car_purchase.odometer,
+                car_purchase.condition,
+                car_purchase.employee_experience
+            )
+            for car_purchase in car_purchases
+        ]
         
         else:
             query = """
@@ -369,6 +386,17 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
 
                     -- If the record exists, perform the update operation
                     IF oltp_car_vin_exists THEN
+                        WITH update_dim_date AS (
+                            UPDATE dim_date
+                            SET date=%s, 
+                            year=%s, 
+                            month=%s, 
+                            day=%s, 
+                            week_day=%s
+                            WHERE 
+                                date_oltp_vin = %s 
+                                AND fact_name = 'purchase'
+                        ) 
                         UPDATE fact_car_purchase
                         SET price = %s,
                             car_years = %s,
@@ -409,6 +437,14 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
             data = [
                 (
                     car_purchase.car_dim.vin,
+
+                    car_purchase.date_dim.date,
+                    car_purchase.date_dim.year,
+                    car_purchase.date_dim.month,
+                    car_purchase.date_dim.day,
+                    car_purchase.date_dim.week_day,
+                    car_purchase.car_dim.vin,
+
                     car_purchase.price,
                     car_purchase.car_years,
                     car_purchase.odometer,
