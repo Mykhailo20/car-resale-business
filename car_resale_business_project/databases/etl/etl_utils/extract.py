@@ -229,7 +229,7 @@ def extract_car_repair_type_data(conn, initial_data_loading, last_etl_datetime):
     return data
     
 
-def extract_purchase_data(conn, initial_data_loading, last_etl_datetime, limit_records=10):
+def extract_purchase_data(conn, initial_data_loading, last_etl_datetime):
     if initial_data_loading:
         # SQL query
         query = """

@@ -99,11 +99,6 @@ def load_buyer_dim(conn, buyer_dims, initial_data_loading):
                         age_group = %s, 
                         sex = %s
                     WHERE buyer_oltp_id = %s;
-                ELSE
-                    -- Otherwise, perform the insert operation
-                    INSERT INTO dim_buyer(first_name, age, age_group, sex, buyer_oltp_id)
-                    VALUES
-                        (%s, %s, %s, %s, %s);
                 END IF;
             END
             $$;
@@ -116,13 +111,7 @@ def load_buyer_dim(conn, buyer_dims, initial_data_loading):
                 buyer_dim.age,
                 buyer_dim.age_group,
                 buyer_dim.sex,
-                buyer_dim.oltp_id,
-
-                buyer_dim.first_name,
-                buyer_dim.age,
-                buyer_dim.age_group,
-                buyer_dim.sex,
-                buyer_dim.oltp_id,
+                buyer_dim.oltp_id
             )
             for buyer_dim in buyer_dims
         ]

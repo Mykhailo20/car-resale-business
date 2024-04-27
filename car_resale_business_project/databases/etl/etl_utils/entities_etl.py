@@ -49,7 +49,7 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     olap_db_conn = pg2.connect(database=olap_config_dict['database'], user=olap_config_dict['user'], password=olap_config_dict['password'])
     
     # INSERT DATA INTO dim_seller table
-    batch_size = 10
+    batch_size = 1000
     start_index = 0
     total_records = len(olap_sellers_list)
 
@@ -66,7 +66,6 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
             load_location_dim(conn=olap_db_conn, location_dims=seller_location_batch_data)
 
         start_index += batch_size
-        break
 
     data_insertion_duration = time.time() - data_insertion_start_time
     print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
@@ -113,8 +112,8 @@ def buyer_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading
     print(f"\nBUYER LOAD")
     olap_db_conn = pg2.connect(database=olap_config_dict['database'], user=olap_config_dict['user'], password=olap_config_dict['password'])
     
-    # INSERT DATA INTO dim_seller table
-    batch_size = 10
+    # INSERT DATA INTO dim_buyer table
+    batch_size = 1000
     start_index = 0
     total_records = len(olap_buyers_list)
 
@@ -131,7 +130,6 @@ def buyer_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading
             load_location_dim(conn=olap_db_conn, location_dims=buyer_location_batch_data)
 
         start_index += batch_size
-        break
 
     data_insertion_duration = time.time() - data_insertion_start_time
     print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
@@ -173,8 +171,8 @@ def car_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, 
     print(f"\nCAR LOAD")
     olap_db_conn = pg2.connect(database=olap_config_dict['database'], user=olap_config_dict['user'], password=olap_config_dict['password'])
     
-    # INSERT DATA INTO dim_scar table
-    batch_size = 10
+    # INSERT DATA INTO dim_car table
+    batch_size = 1000
     start_index = 0
     total_records = len(olap_cars_list)
 
@@ -187,7 +185,6 @@ def car_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, 
         print(f"load_car_dim: len(car_batch_data) = {len(car_batch_data)}\ncar_batch_data = {car_batch_data}")
 
         start_index += batch_size
-        break
 
     data_insertion_duration = time.time() - data_insertion_start_time
     print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
@@ -297,8 +294,8 @@ def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
     print(f"\nPURCHASE EXTRACT")
     
-    purchase_data = extract_purchase_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime, limit_records=100)
-    
+    purchase_data = extract_purchase_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
+    print(f"len(purchase_data) = {len(purchase_data)}")
     if not initial_data_loading:
         print(f"updated_fact_car_purchase_data: {purchase_data}")
         print(f"len(updated_fact_car_purchase_data): {len(purchase_data)}")
