@@ -78,6 +78,86 @@ def load_seller_dim(conn, seller_dims, initial_data_loading):
         data = data[0]
     insert_data(conn, query, data, 'dim_seller')
 
+def load_car_dim(conn, car_dims, initial_data_loading):
+    if initial_data_loading:
+        # SQL query
+        query = """
+            INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
+            VALUES
+                (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        data = [
+            (
+                car_dim.vin,
+                car_dim.manufacture_year,
+                car_dim.make,
+                car_dim.model,
+                car_dim.trim,
+                car_dim.body_type,
+                car_dim.transmission,
+                car_dim.color,
+            )
+            for car_dim in car_dims
+        ]
+    else:
+        query = """
+            DO
+            $$
+            DECLARE
+                oltp_id_exists BOOLEAN;
+            BEGIN
+                -- Check if the record with the specified oltp_id exists
+                SELECT TRUE INTO oltp_id_exists FROM dim_car WHERE vin = %s;
+                
+                -- If the record exists, perform the update operation
+                IF oltp_id_exists THEN
+                    UPDATE dim_car
+                    SET 
+                        manufacture_year = %s,
+                        make = %s,
+                        model = %s,
+                        trim = %s,
+                        body = %s,
+                        transmission = %s,
+                        color = %s
+                    WHERE vin = %s;
+                ELSE
+                    -- Otherwise, perform the insert operation
+                    INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
+                    VALUES
+                        (%s, %s, %s, %s, %s, %s, %s, %s);
+                END IF;
+            END
+            $$;
+        """
+        data = [
+            (
+                car_dim.vin,
+
+                car_dim.manufacture_year,
+                car_dim.make,
+                car_dim.model,
+                car_dim.trim,
+                car_dim.body_type,
+                car_dim.transmission,
+                car_dim.color,
+                car_dim.vin,
+
+                car_dim.vin,
+                car_dim.manufacture_year,
+                car_dim.make,
+                car_dim.model,
+                car_dim.trim,
+                car_dim.body_type,
+                car_dim.transmission,
+                car_dim.color
+            )
+            for car_dim in car_dims
+        ]
+        
+    if len(data) == 1:
+        data = data[0]
+    insert_data(conn, query, data, 'dim_car')
 
 def load_location_dim(conn, location_dims):
     # Since dim_location is a slowly changing dimension, its update will be identical to a regular insert (updating the is_valid field will execute a trigger in the OLAP database)

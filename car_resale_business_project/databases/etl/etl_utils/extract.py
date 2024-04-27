@@ -115,22 +115,42 @@ def extract_location_data(conn, initial_data_loading, last_etl_datetime):
     return data
     
 
-def extract_car_data(conn, limit_records=10):
-    # SQL query
-    query = """
-        SELECT 
-            c.vin, c.manufacture_year, cm.name AS make_name, c.model, c.trim, 
-            cbt.name AS cbt_name, c.transmission, color.name AS color_name
-        FROM car c
-        JOIN car_make cm ON c.make_id = cm.car_make_id
-        JOIN car_body_type cbt ON c.body_type_id = cbt.car_body_type_id
-        JOIN color ON c.color_id = color.color_id
-        LIMIT %s;
-    """
-    with conn.cursor() as cur:
-        cur.execute(query, (limit_records,))
-        # Fetch the results
-        data = cur.fetchall()
+def extract_car_data(conn, initial_data_loading, last_etl_datetime, limit_records=10):
+    if initial_data_loading:
+        # SQL query
+        query = """
+            SELECT 
+                c.vin, c.manufacture_year, cm.name AS make_name, c.model, c.trim, 
+                cbt.name AS cbt_name, c.transmission, color.name AS color_name
+            FROM car c
+            JOIN car_make cm ON c.make_id = cm.car_make_id
+            JOIN car_body_type cbt ON c.body_type_id = cbt.car_body_type_id
+            JOIN color ON c.color_id = color.color_id;
+        """
+        with conn.cursor() as cur:
+            cur.execute(query)
+            # Fetch the results
+            data = cur.fetchall()
+    else:
+         # SQL query
+        query = """
+            SELECT 
+                c.vin, c.manufacture_year, cm.name AS make_name, c.model, c.trim, 
+                cbt.name AS cbt_name, c.transmission, color.name AS color_name
+            FROM car c
+            JOIN car_make cm ON c.make_id = cm.car_make_id
+            JOIN car_body_type cbt ON c.body_type_id = cbt.car_body_type_id
+            JOIN color ON c.color_id = color.color_id
+            WHERE 
+                c.updated_at >= %s
+                OR cm.updated_at >= %s
+                OR cbt.updated_at >= %s
+                OR color.updated_at >= %s;
+        """
+        with conn.cursor() as cur:
+            cur.execute(query, (last_etl_datetime, last_etl_datetime, last_etl_datetime, last_etl_datetime))
+            # Fetch the results
+            data = cur.fetchall()
     return data
 
 

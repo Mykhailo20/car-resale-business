@@ -73,6 +73,63 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     olap_db_conn.close() 
 
 
+def car_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
+
+    oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
+
+    print(f"\nCAR EXTRACT")
+    if initial_data_loading:
+        print(f"Initial data loading.")
+        car_data = extract_car_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
+    else:
+        print(f"Incremental data loading.")
+        car_data = extract_car_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
+        print(f"updated_car_data = {car_data}")
+        print(f"len(updated_car_data) = {len(car_data)}")
+
+    oltp_db_conn.close()
+    car_columns = [
+        'c_vin', 'c_manufacture_year', 'c_make_name', 
+        'c_model', 'c_trim', 'c_cbt_name', 
+        'c_transmission', 'c_color_name',
+    ]
+    car_df = pd.DataFrame(car_data, columns=car_columns)
+
+    print(f"\nCAR TRANSFORM")
+    check_dataframe(car_df, important_columns=['c_vin'], df_name='car_df')
+
+    # Create OLAP Car class instances
+    olap_cars_list = []
+    for _, row in car_df.iterrows():
+        oltp_car_obj = create_car(row)
+
+        olap_car_obj = OLTP_to_OLAP_car(oltp_car_obj, metadata['dimensions']['dim_car'])
+        olap_cars_list.append(olap_car_obj)
+        
+    print(f"\nCAR LOAD")
+    olap_db_conn = pg2.connect(database=olap_config_dict['database'], user=olap_config_dict['user'], password=olap_config_dict['password'])
+    
+    # INSERT DATA INTO dim_scar table
+    batch_size = 10
+    start_index = 0
+    total_records = len(olap_cars_list)
+
+    data_insertion_start_time = time.time()
+    while start_index < total_records:
+
+        end_index = min(start_index + batch_size, total_records)
+        car_batch_data = olap_cars_list[start_index:end_index][start_index:end_index]
+        load_car_dim(conn=olap_db_conn, car_dims=car_batch_data, initial_data_loading=initial_data_loading)
+        print(f"load_car_dim: len(car_batch_data) = {len(car_batch_data)}\ncar_batch_data = {car_batch_data}")
+
+        start_index += batch_size
+        break
+
+    data_insertion_duration = time.time() - data_insertion_start_time
+    print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
+    olap_db_conn.close() 
+
+
 def car_repair_type_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
     oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
 
