@@ -78,28 +78,62 @@ def load_seller_dim(conn, seller_dims, initial_data_loading):
         data = data[0]
     insert_data(conn, query, data, 'dim_seller')
 
-def load_car_dim(conn, car_dims, initial_data_loading):
-    if initial_data_loading:
-        # SQL query
+
+def load_buyer_dim(conn, buyer_dims, initial_data_loading):
+    if initial_data_loading == False:
         query = """
-            INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
-            VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s)
+            DO
+            $$
+            DECLARE
+                oltp_id_exists BOOLEAN;
+            BEGIN
+                -- Check if the record with the specified oltp_id exists
+                SELECT TRUE INTO oltp_id_exists FROM dim_buyer WHERE buyer_oltp_id = %s;
+                
+                -- If the record exists, perform the update operation
+                IF oltp_id_exists THEN
+                    UPDATE dim_buyer
+                    SET 
+                        first_name = %s, 
+                        age = %s, 
+                        age_group = %s, 
+                        sex = %s
+                    WHERE buyer_oltp_id = %s;
+                ELSE
+                    -- Otherwise, perform the insert operation
+                    INSERT INTO dim_buyer(first_name, age, age_group, sex, buyer_oltp_id)
+                    VALUES
+                        (%s, %s, %s, %s, %s);
+                END IF;
+            END
+            $$;
         """
         data = [
             (
-                car_dim.vin,
-                car_dim.manufacture_year,
-                car_dim.make,
-                car_dim.model,
-                car_dim.trim,
-                car_dim.body_type,
-                car_dim.transmission,
-                car_dim.color,
+                buyer_dim.oltp_id,
+
+                buyer_dim.first_name,
+                buyer_dim.age,
+                buyer_dim.age_group,
+                buyer_dim.sex,
+                buyer_dim.oltp_id,
+
+                buyer_dim.first_name,
+                buyer_dim.age,
+                buyer_dim.age_group,
+                buyer_dim.sex,
+                buyer_dim.oltp_id,
             )
-            for car_dim in car_dims
+            for buyer_dim in buyer_dims
         ]
-    else:
+        
+    if len(data) == 1:
+        data = data[0]
+    insert_data(conn, query, data, 'dim_buyer')
+
+
+def load_car_dim(conn, car_dims, initial_data_loading):
+    if initial_data_loading == False:
         query = """
             DO
             $$
@@ -158,6 +192,7 @@ def load_car_dim(conn, car_dims, initial_data_loading):
     if len(data) == 1:
         data = data[0]
     insert_data(conn, query, data, 'dim_car')
+
 
 def load_location_dim(conn, location_dims):
     # Since dim_location is a slowly changing dimension, its update will be identical to a regular insert (updating the is_valid field will execute a trigger in the OLAP database)
@@ -361,12 +396,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                         WHERE car_vin = %s;
                     ELSE
                         -- Otherwise, perform the insert operation
-                        WITH insert_dim_car AS (
-                            INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
-                            VALUES
-                                (%s, %s, %s, %s, %s, %s, %s, %s)
-                            RETURNING vin
-                        ), insert_dim_employee AS (
+                        WITH insert_dim_employee AS (
                             INSERT INTO dim_employee(first_name, age, age_group, sex, salary, work_experience, employee_oltp_id)
                             VALUES
                                 (%s, %s, %s, %s, %s, %s, %s)
@@ -384,7 +414,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                         )
                         VALUES
                             (
-                                (SELECT vin FROM insert_dim_car),
+                                %s,
                                 (SELECT seller_id FROM dim_seller WHERE seller_oltp_id=%s),
                                 (SELECT employee_id FROM insert_dim_employee),
                                 (SELECT location_id FROM dim_location WHERE address_oltp_id=%s AND is_valid = 1),
@@ -421,14 +451,6 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                 car_purchase.employee_experience,
                 car_purchase.car_dim.vin,
 
-                car_purchase.car_dim.vin,
-                car_purchase.car_dim.manufacture_year,
-                car_purchase.car_dim.make,
-                car_purchase.car_dim.model,
-                car_purchase.car_dim.trim,
-                car_purchase.car_dim.body_type,
-                car_purchase.car_dim.transmission,
-                car_purchase.car_dim.color,
                 car_purchase.employee_dim.first_name,
                 car_purchase.employee_dim.age,
                 car_purchase.employee_dim.age_group,
@@ -443,6 +465,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                 car_purchase.date_dim.week_day,
                 car_purchase.date_dim.oltp_id,
                 car_purchase.date_dim.fact_name,
+                car_purchase.car_dim.vin,
                 car_purchase.seller_id,
                 car_purchase.location_id,
                 car_purchase.price,
@@ -485,12 +508,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                             employee_experience = %s
                         WHERE car_vin = %s;
                     ELSE
-                        WITH insert_dim_car AS (
-                            INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
-                            VALUES
-                                (%s, %s, %s, %s, %s, %s, %s, %s)
-                            RETURNING vin
-                        ), insert_dim_date AS (
+                        WITH insert_dim_date AS (
                             INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
                             VALUES
                                 (%s, %s, %s, %s, %s, %s, %s)
@@ -503,7 +521,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                         )
                         VALUES
                             (
-                                (SELECT vin FROM insert_dim_car),
+                                %s,
                                 (SELECT seller_id FROM dim_seller WHERE seller_oltp_id=%s),
                                 (SELECT employee_id FROM dim_employee WHERE employee_oltp_id=%s AND is_valid = 1),
                                 (SELECT location_id FROM dim_location WHERE address_oltp_id=%s AND is_valid = 1),
@@ -532,14 +550,6 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                     car_purchase.employee_experience,
                     car_purchase.car_dim.vin,
 
-                    car_purchase.car_dim.vin,
-                    car_purchase.car_dim.manufacture_year,
-                    car_purchase.car_dim.make,
-                    car_purchase.car_dim.model,
-                    car_purchase.car_dim.trim,
-                    car_purchase.car_dim.body_type,
-                    car_purchase.car_dim.transmission,
-                    car_purchase.car_dim.color,
                     car_purchase.date_dim.date,
                     car_purchase.date_dim.year,
                     car_purchase.date_dim.month,
@@ -547,6 +557,7 @@ def load_fact_car_purchase(conn, car_purchases, insert_new_employee, initial_dat
                     car_purchase.date_dim.week_day,
                     car_purchase.date_dim.oltp_id,
                     car_purchase.date_dim.fact_name,
+                    car_purchase.car_dim.vin,
                     car_purchase.seller_id,
                     car_purchase.employee_dim.oltp_id,
                     car_purchase.location_id,

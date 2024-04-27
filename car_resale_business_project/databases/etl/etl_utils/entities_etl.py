@@ -72,6 +72,70 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
     print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
     olap_db_conn.close() 
 
+def buyer_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
+
+    oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
+
+    print(f"\nBUYER EXTRACT")
+    if initial_data_loading:
+        print(f"Initial data loading.")
+        buyer_data = extract_buyer_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
+    else:
+        print(f"Incremental data loading.")
+        buyer_data = extract_buyer_data(conn=oltp_db_conn, initial_data_loading=initial_data_loading, last_etl_datetime=last_etl_datetime)
+        print(f"updated_buyer_data = {buyer_data}")
+        print(f"len(updated_buyer_data) = {len(buyer_data)}")
+
+    oltp_db_conn.close()
+    buyer_columns = [
+        'b_oltp_id', 'b_first_name', 'b_last_name', 'b_middle_name',
+        'b_birth_date', 'b_sex', 'b_email', 
+        'b_addr_oltp_id',
+        'b_country', 'b_city', 'b_street', 'b_postal_code', 's_sale_date'
+    ]
+    buyer_df = pd.DataFrame(buyer_data, columns=buyer_columns)
+
+    print(f"\nBUYER TRANSFORM")
+    check_dataframe(buyer_df, important_columns=['b_oltp_id', 'b_addr_oltp_id'], df_name='buyer_df')
+
+    # Create OLAP Seller + Location classes instances
+    olap_buyers_list = []
+    olap_buyers_locations_list = []
+    for _, row in buyer_df.iterrows():
+        oltp_buyer_obj = create_buyer(row)
+
+        olap_buyer_obj = OLTP_to_OLAP_buyer_df(df_row=row, buyer_metadata=metadata['dimensions']['dim_buyer'])
+        olap_buyers_list.append(olap_buyer_obj)
+        if initial_data_loading:
+            olap_buyers_locations_obj = OLTP_to_OLAP_location(oltp_address=oltp_buyer_obj.address, location_metadata=metadata['dimensions']['dim_location'])
+            olap_buyers_locations_list.append(olap_buyers_locations_obj)
+        
+    print(f"\nBUYER LOAD")
+    olap_db_conn = pg2.connect(database=olap_config_dict['database'], user=olap_config_dict['user'], password=olap_config_dict['password'])
+    
+    # INSERT DATA INTO dim_seller table
+    batch_size = 10
+    start_index = 0
+    total_records = len(olap_buyers_list)
+
+    data_insertion_start_time = time.time()
+    while start_index < total_records:
+
+        end_index = min(start_index + batch_size, total_records)
+        buyer_batch_data = olap_buyers_list[start_index:end_index]
+        buyer_location_batch_data = olap_buyers_locations_list[start_index:end_index]
+        load_buyer_dim(conn=olap_db_conn, buyer_dims=buyer_batch_data, initial_data_loading=initial_data_loading)
+        print(f"load_bayer_dim: len(bayer_batch_data) = {len(buyer_batch_data)}\nbayer_batch_data = {buyer_batch_data}")
+        if initial_data_loading:
+            print(f"\nload_buyer_dim -> load_dim_location: len(buyer_location_batch_data)={len(buyer_location_batch_data)}\nbuyer_location_batch_data={buyer_location_batch_data}")
+            load_location_dim(conn=olap_db_conn, location_dims=buyer_location_batch_data)
+
+        start_index += batch_size
+        break
+
+    data_insertion_duration = time.time() - data_insertion_start_time
+    print(f"Data insertion time: {data_insertion_duration // 60: .0f}m {data_insertion_duration % 60: .0f}s\n")
+    olap_db_conn.close() 
 
 def car_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading, last_etl_datetime):
 

@@ -62,6 +62,7 @@ def create_employee(row):
 def create_buyer(row):
     address = create_address(row, prefix='b')
     return Buyer(
+        buyer_id=row['b_oltp_id'],
         first_name=row['b_first_name'],
         last_name=row['b_last_name'],
         middle_name=row['b_middle_name'],

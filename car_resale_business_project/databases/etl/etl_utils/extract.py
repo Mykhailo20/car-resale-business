@@ -91,6 +91,67 @@ def extract_seller_data(conn, initial_data_loading, last_etl_datetime):
 
     return data
 
+def extract_buyer_data(conn, initial_data_loading, last_etl_datetime):
+    if initial_data_loading:
+        # SQL query
+        query = """
+            SELECT 
+                b.person_id,
+                b.first_name, b.last_name, b.middle_name,
+                b.birth_date, b.sex, b.email, 
+                b.address_id,
+                country.name AS country_name,
+                c.name AS city_name,
+                addr.street,
+                addr.postal_code,
+                s.sale_date
+            FROM buyer b
+            JOIN address addr
+            ON b.address_id = addr.address_id
+            JOIN city c
+            ON addr.city_id = c.city_id
+            JOIN country
+            ON c.country_id = country.country_id
+            JOIN sale s
+            ON b.person_id = s.buyer_id;
+        """
+        with conn.cursor() as cur:
+            cur.execute(query)
+            # Fetch the results
+            data = cur.fetchall()
+    else:
+        # SQL query
+        query = """
+            SELECT 
+                b.person_id,
+                b.first_name, b.last_name, b.middle_name,
+                b.birth_date, b.sex, b.email, 
+                b.address_id,
+                country.name AS country_name,
+                c.name AS city_name,
+                addr.street,
+                addr.postal_code,
+                s.sale_date
+            FROM buyer b
+            JOIN address addr
+            ON b.address_id = addr.address_id
+            JOIN city c
+            ON addr.city_id = c.city_id
+            JOIN country
+            ON c.country_id = country.country_id
+            JOIN sale s
+            ON b.person_id = s.buyer_id
+            WHERE
+                b.updated_at >= %s
+                OR s.updated_at >= %s;
+        """
+        with conn.cursor() as cur:
+            cur.execute(query, (last_etl_datetime, last_etl_datetime))
+            # Fetch the results
+            data = cur.fetchall()
+
+    return data
+
 
 def extract_location_data(conn, initial_data_loading, last_etl_datetime):
     # SQL query
