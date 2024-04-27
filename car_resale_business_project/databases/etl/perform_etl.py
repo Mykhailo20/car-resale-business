@@ -61,7 +61,7 @@ def perform_etl():
 
         # Update the last_etl.datetime field
         etl_metadata['last_etl']['datetime'] = etl_end_datetime
-        # metadata['current_etl']['initial_data_loading'] = False
+        etl_metadata['current_etl']['initial_data_loading'] = False
 
         # Write the updated metadata back to the file
         with open(ETL_FILENAME, 'w') as file:

@@ -742,6 +742,11 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                             VALUES
                                 (%s, %s, %s, %s, %s, %s, %s)
                             RETURNING employee_id
+                        ), insert_dim_location AS (
+                            INSERT INTO dim_location(country, city, address_oltp_id)
+                            VALUES
+                                (%s, %s, %s)
+                            RETURNING location_id
                         ), insert_dim_date AS (
                             INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name, fact_oltp_id)
                             VALUES
@@ -751,16 +756,17 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
 
                         INSERT INTO fact_car_repair(
                             car_vin, employee_id, location_id, date_id, repair_type_id,
-                            cost, condition_delta
+                            cost, condition_delta,
+                            repair_oltp_id
                         )
                         VALUES
                             (
                                 %s,
                                 (SELECT employee_id FROM insert_dim_employee),
-                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s AND is_valid = 1),
+                                (SELECT location_id FROM insert_dim_location),
                                 (SELECT date_id FROM insert_dim_date),
                                 (SELECT repair_type_id FROM dim_car_repair_type WHERE repair_type=%s),
-                                %s, %s
+                                %s, %s, %s
                             );
                     END IF;
                 END
@@ -799,6 +805,9 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                     car_repair.employee_dim.salary,
                     car_repair.employee_dim.work_experience,
                     car_repair.employee_dim.oltp_id,
+                    car_repair.location_dim.country,
+                    car_repair.location_dim.city,
+                    car_repair.location_dim.oltp_id,
                     car_repair.date_dim.date,
                     car_repair.date_dim.year,
                     car_repair.date_dim.month,
@@ -809,10 +818,10 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                     car_repair.oltp_id,
 
                     car_repair.car_vin,
-                    car_repair.location_dim.oltp_id,
                     car_repair.car_repair_type_dim.repair_type,
                     car_repair.cost,
-                    car_repair.condition_delta
+                    car_repair.condition_delta,
+                    car_repair.oltp_id
                 )
                 for car_repair in car_repairs
             ]
@@ -850,7 +859,13 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                             AND repair_oltp_id = %s;
                     ELSE
                         -- Otherwise, perform the insert operation
-                        WITH insert_dim_date AS (
+                        WITH insert_dim_location AS (
+                            INSERT INTO dim_location(country, city, address_oltp_id)
+                            VALUES
+                                (%s, %s, %s)
+                            RETURNING location_id
+                        ),
+                        insert_dim_date AS (
                             INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name, fact_oltp_id)
                             VALUES
                                 (%s, %s, %s, %s, %s, %s, %s, %s)
@@ -859,16 +874,17 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
 
                         INSERT INTO fact_car_repair(
                             car_vin, employee_id, location_id, date_id, repair_type_id,
-                            cost, condition_delta
+                            cost, condition_delta, 
+                            repair_oltp_id
                         )
                         VALUES
                             (
                                 %s,
                                 (SELECT employee_id FROM dim_employee WHERE employee_oltp_id=%s AND is_valid = 1),
-                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s AND is_valid = 1),
+                                (SELECT location_id FROM insert_dim_location),
                                 (SELECT date_id FROM insert_dim_date),
                                 (SELECT repair_type_id FROM dim_car_repair_type WHERE repair_type=%s),
-                                %s, %s
+                                %s, %s, %s
                             );
                     END IF;
                 END
@@ -878,7 +894,7 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                 (
                     car_repair.car_vin,
                     car_repair.oltp_id,
-                    
+
                     car_repair.date_dim.date,
                     car_repair.date_dim.year,
                     car_repair.date_dim.month,
@@ -891,7 +907,11 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
                     car_repair.condition_delta,
                     car_repair.car_vin,
                     car_repair.oltp_id,
- 
+
+                    car_repair.location_dim.country,
+                    car_repair.location_dim.city,
+                    car_repair.location_dim.oltp_id,
+
                     car_repair.date_dim.date,
                     car_repair.date_dim.year,
                     car_repair.date_dim.month,
@@ -903,10 +923,10 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
 
                     car_repair.car_vin,
                     car_repair.employee_dim.oltp_id,
-                    car_repair.location_dim.oltp_id,
                     car_repair.car_repair_type_dim.repair_type,
                     car_repair.cost,
-                    car_repair.condition_delta
+                    car_repair.condition_delta,
+                    car_repair.oltp_id
                 )
                 for car_repair in car_repairs
             ]
@@ -1140,6 +1160,11 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                             VALUES
                                 (%s, %s, %s, %s, %s)
                             RETURNING buyer_id
+                        ), insert_dim_location AS (
+                            INSERT INTO dim_location(country, city, address_oltp_id)
+                            VALUES
+                                (%s, %s, %s)
+                            RETURNING location_id
                         ), insert_dim_date AS (
                             INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
                             VALUES
@@ -1158,7 +1183,7 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                                 %s,
                                 (SELECT buyer_id FROM insert_dim_buyer),
                                 (SELECT employee_id FROM insert_dim_employee),
-                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s),
+                                (SELECT location_id FROM insert_dim_location),
                                 (SELECT date_id FROM insert_dim_date),
                                 %s, %s, %s, %s,
                                 %s, %s, %s, %s, 
@@ -1213,6 +1238,10 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                 car_sale.buyer_dim.sex,
                 car_sale.buyer_dim.oltp_id,
 
+                car_sale.location_dim.country,
+                car_sale.location_dim.city,
+                car_sale.location_dim.oltp_id,
+
                 car_sale.date_dim.date,
                 car_sale.date_dim.year,
                 car_sale.date_dim.month,
@@ -1222,7 +1251,6 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                 car_sale.date_dim.fact_name,
 
                 car_sale.car_vin,
-                car_sale.location_dim.oltp_id,
 
                 car_sale.service_cost,
                 car_sale.price,
@@ -1283,6 +1311,11 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                             VALUES
                                 (%s, %s, %s, %s, %s)
                             RETURNING buyer_id
+                        ), insert_dim_location AS (
+                            INSERT INTO dim_location(country, city, address_oltp_id)
+                            VALUES
+                                (%s, %s, %s)
+                            RETURNING location_id
                         ), insert_dim_date AS (
                             INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
                             VALUES
@@ -1301,7 +1334,7 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                                 %s,
                                 (SELECT buyer_id FROM insert_dim_buyer),
                                 (SELECT employee_id FROM dim_employee WHERE employee_oltp_id=%s AND is_valid = 1),
-                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s),
+                                (SELECT location_id FROM insert_dim_location),
                                 (SELECT date_id FROM insert_dim_date),
                                 %s, %s, %s, %s,
                                 %s, %s, %s, %s, 
@@ -1341,6 +1374,10 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
                 car_sale.buyer_dim.sex,
                 car_sale.buyer_dim.oltp_id,
 
+                car_sale.location_dim.country,
+                car_sale.location_dim.city,
+                car_sale.location_dim.oltp_id,
+
                 car_sale.date_dim.date,
                 car_sale.date_dim.year,
                 car_sale.date_dim.month,
@@ -1351,7 +1388,6 @@ def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loadin
 
                 car_sale.car_vin,
                 car_sale.employee_dim.oltp_id,
-                car_sale.location_dim.oltp_id,
 
                 car_sale.service_cost,
                 car_sale.price,
