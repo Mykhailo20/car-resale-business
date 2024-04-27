@@ -824,7 +824,7 @@ def load_fact_car_repair(conn, car_repairs, insert_new_employee, initial_data_lo
     insert_data(conn, query, data, 'fact_car_repair')
 
 
-def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_loading):
+def load_fact_car_sale(conn, car_sales, insert_new_employee, initial_data_loading):
     if initial_data_loading:
         if insert_new_employee:
             query = """
@@ -912,7 +912,7 @@ def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_lo
                     car_sale.service_time,
                     car_sale.service_cost
                 )
-                for car_sale in car_purchases
+                for car_sale in car_sales
             ]
         else:
             query = """
@@ -989,12 +989,12 @@ def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_lo
                     car_sale.service_time,
                     car_sale.service_cost
                 )
-                for car_sale in car_purchases
+                for car_sale in car_sales
             ]
     else:
         print(f"fact_car_sale incremental data loading")
-        """"""
         if insert_new_employee:
+            print(f"fact_car_sale: insert new employee")
             query = """
                 DO
                 $$
@@ -1002,28 +1002,53 @@ def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_lo
                     oltp_car_vin_exists BOOLEAN;
                 BEGIN
                     -- Check if the record with the specified oltp_id exists
-                    SELECT TRUE INTO oltp_car_vin_exists FROM fact_car_purchase WHERE car_vin = %s;
+                    SELECT TRUE INTO oltp_car_vin_exists FROM fact_car_sale WHERE car_vin = %s;
 
                     -- If the record exists, perform the update operation
                     IF oltp_car_vin_exists THEN
-                        UPDATE fact_car_purchase
-                        SET price = %s,
-                            car_years = %s,
-                            odometer = %s,
-                            condition = %s,
-                            employee_experience = %s;
-                    ELSE
-                        -- Otherwise, perform the insert operation
-                        WITH insert_dim_car AS (
-                            INSERT INTO dim_car(vin, manufacture_year, make, model, trim, body, transmission, color)
-                            VALUES
-                                (%s, %s, %s, %s, %s, %s, %s, %s)
-                            RETURNING vin
-                        ), insert_dim_employee AS (
+                        WITH insert_dim_employee AS (
                             INSERT INTO dim_employee(first_name, age, age_group, sex, salary, work_experience, employee_oltp_id)
                             VALUES
                                 (%s, %s, %s, %s, %s, %s, %s)
                             RETURNING employee_id
+                        ), update_dim_date AS (
+                            UPDATE dim_date
+                            SET date=%s, 
+                            year=%s, 
+                            month=%s, 
+                            day=%s, 
+                            week_day=%s
+                            WHERE 
+                                date_oltp_vin = %s 
+                                AND fact_name = 'sale'
+                        )
+                        UPDATE fact_car_sale
+                        SET 
+                            employee_id = (SELECT employee_id FROM insert_dim_employee),
+                            service_cost = %s,
+                            price = %s,
+                            gross_profit_amount = %s,
+                            gross_profit_percentage = %s,
+                            mmr = %s,
+                            price_margin = %s,
+                            service_time = %s,
+                            car_years = %s,
+                            odometer = %s,
+                            condition = %s,
+                            employee_experience = %s
+                        WHERE car_vin = %s;
+                    ELSE
+                        -- Otherwise, perform the insert operation
+                        WITH insert_dim_employee AS (
+                            INSERT INTO dim_employee(first_name, age, age_group, sex, salary, work_experience, employee_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s)
+                            RETURNING employee_id
+                        ), insert_dim_buyer AS (
+                            INSERT INTO dim_buyer(first_name, age, age_group, sex, buyer_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s)
+                            RETURNING buyer_id
                         ), insert_dim_date AS (
                             INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
                             VALUES
@@ -1031,69 +1056,227 @@ def load_fact_car_sale(conn, car_purchases, insert_new_employee, initial_data_lo
                             RETURNING date_id
                         )
 
-                        INSERT INTO fact_car_purchase(
-                            car_vin, seller_id, employee_id, location_id, date_id,
-                            price, car_years, odometer, condition, employee_experience
+                        INSERT INTO fact_car_sale(
+                            car_vin, buyer_id, employee_id, location_id, date_id,
+                            service_cost, price, gross_profit_amount, gross_profit_percentage,
+                            mmr, price_margin, service_time,
+                            car_years, odometer, condition, employee_experience
                         )
                         VALUES
                             (
-                                (SELECT vin FROM insert_dim_car),
-                                (SELECT seller_id FROM dim_seller WHERE seller_oltp_id=%s),
+                                %s,
+                                (SELECT buyer_id FROM insert_dim_buyer),
                                 (SELECT employee_id FROM insert_dim_employee),
                                 (SELECT location_id FROM dim_location WHERE address_oltp_id=%s),
                                 (SELECT date_id FROM insert_dim_date),
-                                %s, %s, %s, %s, %s
+                                %s, %s, %s, %s,
+                                %s, %s, %s, %s, 
+                                %s, %s, %s
                             );
                     END IF;
                 END
                 $$;
             """
-            if insert_new_employee:
-                data = [
-                (
-                    car_purchase.car_dim.vin,
-                    car_purchase.price,
-                    car_purchase.car_years,
-                    car_purchase.odometer,
-                    car_purchase.condition,
-                    car_purchase.employee_experience,
+            data = [
+            (
+                car_sale.car_vin,
 
-                    car_purchase.car_dim.vin,
-                    car_purchase.car_dim.manufacture_year,
-                    car_purchase.car_dim.make,
-                    car_purchase.car_dim.model,
-                    car_purchase.car_dim.trim,
-                    car_purchase.car_dim.body_type,
-                    car_purchase.car_dim.transmission,
-                    car_purchase.car_dim.color,
-                    car_purchase.employee_dim.first_name,
-                    car_purchase.employee_dim.age,
-                    car_purchase.employee_dim.age_group,
-                    car_purchase.employee_dim.sex,
-                    car_purchase.employee_dim.salary,
-                    car_purchase.employee_dim.work_experience,
-                    car_purchase.employee_dim.oltp_id,
-                    car_purchase.date_dim.date,
-                    car_purchase.date_dim.year,
-                    car_purchase.date_dim.month,
-                    car_purchase.date_dim.day,
-                    car_purchase.date_dim.week_day,
-                    car_purchase.date_dim.oltp_id,
-                    car_purchase.date_dim.fact_name,
-                    car_purchase.seller_id,
-                    car_purchase.location_id,
-                    car_purchase.price,
-                    car_purchase.car_years,
-                    car_purchase.odometer,
-                    car_purchase.condition,
-                    car_purchase.employee_experience
-                )
-                for car_purchase in car_purchases
-            ]
+                car_sale.employee_dim.first_name,
+                car_sale.employee_dim.age,
+                car_sale.employee_dim.age_group,
+                car_sale.employee_dim.sex,
+                car_sale.employee_dim.salary,
+                car_sale.employee_dim.work_experience,
+                car_sale.employee_dim.oltp_id,
+
+                car_sale.date_dim.date,
+                car_sale.date_dim.year,
+                car_sale.date_dim.month,
+                car_sale.date_dim.day,
+                car_sale.date_dim.week_day,
+                car_sale.car_vin,
+
+                car_sale.service_cost,
+                car_sale.price,
+                car_sale.gross_profit_amount,
+                car_sale.gross_profit_percentage,
+                car_sale.mmr,
+                car_sale.price_margin,
+                car_sale.service_time,
+                car_sale.car_years,
+                car_sale.odometer,
+                car_sale.condition,
+                car_sale.employee_experience,
+                car_sale.car_vin,
+
+                car_sale.employee_dim.first_name,
+                car_sale.employee_dim.age,
+                car_sale.employee_dim.age_group,
+                car_sale.employee_dim.sex,
+                car_sale.employee_dim.salary,
+                car_sale.employee_dim.work_experience,
+                car_sale.employee_dim.oltp_id,
+                car_sale.buyer_dim.first_name,
+                car_sale.buyer_dim.age,
+                car_sale.buyer_dim.age_group,
+                car_sale.buyer_dim.sex,
+                car_sale.buyer_dim.oltp_id,
+
+                car_sale.date_dim.date,
+                car_sale.date_dim.year,
+                car_sale.date_dim.month,
+                car_sale.date_dim.day,
+                car_sale.date_dim.week_day,
+                car_sale.date_dim.oltp_id,
+                car_sale.date_dim.fact_name,
+
+                car_sale.car_vin,
+                car_sale.location_dim.oltp_id,
+
+                car_sale.service_cost,
+                car_sale.price,
+                car_sale.gross_profit_amount,
+                car_sale.gross_profit_percentage,
+                car_sale.mmr,
+                car_sale.price_margin,
+                car_sale.service_time,
+                car_sale.car_years,
+                car_sale.odometer,
+                car_sale.condition,
+                car_sale.employee_experience 
+            )
+            for car_sale in car_sales
+        ]
         
         else:
-            print("fact_car_sale incremental loading")
+            query = """
+                DO
+                $$
+                DECLARE
+                    oltp_car_vin_exists BOOLEAN;
+                BEGIN
+                    -- Check if the record with the specified oltp_id exists
+                    SELECT TRUE INTO oltp_car_vin_exists FROM fact_car_sale WHERE car_vin = %s;
+
+                    -- If the record exists, perform the update operation
+                    IF oltp_car_vin_exists THEN
+                        WITH update_dim_date AS (
+                            UPDATE dim_date
+                            SET date=%s, 
+                            year=%s, 
+                            month=%s, 
+                            day=%s, 
+                            week_day=%s
+                            WHERE 
+                                date_oltp_vin = %s 
+                                AND fact_name = 'sale'
+                        )
+                        UPDATE fact_car_sale
+                        SET
+                            service_cost = %s,
+                            price = %s,
+                            gross_profit_amount = %s,
+                            gross_profit_percentage = %s,
+                            mmr = %s,
+                            price_margin = %s,
+                            service_time = %s,
+                            car_years = %s,
+                            odometer = %s,
+                            condition = %s,
+                            employee_experience = %s
+                        WHERE car_vin = %s;
+                    ELSE
+                        -- Otherwise, perform the insert operation
+                        WITH insert_dim_buyer AS (
+                            INSERT INTO dim_buyer(first_name, age, age_group, sex, buyer_oltp_id)
+                            VALUES
+                                (%s, %s, %s, %s, %s)
+                            RETURNING buyer_id
+                        ), insert_dim_date AS (
+                            INSERT INTO dim_date(date, year, month, day, week_day, date_oltp_vin, fact_name)
+                            VALUES
+                                (%s, %s, %s, %s, %s, %s, %s)
+                            RETURNING date_id
+                        )
+
+                        INSERT INTO fact_car_sale(
+                            car_vin, buyer_id, employee_id, location_id, date_id,
+                            service_cost, price, gross_profit_amount, gross_profit_percentage,
+                            mmr, price_margin, service_time,
+                            car_years, odometer, condition, employee_experience
+                        )
+                        VALUES
+                            (
+                                %s,
+                                (SELECT buyer_id FROM insert_dim_buyer),
+                                (SELECT employee_id FROM dim_employee WHERE employee_oltp_id=%s AND is_valid = 1),
+                                (SELECT location_id FROM dim_location WHERE address_oltp_id=%s),
+                                (SELECT date_id FROM insert_dim_date),
+                                %s, %s, %s, %s,
+                                %s, %s, %s, %s, 
+                                %s, %s, %s
+                            );
+                    END IF;
+                END
+                $$;
+            """
+            data = [
+            (
+                car_sale.car_vin,
+
+                car_sale.date_dim.date,
+                car_sale.date_dim.year,
+                car_sale.date_dim.month,
+                car_sale.date_dim.day,
+                car_sale.date_dim.week_day,
+                car_sale.car_vin,
+
+                car_sale.service_cost,
+                car_sale.price,
+                car_sale.gross_profit_amount,
+                car_sale.gross_profit_percentage,
+                car_sale.mmr,
+                car_sale.price_margin,
+                car_sale.service_time,
+                car_sale.car_years,
+                car_sale.odometer,
+                car_sale.condition,
+                car_sale.employee_experience,
+                car_sale.car_vin,
+
+                car_sale.buyer_dim.first_name,
+                car_sale.buyer_dim.age,
+                car_sale.buyer_dim.age_group,
+                car_sale.buyer_dim.sex,
+                car_sale.buyer_dim.oltp_id,
+
+                car_sale.date_dim.date,
+                car_sale.date_dim.year,
+                car_sale.date_dim.month,
+                car_sale.date_dim.day,
+                car_sale.date_dim.week_day,
+                car_sale.date_dim.oltp_id,
+                car_sale.date_dim.fact_name,
+
+                car_sale.car_vin,
+                car_sale.employee_dim.oltp_id,
+                car_sale.location_dim.oltp_id,
+
+                car_sale.service_cost,
+                car_sale.price,
+                car_sale.gross_profit_amount,
+                car_sale.gross_profit_percentage,
+                car_sale.mmr,
+                car_sale.price_margin,
+                car_sale.service_time,
+                car_sale.car_years,
+                car_sale.odometer,
+                car_sale.condition,
+                car_sale.employee_experience 
+            )
+            for car_sale in car_sales
+        ]
 
     if len(data) == 1:
         data = data[0]
-    # insert_data(conn, query, data, 'fact_car_sale')
+    insert_data(conn, query, data, 'fact_car_sale')

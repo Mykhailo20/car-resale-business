@@ -485,8 +485,8 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
                                 WHERE employee_oltp_id = %s AND is_valid = 1;
                                 
                                 CREATE TEMPORARY TABLE temp_table AS
-                                -- Select the employee_experience from the fact_car_purchase table
-                                SELECT employee_experience FROM fact_car_purchase 
+                                -- Select the employee_experience from the fact_car_sale table
+                                SELECT employee_experience FROM fact_car_sale 
                                 WHERE employee_id = employee_id_local;
                             ELSE
                                 CREATE TEMPORARY TABLE temp_table AS
@@ -497,31 +497,24 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
 
                         SELECT * FROM temp_table;
                     """
-                    """
+
                     with olap_db_conn.cursor() as cur:
-                        cur.execute(query, (olap_repair_obj.employee_dim.oltp_id, olap_repair_obj.employee_dim.oltp_id))
+                        cur.execute(query, (olap_sale_obj.employee_dim.oltp_id, olap_sale_obj.employee_dim.oltp_id))
                         # Fetch the results
                         data = cur.fetchall()
                     
                     prev_work_experience = data[0][0]
-                    print(f"fact_car_purchase incremental data loading: data (employee work_experience) = {data}")
-                    print(f"work_experience = {prev_work_experience}")
-                    print(f"current work_experience = {olap_repair_obj.employee_dim.work_experience}")
-
-                    if prev_work_experience != olap_repair_obj.employee_dim.work_experience:
-                        print(f"{prev_work_experience} != {olap_repair_obj.employee_dim.work_experience}")
-                        # Temporary condition
-                        if prev_work_experience != -1:
-                            load_fact_car_purchase(olap_db_conn, [olap_repair_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
-                """
-
+                    if prev_work_experience != olap_sale_obj.employee_dim.work_experience:
+                        load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
+                    else:
+                        load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=False, initial_data_loading=initial_data_loading)
+                        
             elif (prev_year != row['s_sale_year']) or (prev_month != row['s_sale_month']):
                 load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
 
             else:
                 load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=False, initial_data_loading=initial_data_loading)
 
-            # print(f"olap_purchase_obj = {olap_purchase_obj}\n")
             prev_year = row['s_sale_year']
             prev_month = row['s_sale_month']
             index += 1

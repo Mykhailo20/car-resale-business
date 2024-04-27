@@ -46,6 +46,7 @@ def perform_etl():
             location_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
             purchase_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
             repair_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
+            sale_etl(oltp_config_dict, olap_config_dict, olap_metadata, initial_data_loading, last_etl_datetime)
     except ValueError as e:
         print("A ValueError occurred during the ETL process.")
         print(f"Error: {e}")

@@ -233,7 +233,7 @@ def OLTP_to_OLAP_sale_df(df_row, metadata: dict):
     dim_buyer_obj = OLTP_to_OLAP_buyer_df(df_row, buyer_metadata=metadata['dimensions']['dim_buyer'])
 
     employee_obj = create_employee(df_row)
-    dim_employee_obj = OLTP_to_OLAP_employee(employee_obj, transaction_date=df_row['p_purchase_date'], employee_metadata=metadata['dimensions']['dim_employee'])
+    dim_employee_obj = OLTP_to_OLAP_employee(employee_obj, transaction_date=df_row['s_sale_date'], employee_metadata=metadata['dimensions']['dim_employee'])
 
     address_obj = create_address(df_row, prefix='s')
     dim_location_obj = OLTP_to_OLAP_location(address_obj, location_metadata=metadata['dimensions']['dim_location'])

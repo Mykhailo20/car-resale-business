@@ -27,7 +27,7 @@ class DateDim:
     month: int
     day: int
     week_day: str
-    oltp_id: int
+    oltp_id: str    # was int
     fact_name: str
 
 @dataclass
