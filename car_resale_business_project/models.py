@@ -452,6 +452,55 @@ class Purchase(db.Model):
             'employee': self.employee.to_dict() if self.employee else None,
         }
     
+@dataclass
+class Repair(db.Model):
+    __tablename__ = 'repair'
+
+    repair_id: int
+    car_vin: str
+    employee_id: int
+    address_id: int
+    repair_type: str
+    cost: int
+    condition: float
+    description: str
+    repair_date: date
+
+    repair_id = db.Column(db.Integer, primary_key=True)
+    car_vin = db.Column(db.String(17),  db.ForeignKey('car.vin'))
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.person_id'))
+    address_id = db.Column(db.Integer, db.ForeignKey('address.address_id'))
+    repair_type = db.Column(db.Text)
+    cost = db.Column(db.Integer)
+    condition = db.Column(db.Numeric(2, 1))
+    description = db.Column(db.Text)
+    repair_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime)
+    updated_at = db.Column(db.DateTime)
+
+    # Define the relationship with the Car table
+    car = db.relationship('Car', backref='repair')
+    employee = db.relationship('Employee', backref='repair', lazy=True)
+    address = db.relationship('Address', backref='repair', lazy=True)
+
+    def to_dict(self):
+        return {
+            'repair_id': self.repair_id,
+            'car_vin': self.car_vin,
+            'employee_id': self.employee_id,
+            'address_id': self.address_id,
+            'repair_type': self.repair_type,
+            'cost': self.cost,
+            'condition': float(self.condition) if self.condition is not None else None,
+            'description': self.description,
+            'repair_date': self.repair_date.isoformat() if self.repair_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'car': self.car.to_dict() if self.car else None,
+            'employee': self.employee.to_dict() if self.employee else None,
+            'address': self.address.to_dict() if self.address else None
+        }
+    
 
 @dataclass
 class Sale(db.Model):

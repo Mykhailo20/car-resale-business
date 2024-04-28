@@ -44,3 +44,15 @@ body {
     border-width: 2px;
 }
 
+.header__go-back {
+    height: 6vh;
+    display: flex;
+    align-items: center;
+    padding-left: 1vw;
+}
+
+.go-back-btn {
+    height: 4vh;
+    min-width: 5vw;
+    padding: 0.1rem 0.05rem;
+}

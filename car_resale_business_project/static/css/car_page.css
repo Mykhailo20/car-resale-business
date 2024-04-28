@@ -1,0 +1,148 @@
+.main-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 10px;
+    min-height: 100svh;
+    height: 100%;
+    padding-left: 1vw;
+}
+.car-details {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 2vh;
+}
+
+.car-preview {
+    width: 100%;
+    background-color: rgba(144, 144, 144, 0.1);
+    height: fit-content;
+    padding: 1vw;
+    border-radius: 10px;
+}
+
+.car-preview__car-image {
+    background-color: #c4c4c4;
+    width: 100%; 
+    height: 400px;
+    margin-bottom: 1vh;
+}
+
+.car-preview__buttons_btn {
+    min-width: 5vw;
+}
+
+.car-chars {
+    width: 100%;
+    height: fit-content;
+    padding: 1vh 2vw;
+    background-color: rgba(144, 144, 144, 0.1);
+    border-radius: 10px;
+    margin-bottom: 2vh;
+}
+
+.car-characteristics__item__data {
+    height: fit-content;
+    padding-top: 2vh;
+    padding-right: 60px;
+    margin-bottom: 3vh;
+}
+
+.car-history {
+    display: flex;
+    height: 100%;
+    width: 60%;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    padding: 1vh 2vw;
+    background-color: rgba(144, 144, 144, 0.1);
+    border-radius: 10px;
+}
+.car-history__item {
+    width: 100%;
+    height: fit-content;
+}
+.car-history__item__data {
+    height: fit-content;
+    display: none;
+    width: 100%;
+    padding-top: 2vh;
+    padding-right: 60px;
+    margin-bottom: 3vh;
+}
+
+.car-history__item__header {
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.car-history__item__header_divide-line {
+    border: none;
+    border-top: 1px solid black;
+    height: 1px;
+    margin: 0.5vh 0px;
+}
+
+.car-history__item__data__attributes-div {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: flex-start; 
+    align-items: start;
+    width: 100%;
+    margin-bottom: 1.5vh;
+}
+
+.car-history__item__data__attributes-div__column {
+    display: flex;
+    flex-direction: column; 
+    justify-content: space-between; 
+    align-items: start; 
+    gap: 10px;
+    width: 50%;
+}
+
+.car-history__item__data__attributes-div__column__item {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: start; 
+    align-items: start; 
+    gap: 0px;
+}
+
+.car-history__item__data__attributes-div__column__item__header{
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.car-history__item__data__description-div {
+    /* Some styles here */
+}
+
+.car-history__item__data__description-div__header {
+    font-weight: bold;
+}
+
+.car-history__item__data__description-div__text {
+    max-height: 200px; 
+    overflow-y: auto; 
+    background-color: gainsboro;
+}
+
+.car-history__repairs {
+    display: none;
+}
+
+.car-history__item__repair {
+    height: fit-content;
+}
+
+.car-history__item__repair__header {
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}

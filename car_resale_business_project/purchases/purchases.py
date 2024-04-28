@@ -12,6 +12,6 @@ from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 purchases = Blueprint("purchases", __name__, template_folder="templates", static_folder="static")
 
 
-@purchases.route('/add')
+@purchases.route('add')
 def add():
     return render_template('add.html')

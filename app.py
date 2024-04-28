@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request, jsonify, session
+from flask import redirect, url_for, request, jsonify, session, render_template
 from sqlalchemy import func
 
 from car_resale_business_project import app, db
@@ -84,7 +84,12 @@ def get_car_brand_model_body_types(make_id, model_name):
     return jsonify(car_body_types=car_body_types_json)
 
 
+@app.route('/car_page_test')
+def car_page_test():
+    return render_template('car_page.html')
+
+
 if __name__ == '__main__':
-    # app.run(debug=True)
-    perform_etl()
+    app.run(debug=True)
+    # perform_etl()
 

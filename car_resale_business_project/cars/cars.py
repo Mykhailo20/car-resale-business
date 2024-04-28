@@ -4,11 +4,26 @@ from sqlalchemy import desc
 from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
 from car_resale_business_project.cars.utils.filters import *
-from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale
+from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale, Repair
 from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
 
+@cars.route('/<vin>')
+def car_page(vin):
+    # Query the database to retrieve car details
+    car = Car.query.filter_by(vin=vin).first()
+    
+    # Query the database to retrieve purchase details
+    purchase = Purchase.query.filter_by(car_vin=vin).first()
+    
+    # Query the database to retrieve repair details
+    repairs = Repair.query.filter_by(car_vin=vin).all()
+    
+    # Query the database to retrieve sale details
+    sale = Sale.query.filter_by(car_vin=vin).first()
+
+    return render_template('car_page.html', car=car, purchase=purchase, repairs=repairs, sale=sale)
 
 @cars.route('/last_purchased')
 def last_purchased():
@@ -53,7 +68,7 @@ def last_purchased_filter():
         })
 
 
-@cars.route('search_results/last_purchased/filter', methods=['POST'])
+@cars.route('/search_results/last_purchased/filter', methods=['POST'])
 def search_results_last_purchased_filter():
     filters = request.json
     renew_session_filters(filters)
@@ -137,7 +152,7 @@ def last_sold_filter():
             "urls": urls
         })
 
-@cars.route('search_results/last_sold/filter', methods=['POST'])
+@cars.route('/search_results/last_sold/filter', methods=['POST'])
 def search_results_last_sold_filter():
     filters = request.json
     renew_session_filters(filters)

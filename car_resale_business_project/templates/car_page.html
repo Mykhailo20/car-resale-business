@@ -1,0 +1,199 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/car_page.css">
+<div class="header__go-back">
+    <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
+</div>
+<div class="main-content">
+ <div class="car-details">
+    <div class="car-preview">
+        <div class="car-preview__car-image"></div>
+        <div class="car-preview__buttons">
+            <button class="btn btn-outline-success car-preview__buttons_btn">Sell</button>
+            <button class="btn btn-outline-success car-preview__buttons_btn">Repair</button>
+        </div>
+    </div>
+    <div class="car-chars">
+        <span class="car-history__item__header">Car Characteristics</span>
+        <hr class="car-history__item__header_divide-line">
+        <div class="car-characteristics__item__data">
+            <div class="car-history__item__data__attributes-div">
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Seller:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase City:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Price:</span>
+                        <span>Seller</span>
+                    </div>
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Employee:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Date:</span>
+                        <span>Seller</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+ <div class="car-history">
+    <div id="item_1" class="car-history__item">
+        <span class="car-history__item__header" onclick="expandData(1)">Car Purchase</span>
+        <hr class="car-history__item__header_divide-line">
+        <div class="car-history__item__data">
+            <div class="car-history__item__data__attributes-div">
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Seller:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase City:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Price:</span>
+                        <span>Seller</span>
+                    </div>
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Employee:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Date:</span>
+                        <span>Seller</span>
+                    </div>
+                </div>
+            </div>
+            <div class="car-history__item__data__description-div">
+                <span class="car-history__item__data__attributes-div__column__item__header">Purchase Description: </span>
+                <div class="car-history__item__data__description-div__text">
+                    dnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
+                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
+                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjk
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="item_2" class="car-history__item">
+    <span class="car-history__item__header" onclick="expandRepairData(2)">Car Repairs</span>
+    <hr class="car-history__item__header_divide-line">
+       <div class="car-history__repairs">
+            <div id="repair_1" class="car-history__item__repair" onclick="expandChild(1)">
+                <span class="car-history__item__repair__header">Repair 1</span>
+                <hr class="car-history__item__header_divide-line">
+                <div class="car-history__item__data">
+                    <div class="car-history__item__data__attributes-div">
+                        <div class="car-history__item__data__attributes-div__column">
+                            <div class="car-history__item__data__attributes-div__column__item">
+                                <span class="car-history__item__data__attributes-div__column__item__header">Employee-Manager:</span>
+                                <span>Seller</span>
+                            </div>
+                            <div class="car-history__item__data__attributes-div__column__item">
+                                <span class="car-history__item__data__attributes-div__column__item__header">Repair Cost:</span>
+                                <span>Seller</span>
+                            </div>
+                            <div class="car-history__item__data__attributes-div__column__item">
+                                <span class="car-history__item__data__attributes-div__column__item__header">Condition Delta:</span>
+                                <span>Seller</span>
+                            </div>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column">
+                            <div class="car-history__item__data__attributes-div__column__item">
+                                <span class="car-history__item__data__attributes-div__column__item__header">Repair City:</span>
+                                <span>Seller</span>
+                            </div>
+                            <div class="car-history__item__data__attributes-div__column__item">
+                                <span class="car-history__item__data__attributes-div__column__item__header">Repair Date:</span>
+                                <span>Seller</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="car-history__item__data__description-div">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Description: </span>
+                        <div class="car-history__item__data__description-div__text">
+                            dnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
+                            ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
+                            ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjk
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="repair_2" class="car-history__item__repair-header" onclick="expandChild(2)">
+                <span class="car-history__item__repair__header">Repair 2</span>
+                <hr class="car-history__item__header_divide-line">
+                <div style="background-color: antiquewhite; display: none;" class="repair-content">ijdhfoiusdhfijds</div>
+            </div>
+        </div>
+    </div>
+     <div id="item_3" class="car-history__item">
+        <span class="car-history__item__header" onclick="expandData(3)">Car Sale</span>
+        <hr class="car-history__item__header_divide-line">
+        <div class="car-history__item__data">
+            <div class="car-history__item__data__attributes-div">
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Buyer:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Sale City:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Sale Price:</span>
+                        <span>Seller</span>
+                    </div>
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Employee-Seller:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                        <span>Seller</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Sale Date:</span>
+                        <span>Seller</span>
+                    </div>
+                </div>
+            </div>
+            <div class="car-history__item__data__description-div">
+                <span class="car-history__item__data__attributes-div__column__item__header">Sale Description: </span>
+                <div class="car-history__item__data__description-div__text">
+                    dnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
+                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
+                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjk
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+</div>
+<script src="../static/js/car_page.js">
+</script>
+{% endblock %}
+
