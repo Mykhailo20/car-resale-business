@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from typing import Optional
 
 from car_resale_business_project.databases.classes.OLTP.employee import Employee
 from car_resale_business_project.databases.classes.OLTP.buyer import Buyer

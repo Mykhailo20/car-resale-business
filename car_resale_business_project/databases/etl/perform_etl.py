@@ -9,16 +9,15 @@ import pandas as pd
 import psycopg2 as pg2
 
 from car_resale_business_project.config.db_config import get_oltp_etl_test_config, get_olap_etl_test_config, get_oltp_fill_demonstration_config, get_olap_fill_demonstration_config
-from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME
-from car_resale_business_project.config.data import *
+from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME, ETL_LOGGING_FILENAME
+from car_resale_business_project.config.data_config import *
 from car_resale_business_project.databases.etl.etl_utils.extract import *
 
 from car_resale_business_project.databases.etl.etl_utils.entities_etl import *
 
     
 def perform_etl():
-    logging_filename = 'car_resale_business_project/logging/etl_logging.log'
-    logging.basicConfig(filename=logging_filename, level=logging.INFO)
+    logging.basicConfig(filename=ETL_LOGGING_FILENAME, level=logging.INFO)
     oltp_config_dict = get_oltp_fill_demonstration_config()
     olap_config_dict = get_olap_fill_demonstration_config()
     # Record the ETL start time in the log file
@@ -61,7 +60,7 @@ def perform_etl():
 
         # Update the last_etl.datetime field
         etl_metadata['last_etl']['datetime'] = etl_end_datetime
-        etl_metadata['current_etl']['initial_data_loading'] = False
+        # etl_metadata['current_etl']['initial_data_loading'] = False
 
         # Write the updated metadata back to the file
         with open(ETL_FILENAME, 'w') as file:

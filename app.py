@@ -4,6 +4,8 @@ from sqlalchemy import func
 from car_resale_business_project import app, db
 from car_resale_business_project.models import Car, CarMake, CarBodyType
 from car_resale_business_project.databases.etl.perform_etl import perform_etl
+from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME
+from car_resale_business_project.databases.fill_oltp.perform_filling import *
 
 
 @app.route('/')
@@ -90,6 +92,8 @@ def car_page_test():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # perform_etl()
+    # app.run(debug=True)
+    
+    # perform_oltp_filling(samples_no=5000)
+    perform_etl()
 

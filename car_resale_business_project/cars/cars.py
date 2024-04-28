@@ -5,7 +5,7 @@ from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
 from car_resale_business_project.cars.utils.filters import *
 from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale, Repair
-from car_resale_business_project.config.data import classify_condition
+from car_resale_business_project.config.data_config import CAR_RELATIVE_CONDITION_DICT
 from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
@@ -26,10 +26,10 @@ def car_page(vin):
 
     # Initialize the list to store condition deltas
     repairs_condition_delta_list = []
-    relative_conditions_list = [classify_condition(purchase.condition), classify_condition(sale.condition)] # because we don't know how many repairs
+    relative_conditions_list = [CAR_RELATIVE_CONDITION_DICT(purchase.condition), CAR_RELATIVE_CONDITION_DICT(sale.condition)] # because we don't know how many repairs
     repairs_cost = 0
     car_condition = purchase.condition
-    car_rel_condition = classify_condition(purchase.condition)
+    car_rel_condition = CAR_RELATIVE_CONDITION_DICT(purchase.condition)
 
     # Iterate through repairs to calculate condition deltas
     for i, repair in enumerate(repairs):
@@ -43,7 +43,7 @@ def car_page(vin):
         car_condition = repair.condition
         # Append the condition delta to the list
         repairs_condition_delta_list.append(condition_delta)
-        repair_rel_condition = classify_condition(repair.condition)
+        repair_rel_condition = CAR_RELATIVE_CONDITION_DICT(repair.condition)
         car_rel_condition = repair_rel_condition 
         relative_conditions_list.append(repair_rel_condition)
     
