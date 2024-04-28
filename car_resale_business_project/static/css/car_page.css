@@ -142,7 +142,16 @@
 }
 
 .car-history__item__repair__header {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
+}
+
+.car-history__repairs-no-repairs {
+    font-size: 20px;
+    padding-top: 2vh;
+}
+
+.car-history__repairs-no-repairs__repair-btn {
+    margin-bottom: 2vh;
 }

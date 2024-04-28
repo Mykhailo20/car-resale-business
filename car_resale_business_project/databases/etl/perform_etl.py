@@ -10,7 +10,7 @@ import psycopg2 as pg2
 
 from car_resale_business_project.config.db_config import get_oltp_etl_test_config, get_olap_etl_test_config, get_oltp_fill_demonstration_config, get_olap_fill_demonstration_config
 from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME
-from car_resale_business_project.config.data_formats import *
+from car_resale_business_project.config.data import *
 from car_resale_business_project.databases.etl.etl_utils.extract import *
 
 from car_resale_business_project.databases.etl.etl_utils.entities_etl import *

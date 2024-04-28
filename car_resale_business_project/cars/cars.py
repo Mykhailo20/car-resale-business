@@ -5,6 +5,7 @@ from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
 from car_resale_business_project.cars.utils.filters import *
 from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale, Repair
+from car_resale_business_project.config.data import classify_condition
 from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
@@ -17,13 +18,41 @@ def car_page(vin):
     # Query the database to retrieve purchase details
     purchase = Purchase.query.filter_by(car_vin=vin).first()
     
-    # Query the database to retrieve repair details
-    repairs = Repair.query.filter_by(car_vin=vin).all()
-    
     # Query the database to retrieve sale details
     sale = Sale.query.filter_by(car_vin=vin).first()
 
-    return render_template('car_page.html', car=car, purchase=purchase, repairs=repairs, sale=sale)
+    # Query the database to retrieve repair details
+    repairs = Repair.query.filter_by(car_vin=vin).order_by(Repair.repair_date).all()
+
+    # Initialize the list to store condition deltas
+    repairs_condition_delta_list = []
+    relative_conditions_list = [classify_condition(purchase.condition), classify_condition(sale.condition)] # because we don't know how many repairs
+    repairs_cost = 0
+    car_condition = purchase.condition
+    car_rel_condition = classify_condition(purchase.condition)
+
+    # Iterate through repairs to calculate condition deltas
+    for i, repair in enumerate(repairs):
+        if i == 0:  # First repair
+            condition_delta = repair.condition - purchase.condition
+        else:
+            previous_repair = repairs[i - 1]
+            condition_delta = previous_repair.condition - repair.condition
+
+        repairs_cost += repair.cost
+        car_condition = repair.condition
+        # Append the condition delta to the list
+        repairs_condition_delta_list.append(condition_delta)
+        repair_rel_condition = classify_condition(repair.condition)
+        car_rel_condition = repair_rel_condition 
+        relative_conditions_list.append(repair_rel_condition)
+    
+    gross_profit_amount = None
+    if sale is not None:
+        gross_profit_amount = sale.price - purchase.price - repairs_cost
+
+    print(f"repairs_condition_delta_list = {repairs_condition_delta_list}")
+    return render_template('car_page.html', car=car, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale, gross_profit_amount=gross_profit_amount)
 
 @cars.route('/last_purchased')
 def last_purchased():

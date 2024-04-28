@@ -21,31 +21,51 @@
             <div class="car-history__item__data__attributes-div">
                 <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Seller:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">VIN:</span>
+                        <span>{{ car.vin }}</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase City:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Model:</span>
+                        <span>{{ car.model }}</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Price:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Body Type:</span>
+                        <span>{{ car.body_type.name }}</span>
                     </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Manufacture Year:</span>
+                        <span>{{ car.manufacture_year }}</span>
+                    </div>
+                    {% if sale == None %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Current Condition:</span>
+                            <span>{{ car_condition }} ({{ car_rel_condition }})</span>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Employee:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Brand:</span>
+                        <span>{{ car.make.name }}</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Trim:</span>
+                        <span>{{ car.trim }}</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Date:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Transmission:</span>
+                        <span>{{ car.transmission }}</span>
                     </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Color:</span>
+                        <span>{{ car.color.name }}</span>
+                    </div>
+                    {% if sale == None %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ purchase.odometer }} mi</span>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -60,135 +80,175 @@
                 <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
                         <span class="car-history__item__data__attributes-div__column__item__header">Seller:</span>
-                        <span>Seller</span>
+                        <span>{{ purchase.seller.name }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                        <span>{{ purchase.condition }} ({{relative_conditions_list[0]}})</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
                         <span class="car-history__item__data__attributes-div__column__item__header">Purchase City:</span>
-                        <span>Seller</span>
+                        <span>{{ purchase.seller.address.city.name }}</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
                         <span class="car-history__item__data__attributes-div__column__item__header">Purchase Price:</span>
-                        <span>Seller</span>
+                        <span>{{ purchase.price }} $</span>
                     </div>
                 </div>
                 <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
                         <span class="car-history__item__data__attributes-div__column__item__header">Employee:</span>
-                        <span>Seller</span>
+                        <span>{{ purchase.employee.first_name + ' ' + purchase.employee.last_name }}</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                        <span>{{ purchase.odometer }} mi</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
                         <span class="car-history__item__data__attributes-div__column__item__header">Purchase Date:</span>
-                        <span>Seller</span>
+                        <span>{{ purchase.purchase_date }}</span>
                     </div>
                 </div>
             </div>
-            <div class="car-history__item__data__description-div">
-                <span class="car-history__item__data__attributes-div__column__item__header">Purchase Description: </span>
-                <div class="car-history__item__data__description-div__text">
-                    dnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
-                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
-                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjk
+            
+                <div class="car-history__item__data__description-div">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Purchase Description: </span>
+                    <div class="car-history__item__data__description-div__text">
+                        {% if purchase.description %}
+                            {{ purchase.description }}
+                        {% else %}
+                            No description.
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            
         </div>
     </div>
     <div id="item_2" class="car-history__item">
     <span class="car-history__item__header" onclick="expandRepairData(2)">Car Repairs</span>
     <hr class="car-history__item__header_divide-line">
        <div class="car-history__repairs">
-            <div id="repair_1" class="car-history__item__repair" onclick="expandChild(1)">
-                <span class="car-history__item__repair__header">Repair 1</span>
-                <hr class="car-history__item__header_divide-line">
-                <div class="car-history__item__data">
-                    <div class="car-history__item__data__attributes-div">
-                        <div class="car-history__item__data__attributes-div__column">
-                            <div class="car-history__item__data__attributes-div__column__item">
-                                <span class="car-history__item__data__attributes-div__column__item__header">Employee-Manager:</span>
-                                <span>Seller</span>
+        {%if repairs %}
+            {% for repair in repairs %}
+                <div id="repair_{{loop.index}}" class="car-history__item__repair" onclick="expandChild({{loop.index}})">
+                    <span class="car-history__item__repair__header">Repair {{ loop.index }}</span>
+                    <hr class="car-history__item__header_divide-line">
+                    <div class="car-history__item__data">
+                        <div class="car-history__item__data__attributes-div">
+                            <div class="car-history__item__data__attributes-div__column">
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Employee-Manager:</span>
+                                    <span>{{ repair.employee.first_name + ' ' + repair.employee.last_name }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair Cost:</span>
+                                    <span>{{ repair.cost }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                                    <span>{{ repair.condition }} ({{relative_conditions_list[loop.index + 1]}})</span>
+                                </div>
                             </div>
-                            <div class="car-history__item__data__attributes-div__column__item">
-                                <span class="car-history__item__data__attributes-div__column__item__header">Repair Cost:</span>
-                                <span>Seller</span>
-                            </div>
-                            <div class="car-history__item__data__attributes-div__column__item">
-                                <span class="car-history__item__data__attributes-div__column__item__header">Condition Delta:</span>
-                                <span>Seller</span>
+                            <div class="car-history__item__data__attributes-div__column">
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair City:</span>
+                                    <span>{{ repair.address.city.name }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair Date:</span>
+                                    <span>{{ repair.repair_date }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Condition Delta:</span>
+                                    <span>{{ repairs_condition_delta_list[loop.index - 1] }}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="car-history__item__data__attributes-div__column">
-                            <div class="car-history__item__data__attributes-div__column__item">
-                                <span class="car-history__item__data__attributes-div__column__item__header">Repair City:</span>
-                                <span>Seller</span>
+                        <div class="car-history__item__data__description-div">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Repair Description: </span>
+                            <div class="car-history__item__data__description-div__text">
+                                {% if repair.description %}
+                                    {{ repair.description }}
+                                {% else %}
+                                    No description.
+                                {% endif %}
                             </div>
-                            <div class="car-history__item__data__attributes-div__column__item">
-                                <span class="car-history__item__data__attributes-div__column__item__header">Repair Date:</span>
-                                <span>Seller</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="car-history__item__data__description-div">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Description: </span>
-                        <div class="car-history__item__data__description-div__text">
-                            dnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
-                            ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
-                            ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjk
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="repair_2" class="car-history__item__repair-header" onclick="expandChild(2)">
-                <span class="car-history__item__repair__header">Repair 2</span>
-                <hr class="car-history__item__header_divide-line">
-                <div style="background-color: antiquewhite; display: none;" class="repair-content">ijdhfoiusdhfijds</div>
-            </div>
+            {% endfor %}
+        {% else %}
+            <p class="car-history__repairs-no-repairs">No repairs were carried out on the car.</p>
+            <button class="btn btn-outline-success car-history__repairs-no-repairs__repair-btn">Repair</button>
+        {% endif %}
         </div>
     </div>
      <div id="item_3" class="car-history__item">
         <span class="car-history__item__header" onclick="expandData(3)">Car Sale</span>
         <hr class="car-history__item__header_divide-line">
         <div class="car-history__item__data">
+            {% if sale %}
+                <div class="car-history__item__data__attributes-div">
+                    <div class="car-history__item__data__attributes-div__column">
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Buyer:</span>
+                            <span>{{ sale.buyer.first_name + ' ' + sale.buyer.last_name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                            <span>{{ sale.condition }} ({{ relative_conditions_list[1] }})</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Sale City:</span>
+                            <span>{{ sale.buyer.address.city.name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Sale Price:</span>
+                            <span>{{ sale.price }} $</span>
+                        </div>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column">
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Employee-Seller:</span>
+                            <span>{{ sale.employee.first_name + ' ' + sale.employee.last_name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ sale.odometer }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Sale Date:</span>
+                            <span>{{ sale.sale_date }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Gross Profit Amount:</span>
+                            <span>{{ gross_profit_amount }} $</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="car-history__item__data__description-div">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Sale Description: </span>
+                    <div class="car-history__item__data__description-div__text">
+                        {% if sale.description %}
+                                {{ sale.description }}
+                            {% else %}
+                                No description.
+                            {% endif %}
+                    </div>
+                </div>
+            {% else %}
             <div class="car-history__item__data__attributes-div">
                 <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Buyer:</span>
-                        <span>Seller</span>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Estimated Price:</span>
+                        <span>Estimated Price</span>
                     </div>
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Sale City:</span>
-                        <span>Seller</span>
-                    </div>
-                    <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Sale Price:</span>
-                        <span>Seller</span>
-                    </div>
-                </div>
-                <div class="car-history__item__data__attributes-div__column">
-                    <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Employee-Seller:</span>
-                        <span>Seller</span>
-                    </div>
-                    <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
-                        <span>Seller</span>
-                    </div>
-                    <div class="car-history__item__data__attributes-div__column__item">
-                        <span class="car-history__item__data__attributes-div__column__item__header">Sale Date:</span>
-                        <span>Seller</span>
+                        <button class="btn btn-outline-success">Reestimate</button>
                     </div>
                 </div>
             </div>
-            <div class="car-history__item__data__description-div">
-                <span class="car-history__item__data__attributes-div__column__item__header">Sale Description: </span>
-                <div class="car-history__item__data__description-div__text">
-                    dnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
-                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjks
-                    ahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjkdnjsahjdkhsakjdhjksahjk
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
  </div>
