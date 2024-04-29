@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/databases.css">
+<!--<div class="header__go-back">
+    <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
+</div>-->
+<div class="main-content">
+    <div class="databases-container">
+        <div class="databases-container__database-block">
+            <div class="databases-container__header">
+                <p class="databases-container__header__title">OLTP Database</p>
+            </div>
+            <hr class="divide-line">
+            <div class="databases-container__database-block__content">
+                <div class="databases-container__database-block__content__data">
+                    <div class="databases-container__database-block__content__data__records-no">
+                        <p class="databases-records-no">Number of records in '{{ filename }}': {{ max_records_no }}</p>
+                        <div class="databases-records-no__slider-container">
+                            <label for="records-no-slider">Please select the number of records (table 'car') to fill the OLTP database:</label><br>
+                            <input type="range" id="records-no-slider" name="records-slider" min="{{ min_records_no }}" max="{{ max_records_no }}" value="{{ min_records_no }}">
+                            <span id="selected-records">{{ min_records_no }}</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline-success databases-btn">Fill OLTP</button>
+                </div>
+                <div class="databases-container__database-block__content__log">
+                    <div class="databases-container__database-block__content__log__header">
+                        Logging
+                    </div>
+                    <div id="fill-oltp-log-text" class="databases-container__database-block__content__log__text">
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="databases-container__database-block">
+            <div class="databases-container__header">
+                <p class="databases-container__header__title">OLAP Database</p>
+            </div>
+            <hr class="divide-line">
+            <div class="databases-container__database-block__content">
+                <div class="databases-container__database-block__content__data olap-btns">
+                    <button class="btn btn-outline-success databases-btn">Fill OLAP</button>
+                    <button class="btn btn-outline-success databases-btn">Update OLAP</button>
+                </div>
+                <div class="databases-container__database-block__content__log">
+                    <div class="databases-container__database-block__content__log__header">
+                        Logging
+                    </div>
+                    <div class="databases-container__database-block__content__log__text">   
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../static/js/databases.js"></script>
+{% endblock %}

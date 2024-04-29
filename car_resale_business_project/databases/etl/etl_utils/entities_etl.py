@@ -60,9 +60,9 @@ def seller_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loadin
         seller_batch_data = olap_sellers_list[start_index:end_index]
         seller_location_batch_data = olap_sellers_locations_list[start_index:end_index]
         load_seller_dim(conn=olap_db_conn, seller_dims=seller_batch_data, initial_data_loading=initial_data_loading)
-        print(f"load_seller_dim: len(seller_batch_data) = {len(seller_batch_data)}\nseller_batch_data = {seller_batch_data}")
+        print(f"load_seller_dim: len(seller_batch_data) = {len(seller_batch_data)}")
         if initial_data_loading:
-            print(f"\nload_seller_dim -> load_dim_location: len(seller_location_batch_data)={len(seller_location_batch_data)}\nseller_location_batch_data={seller_location_batch_data}")
+            print(f"\nload_seller_dim -> load_dim_location: len(seller_location_batch_data)={len(seller_location_batch_data)}")
             load_location_dim(conn=olap_db_conn, location_dims=seller_location_batch_data)
 
         start_index += batch_size

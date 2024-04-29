@@ -1,17 +1,39 @@
 from flask import redirect, url_for, request, jsonify, session, render_template
 from sqlalchemy import func
+import os
 
 from car_resale_business_project import app, db
-from car_resale_business_project.models import Car, CarMake, CarBodyType
-from car_resale_business_project.databases.etl.perform_etl import perform_etl
+
 from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME
+from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER
+
+from car_resale_business_project.models import Car, CarMake, CarBodyType
+from car_resale_business_project.utils.help_functions import *
+from car_resale_business_project.databases.etl.perform_etl import perform_etl
 from car_resale_business_project.databases.fill_oltp.perform_filling import *
 
 
 @app.route('/')
 def index():
-    session.clear()
-    return redirect(url_for('cars.last_purchased'))
+    if not session:
+        print("Session is empty -> go to the databases page")
+        return redirect(url_for('databases'))
+    else:
+        print("Session is not empty -> go to the car.last_purchased page")
+        session.clear()
+        return redirect(url_for('cars.last_purchased'))
+    
+
+@app.route('/databases')
+def databases():
+    records_number = get_file_length(filename=FILL_OLTP_DATA_FILENAME)
+    return render_template('databases.html', filename=os.path.basename(FILL_OLTP_DATA_FILENAME), min_records_no=FILL_OLTP_MIN_RECORDS_NUMBER, max_records_no=records_number)
+
+
+@app.route('/fill_oltp')
+def fill_oltp():
+    print(f"fill_oltp")
+    # perform_oltp_filling(samples_no=5000)
 
 
 @app.route('/get_car_brand_models/<make_id>')
@@ -91,9 +113,10 @@ def car_page_test():
     return render_template('car_page.html')
 
 
+
 if __name__ == '__main__':
-    # app.run(debug=True)
+    app.run(debug=True)
     
     # perform_oltp_filling(samples_no=5000)
-    perform_etl()
+    # perform_etl()
 
