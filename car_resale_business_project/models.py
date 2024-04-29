@@ -2,6 +2,7 @@ from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy import ForeignKeyConstraint
 from dataclasses import dataclass
 from datetime import datetime, date
+import base64
 
 from car_resale_business_project import db
 
@@ -442,6 +443,7 @@ class Purchase(db.Model):
             'odometer': self.odometer,
             'condition': float(self.condition) if self.condition is not None else None,
             'description': self.description,
+            'car_image': base64.b64encode(self.car_image).decode("utf-8") if self.car_image else None,
             'car_image_content_type': self.car_image_content_type,
             'purchase_date': self.purchase_date.isoformat() if self.purchase_date else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -546,6 +548,7 @@ class Sale(db.Model):
             'odometer': self.odometer,
             'condition': float(self.condition) if self.condition is not None else None,
             'description': self.description,
+            'car_image': base64.b64encode(self.car_image).decode("utf-8") if self.car_image else None,
             'car_image_content_type': self.car_image_content_type,
             'sale_date': self.sale_date.isoformat() if self.sale_date else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,

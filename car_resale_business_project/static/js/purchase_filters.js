@@ -95,7 +95,7 @@ function updateCarCards(purchasesData, mainPage, pages, urls) {
             <div class="car-card">
                 <div class="car-card__left-side">
                     <div class="car-card__left-side__car-image">
-                        <img>
+                        ${purchase.car_image_content_type ? `<img src="data:${purchase.car_image_content_type};base64,${purchase.car_image}" alt="Car Image" class="car-img">` : ''}
                     </div>
                     <a href="/car/${purchase.car.vin}" class="btn btn-outline-success details-btn">Details</a>
                 </div>
