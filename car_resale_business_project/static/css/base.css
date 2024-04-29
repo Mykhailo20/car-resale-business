@@ -9,7 +9,7 @@ body {
     margin: 1vh 1vw 3vh;
 }
 
-.search-form-title {
+.form-title {
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 1vh;
@@ -64,4 +64,32 @@ body {
     height: 4vh;
     min-width: 5vw;
     padding: 0.1rem 0.05rem;
+}
+
+.car-image-file-uploader::file-selector-button {
+    /* Hide the default button text */
+    display: none;
+}
+
+.car-image-file-uploader::before {
+    content: "Choose Car Image";
+    display: inline-block;
+    background-color: transparent;
+    color: #1532CA;
+    border: 1px solid #1532CA;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 0.5rem 0.25rem;
+    margin-bottom: 1vh;
+    margin-right: 0.25vw;
+    transition: all 0.3s ease;
+}
+
+.car-image-file-uploader:hover::before {
+    background-color: #1532CA;
+    color: white;
+}
+
+.submit-transaction-btn {
+    width: 8vw;
 }

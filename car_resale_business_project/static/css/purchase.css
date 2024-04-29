@@ -1,0 +1,66 @@
+.purchase-page-content {
+    display: flex;
+    justify-content: center;
+}
+
+.add-purchase-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    margin: 3vh 0px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: rgba(144, 144, 144, 0.1);
+}
+
+.add-purchase-container__header-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: 2vh 1vw 0 1vw;
+}
+
+.go-back-btn {
+    min-width: 7vw;
+    max-width: 7vw;
+}
+
+.add-purchase-container__form-container__entity-container {
+    margin: 0 1vw 0 1vw;
+}
+
+.add-purchase-container__form-container__entity-container__title {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 1vh;
+}
+
+.add-purchase-input-row {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 1vh;
+}
+
+.add-purchase-input {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 49.6%;
+    margin-bottom: 1vh;
+}
+
+.add-purchase-container__form-container__entity-container__divide-line {
+    margin-top: 0.25rem;
+}
+
+.add-purchase-container__form-container__entity-container__submit-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 1vh;
+}

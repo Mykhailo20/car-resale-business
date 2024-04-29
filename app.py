@@ -17,6 +17,7 @@ from car_resale_business_project.utils.help_functions import *
 from car_resale_business_project.cars.utils.filters import remove_session_car_filters
 
 from car_resale_business_project.models import Car, CarMake, CarBodyType
+from car_resale_business_project.forms import AddPurchaseForm
 
 
 @app.route('/')
@@ -125,6 +126,13 @@ def update_olap():
         message += f"[{end_timestamp}]: Error occurred during OLAP Incremental ETL process: {str(e)}.\n"
     return message
 
+@app.route('/purchase')
+def purchase():
+    add_purchase_form = AddPurchaseForm()
+    if add_purchase_form.identifier.data == "add_purchase_form" and request.method == 'POST': # It is not quite correct
+        car_vin = add_purchase_form.car_vin.data
+        print(f"Add Purchase: car_vin = {car_vin}")
+    return render_template('purchase.html', add_purchase_form=add_purchase_form)
 
 @app.route('/get_car_brand_models/<make_id>')
 def get_car_brand_models(make_id):

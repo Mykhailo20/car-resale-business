@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/purchase.css">
+<div class="purchase-page-content">
+    <div class="add-purchase-container">
+        <div class="add-purchase-container__header-container">
+            <p class="form-title">Purchase Car Registration</p>
+            <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
+        </div>
+        <hr class="divide-line">
+        <div class="add-purchase-container__form-container">
+            <form method="POST" id="add_purchase_form">
+                {{ add_purchase_form.hidden_tag() }}
+                {{ add_purchase_form.identifier(hidden=True, value='add_purchase_form') }}
+                <div class="add-purchase-container__form-container__entity-container">
+                    <div class="add-purchase-container__form-container__entity-container__title">
+                        Seller
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.seller_name(class="add-purchase-input-row", id="car-seller")}}
+                    </div>
+                    <hr class="add-purchase-container__form-container__entity-container__divide-line">
+                </div>
+                <div class="add-purchase-container__form-container__entity-container">
+                    <div class="add-purchase-container__form-container__entity-container__title">
+                        Employee
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.employee_name(class="add-purchase-input-row", id="car-employee-buyer")}}
+                    </div>
+                    <hr class="add-purchase-container__form-container__entity-container__divide-line">
+                </div>
+                <div class="add-purchase-container__form-container__entity-container">
+                    <div class="add-purchase-container__form-container__entity-container__title">
+                        Car
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.car_vin(class="add-purchase-input-row", id="car-vin")}}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.brand(class="add-purchase-input", id="car-brand")}}
+                        {{ add_purchase_form.model(class="add-purchase-input", id="car-model", disabled="true") }}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.trim(class="add-purchase-input", id="car-trim", disabled="true")}}
+                        {{ add_purchase_form.body_type(class="add-purchase-input", id="car-body-type") }}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.transmission(class="add-purchase-input", id="car-transmission")}}
+                        {{ add_purchase_form.manufacture_year(class="add-purchase-input", id="car-manufacture-year") }}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.condition(class="add-purchase-input", id="car-condition")}}
+                        {{ add_purchase_form.odometer(class="add-purchase-input", id="car-odometer") }}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.purchase_date(class="add-purchase-input", id="purchase-date", placeholder="Purchase Date")}}
+                        {{ add_purchase_form.purchase_price(class="add-purchase-input", id="purchase-price") }}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        <input type="file" class="car-image-file-uploader" name="car-image">
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.description(class="add-purchase-input-row", id="purchase-description") }}
+                    </div>
+                    <hr class="add-purchase-container__form-container__entity-container__divide-line">
+                    <div class="add-purchase-container__form-container__entity-container__submit-btn-container">
+                        {{ add_purchase_form.submit(class="btn btn-outline-success submit-transaction-btn", id="add-purchase-submit-btn") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
