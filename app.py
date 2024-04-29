@@ -1,5 +1,6 @@
 from flask import redirect, url_for, request, jsonify, session, render_template, Response, stream_with_context
-from sqlalchemy import func
+from werkzeug.utils import secure_filename
+
 import os
 from datetime import datetime
 import json
@@ -16,7 +17,7 @@ from car_resale_business_project.databases.fill_oltp.perform_filling import *
 from car_resale_business_project.utils.help_functions import *
 from car_resale_business_project.cars.utils.filters import remove_session_car_filters
 
-from car_resale_business_project.models import Car, CarMake, CarBodyType
+from car_resale_business_project.models import Car, CarBodyType, Purchase, Repair, Sale
 from car_resale_business_project.forms import AddPurchaseForm
 
 
@@ -126,13 +127,63 @@ def update_olap():
         message += f"[{end_timestamp}]: Error occurred during OLAP Incremental ETL process: {str(e)}.\n"
     return message
 
-@app.route('/purchase')
+@app.route('/purchase', methods=['GET', 'POST'])
 def purchase():
     add_purchase_form = AddPurchaseForm()
     if add_purchase_form.identifier.data == "add_purchase_form" and request.method == 'POST': # It is not quite correct
+        
+        car_image = request.files['car-image']
+        car_image_content_type = None
+        if car_image:
+            car_image_content_type = car_image.mimetype
+
+        form_data = request.form.to_dict()
+        print(f"form_data = {form_data}")
+        
+        seller = add_purchase_form.seller_name.data
+        employee = add_purchase_form.employee_name.data
+        
+        # Car
         car_vin = add_purchase_form.car_vin.data
-        print(f"Add Purchase: car_vin = {car_vin}")
-    return render_template('purchase.html', add_purchase_form=add_purchase_form)
+
+        # Create a new car instance
+        car = Car(
+            vin=car_vin,
+            manufacture_year=add_purchase_form.manufacture_year.data,
+            make_id=add_purchase_form.brand.data.car_make_id,
+            model=form_data['model'],
+            trim=form_data['trim'],
+            body_type_id=add_purchase_form.body_type.data.car_body_type_id,
+            transmission=add_purchase_form.transmission.data,
+            color_id=add_purchase_form.color.data.color_id,
+            description=add_purchase_form.description.data,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+
+        # Create a new purchase instance
+        purchase = Purchase(
+            car_vin=car_vin,
+            seller_id=seller.seller_id,
+            employee_id=employee.person_id,
+            price=add_purchase_form.purchase_price.data,
+            odometer=add_purchase_form.odometer.data,
+            condition=add_purchase_form.condition.data,
+            description=add_purchase_form.description.data,
+            car_image=car_image.read(),
+            car_image_content_type=car_image_content_type,
+            purchase_date=add_purchase_form.purchase_date.data,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+    
+        # print(f"car = {car}; purchase = {purchase}")
+        db.session.add(car)
+        db.session.add(purchase)
+        db.session.commit()
+        return redirect(url_for('cars.last_purchased'))
+
+    return render_template('add_purchase.html', add_purchase_form=add_purchase_form)
 
 @app.route('/get_car_brand_models/<make_id>')
 def get_car_brand_models(make_id):
@@ -205,6 +256,25 @@ def get_car_brand_model_body_types(make_id, model_name):
     # Return the JSON response
     return jsonify(car_body_types=car_body_types_json)
 
+
+@app.route('/get_car_brand_model_trims/<make_id>/<model_name>')
+def get_car_brand_model_trims(make_id, model_name):
+    print(f"make_id = {make_id}; model_name = {model_name}")
+    if make_id is None:
+        return "Make not found", 404
+    
+    if model_name is None:
+        return "Model not found", 404
+    
+    trims = db.session.query(Car.trim).filter(Car.make_id == make_id, Car.model == model_name).distinct().all()
+    
+    if not trims:
+        return "No trims found for the specified make and model", 404
+    
+    trim_values = [trim[0] for trim in trims]
+    print(f"trims = {trims}; trim_values = {trim_values}")
+    return jsonify(trim_values)
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -42,7 +42,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     width: 100%;
-    margin-bottom: 1vh;
+    margin-bottom: 2vh;
 }
 
 .add-purchase-input {
@@ -51,7 +51,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     width: 49.6%;
-    margin-bottom: 1vh;
+    margin-bottom: 2vh;
 }
 
 .add-purchase-container__form-container__entity-container__divide-line {

@@ -412,7 +412,7 @@ class Purchase(db.Model):
     condition : float
     description: str
     car_image: bytes
-    content_type: str
+    car_image_content_type: str
     purchase_date: date
 
     car_vin = db.Column(db.String(17),  db.ForeignKey('car.vin'), primary_key=True)
@@ -423,7 +423,7 @@ class Purchase(db.Model):
     condition = db.Column(db.Numeric(2, 1))
     description = db.Column(db.Text)
     car_image =  db.Column(db.Text)
-    content_type = db.Column(db.String(10))
+    car_image_content_type = db.Column(db.String(10))
     purchase_date = db.Column(db.Date)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
@@ -443,7 +443,7 @@ class Purchase(db.Model):
             'condition': float(self.condition) if self.condition is not None else None,
             'description': self.description,
             'car_image': self.car_image,
-            'content_type': self.content_type,
+            'car_image_content_type': self.car_image_content_type,
             'purchase_date': self.purchase_date.isoformat() if self.purchase_date else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
@@ -515,7 +515,7 @@ class Sale(db.Model):
     condition : float
     description: str
     car_image: bytes
-    content_type: str
+    car_image_content_type: str
     sale_date: date
 
     car_vin = db.Column(db.String(17),  db.ForeignKey('car.vin'), primary_key=True)
@@ -527,7 +527,7 @@ class Sale(db.Model):
     condition = db.Column(db.Numeric(2, 1))
     description = db.Column(db.Text)
     car_image =  db.Column(db.Text)
-    content_type = db.Column(db.String(10))
+    car_image_content_type = db.Column(db.String(10))
     sale_date = db.Column(db.Date)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
@@ -548,7 +548,7 @@ class Sale(db.Model):
             'condition': float(self.condition) if self.condition is not None else None,
             'description': self.description,
             'car_image': self.car_image,
-            'content_type': self.content_type,
+            'car_image_content_type': self.car_image_content_type,
             'sale_date': self.sale_date.isoformat() if self.sale_date else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,

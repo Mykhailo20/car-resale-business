@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<link rel="stylesheet" href="../static/css/purchase.css">
+<link rel="stylesheet" href="../static/css/add_purchase.css">
 <div class="purchase-page-content">
     <div class="add-purchase-container">
         <div class="add-purchase-container__header-container">
@@ -9,7 +9,7 @@
         </div>
         <hr class="divide-line">
         <div class="add-purchase-container__form-container">
-            <form method="POST" id="add_purchase_form">
+            <form method="POST" id="add_purchase_form" enctype="multipart/form-data">
                 {{ add_purchase_form.hidden_tag() }}
                 {{ add_purchase_form.identifier(hidden=True, value='add_purchase_form') }}
                 <div class="add-purchase-container__form-container__entity-container">
@@ -58,6 +58,9 @@
                         {{ add_purchase_form.purchase_price(class="add-purchase-input", id="purchase-price") }}
                     </div>
                     <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_purchase_form.color(class="add-purchase-input", id="car-color", placeholder="Color")}}
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
                         <input type="file" class="car-image-file-uploader" name="car-image">
                     </div>
                     <div class="add-purchase-container__form-container__entity-container__inputs">
@@ -72,4 +75,5 @@
         </div>
     </div>
 </div>
+<script src="../static/js/add_purchase.js"></script>
 {% endblock %}
