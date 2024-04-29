@@ -25,7 +25,7 @@ from car_resale_business_project.forms import AddPurchaseForm
 def index():
     # session.clear()
     remove_session_car_filters()
-
+    print(f"url_for('cars.car_page', vin=12345) = {url_for('cars.car_page', vin=12345)}")
     with open(MAIN_PAGE_CONFIG_FILENAME) as file:
         main_page_metadata = json.load(file)
 
@@ -177,7 +177,6 @@ def purchase():
             updated_at=datetime.now()
         )
     
-        # print(f"car = {car}; purchase = {purchase}")
         db.session.add(car)
         db.session.add(purchase)
         db.session.commit()

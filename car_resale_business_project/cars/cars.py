@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 from sqlalchemy import desc
+import base64
 
 from car_resale_business_project import db
 from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
@@ -32,6 +33,7 @@ def car_page(vin):
         
     repairs_cost = 0
     car_condition = purchase.condition
+    car_image = {"image": purchase.car_image, "content_type": purchase.car_image_content_type }
     car_rel_condition = CAR_RELATIVE_CONDITION_DICT(purchase.condition)
 
     # Iterate through repairs to calculate condition deltas
@@ -53,9 +55,13 @@ def car_page(vin):
     gross_profit_amount = None
     if sale is not None:
         gross_profit_amount = sale.price - purchase.price - repairs_cost
+        if sale.car_image:
+            car_image["image"] = sale.car_image, 
+            car_image["content_type"] = sale.car_image_content_type 
 
     print(f"repairs_condition_delta_list = {repairs_condition_delta_list}")
-    return render_template('car_page.html', car=car, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale, gross_profit_amount=gross_profit_amount)
+    car_image['image'] = base64.b64encode(car_image['image']).decode("utf-8")
+    return render_template('car_page.html', car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale, gross_profit_amount=gross_profit_amount)
 
 @cars.route('/last_purchased')
 def last_purchased():
@@ -64,7 +70,9 @@ def last_purchased():
     base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
     last_purchases = construct_query(base_query=base_query, transaction_name='Purchase', page=page)
     filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
-
+    for purchase in last_purchases.items:
+        if purchase.car_image_content_type:
+            purchase.car_image = base64.b64encode(purchase.car_image).decode("utf-8")
     return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=last_purchases, main_page=True)
 
 
@@ -148,6 +156,10 @@ def last_sold():
                 base_query = base_query.filter(filter_operation(filter_value))
 
     last_sales = base_query.paginate(page=page, per_page=CAR_CARDS_PER_PAGE)
+    for sale in last_sales.items:
+        if sale.car_image_content_type:
+            sale.car_image = base64.b64encode(sale.car_image).decode("utf-8")
+
     filter_values_dict = get_filter_values(session.get('sale_brand', None), session.get('sale_model', None))
     return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=last_sales, main_page=True)
 
@@ -286,6 +298,10 @@ def search_results(search_place_choice):
     print(f"/search_results/{search_place_choice}: session = {session}")
     filtered_transaction_records = construct_query(base_query, transaction_name, page=page)
     print(f"filtered_transaction_records = {filtered_transaction_records}")
+
+    for transaction_record in filtered_transaction_records.items:
+        if transaction_record.car_image_content_type:
+            transaction_record.car_image = base64.b64encode(transaction_record.car_image).decode("utf-8")
 
     filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
     if search_place_choice == 'cars_in_storage':
