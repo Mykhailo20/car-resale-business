@@ -16,7 +16,7 @@ def configure_logging():
     oltp_logger.setLevel(logging.DEBUG)
     oltp_handler = logging.FileHandler(FILL_OLTP_LOGGING_FILENAME)
     oltp_handler.setLevel(logging.DEBUG)
-    oltp_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    oltp_formatter = logging.Formatter('[%(asctime)s] - %(levelname)s: %(message)s')
     oltp_handler.setFormatter(oltp_formatter)
     oltp_logger.addHandler(oltp_handler)
 

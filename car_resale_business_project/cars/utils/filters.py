@@ -123,3 +123,17 @@ def construct_query(base_query, transaction_name, page=1):
     base_query = base_query.paginate(page=page, per_page=CAR_CARDS_PER_PAGE)
     return base_query
 
+def remove_session_car_filters():
+    print(f"Start removing session car filters.")
+    # List of keys corresponding to filter operations
+    filter_keys = ['purchase_car_vin', 'purchase_brand', 'purchase_model', 'purchase_body_type',
+                   'purchase_transmission', 'purchase_city', 'purchase_manufacture_year',
+                   'purchase_condition', 'purchase_odometer', 'purchase_date_from', 'purchase_date_to',
+                   'sale_car_vin', 'sale_brand', 'sale_model', 'sale_body_type', 
+                   'sale_transmission', 'sale_city', 'sale_manufacture_year', 
+                   'sale_condition', 'sale_odometer', 'sale_date_from', 'sale_date_to']
+
+    # Remove filter keys from the session
+    for key in filter_keys:
+        session.pop(key, None)
+    print("Successfully removed session car filters.")

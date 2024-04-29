@@ -1,0 +1,12 @@
+{
+    "fill_oltp": {
+        "last_filling": {
+            "datetime": "2024-04-29 14:45:42"
+        }
+    },
+    "etl": {
+        "last_etl": {
+            "datetime": "2024-04-29 15:36:26"
+        }
+    }
+}

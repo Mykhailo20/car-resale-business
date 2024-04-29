@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-outline-success databases-btn">Fill OLTP</button>
+                    <button id="fill-oltp-btn" class="btn btn-outline-success databases-btn" {% if oltp_db_filled %}disabled{% endif %}>Fill OLTP</button>
                 </div>
                 <div class="databases-container__database-block__content__log">
                     <div class="databases-container__database-block__content__log__header">
@@ -42,14 +42,14 @@
             <hr class="divide-line">
             <div class="databases-container__database-block__content">
                 <div class="databases-container__database-block__content__data olap-btns">
-                    <button class="btn btn-outline-success databases-btn">Fill OLAP</button>
-                    <button class="btn btn-outline-success databases-btn">Update OLAP</button>
+                    <button id="fill-olap-btn" class="btn btn-outline-success databases-btn" {% if not oltp_db_filled or olap_db_filled %}disabled{% endif %}>Fill OLAP</button>
+                    <button id="update-olap-btn" class="btn btn-outline-success databases-btn" {% if not olap_db_filled %}disabled{% endif %}>Update OLAP</button>
                 </div>
                 <div class="databases-container__database-block__content__log">
                     <div class="databases-container__database-block__content__log__header">
                         Logging
                     </div>
-                    <div class="databases-container__database-block__content__log__text">   
+                    <div id="etl-log-text" class="databases-container__database-block__content__log__text">   
                     </div>
                 </div>
             </div>

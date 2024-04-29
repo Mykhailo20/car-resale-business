@@ -9,14 +9,14 @@ import pandas as pd
 import psycopg2 as pg2
 
 from car_resale_business_project.config.db_config import get_oltp_etl_test_config, get_olap_etl_test_config, get_oltp_fill_demonstration_config, get_olap_fill_demonstration_config
-from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_FILENAME, ETL_LOGGING_FILENAME
+from car_resale_business_project.config.files_config import OLAP_METADATA_FILENAME, ETL_CONFIG_FILENAME, ETL_LOGGING_FILENAME
 from car_resale_business_project.config.data_config import *
 from car_resale_business_project.databases.etl.etl_utils.extract import *
 
 from car_resale_business_project.databases.etl.etl_utils.entities_etl import *
 
     
-def perform_etl():
+def perform_etl(initial_data_loading):
     logging.basicConfig(filename=ETL_LOGGING_FILENAME, level=logging.INFO)
     oltp_config_dict = get_oltp_fill_demonstration_config()
     olap_config_dict = get_olap_fill_demonstration_config()
@@ -25,11 +25,10 @@ def perform_etl():
     with open(OLAP_METADATA_FILENAME) as file:
         olap_metadata = json.load(file)
 
-    with open(ETL_FILENAME) as file:
-        etl_metadata = json.load(file)
+    with open(ETL_CONFIG_FILENAME) as file:
+        metadata = json.load(file)
 
-    initial_data_loading = etl_metadata['current_etl']['initial_data_loading']
-    last_etl_datetime=etl_metadata['last_etl']['datetime']
+    last_etl_datetime=metadata['etl']['last_etl']['datetime']
 
     try:
         if initial_data_loading:
@@ -59,12 +58,11 @@ def perform_etl():
         logging.info(f"ETL process ended at: {etl_end_datetime}")
 
         # Update the last_etl.datetime field
-        etl_metadata['last_etl']['datetime'] = etl_end_datetime
-        # etl_metadata['current_etl']['initial_data_loading'] = False
+        metadata['etl']['last_etl']['datetime'] = etl_end_datetime
 
         # Write the updated metadata back to the file
-        with open(ETL_FILENAME, 'w') as file:
-            json.dump(etl_metadata, file, indent=4)  # Indent for pretty formatting
+        with open(ETL_CONFIG_FILENAME, 'w') as file:
+            json.dump(metadata, file, indent=4)  # Indent for pretty formatting
 
 
 if __name__ == "__main__":

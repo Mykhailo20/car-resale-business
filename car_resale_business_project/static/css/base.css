@@ -32,11 +32,20 @@ body {
 .btn-outline-success:hover {
     background-color: #1532CA;
 }
+.btn-outline-success:disabled {
+    background-color: #1532CA;
+    color: white;
+}
+
 .btn-success {
     background-color: #1532CA;
 }
 .btn-success:hover {
     background-color: #1532CA;
+}
+.btn-success:disabled {
+    background-color: #1532CA;
+    color: white;
 }
 
 

@@ -103,7 +103,7 @@ function updateCarCards(transaction_name, transactionData, mainPage, pages, urls
                     <div class="car-card__left-side__car-image">
                         <img>
                     </div>
-                    <button class="btn btn-outline-success details-btn">Details</button>
+                    <a href="${url_for('cars.car_page', vin=transaction.car.vin)}" class="btn btn-outline-success details-btn">Details</a>
                 </div>
                 <div class="car-card__right-side">
                     <div class="car-card__right-side__car-details-header">

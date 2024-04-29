@@ -26,7 +26,10 @@ def car_page(vin):
 
     # Initialize the list to store condition deltas
     repairs_condition_delta_list = []
-    relative_conditions_list = [CAR_RELATIVE_CONDITION_DICT(purchase.condition), CAR_RELATIVE_CONDITION_DICT(sale.condition)] # because we don't know how many repairs
+    relative_conditions_list = [CAR_RELATIVE_CONDITION_DICT(purchase.condition)]
+    if sale is not None:
+        relative_conditions_list.append(CAR_RELATIVE_CONDITION_DICT(sale.condition)) # because we don't know how many repairs
+        
     repairs_cost = 0
     car_condition = purchase.condition
     car_rel_condition = CAR_RELATIVE_CONDITION_DICT(purchase.condition)
@@ -216,11 +219,14 @@ def search_results_last_sold_filter():
 
 @cars.route('/search', methods=['GET', 'POST'])
 def search():
-    session.clear()
+    # session.clear()
+    remove_session_car_filters()
     car_vin_form = SearchByVinForm()
     car_filters_form = SearchByFiltersForm()
     if car_vin_form.identifier.data == "car_vin_form" and request.method == 'POST': # It is not quite correct
         car_vin = car_vin_form.car_vin.data
+        session['purchase_car_vin'] = car_vin
+        session['sale_car_vin'] = car_vin
         print(f"car_vin_form.identifier.data == 'car_vin_form': session = {session}")
         return redirect(url_for('cars.search_results', search_place_choice='cars_sold', **{'car_vin': car_vin}))
     
