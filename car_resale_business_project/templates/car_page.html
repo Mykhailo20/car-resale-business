@@ -5,6 +5,23 @@
 <div class="header__go-back">
     <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
 </div>
+{% for category, message in get_flashed_messages(with_categories=true) %}
+    {% if category == 'success' %}
+        <div class="alert alert-dismissible fade show flash-container alert-success" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% elif category == 'error' %}
+        <div class="alert alert-dismissible fade show flash-container alert-danger" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+{% endfor %}
 <div class="main-content">
  <div class="car-details">
     <div class="car-preview">
@@ -14,8 +31,8 @@
             {% endif %}
         </div>
         <div class="car-preview__buttons">
-            <button class="btn btn-outline-success car-preview__buttons_btn">Sell</button>
-            <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success details-btn">Repair</a>
+            <a href="{{ url_for('sale', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Sell</a>
+            <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Repair</a>
         </div>
     </div>
     <div class="car-chars">
@@ -150,7 +167,11 @@
                                 </div>
                                 <div class="car-history__item__data__attributes-div__column__item">
                                     <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
-                                    <span>{{ repair.condition }} ({{relative_conditions_list[loop.index + 1]}})</span>
+                                    {% if sale %}
+                                        <span>{{ repair.condition }} ({{relative_conditions_list[loop.index + 1]}})</span>
+                                    {% else %}
+                                        <span>{{ repair.condition }} ({{relative_conditions_list[loop.index]}})</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="car-history__item__data__attributes-div__column">
@@ -183,7 +204,7 @@
             {% endfor %}
         {% else %}
             <p class="car-history__repairs-no-repairs">No repairs were carried out on the car.</p>
-            <button class="btn btn-outline-success car-history__repairs-no-repairs__repair-btn">Repair</button>
+            <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success details-btn">Repair</a>
         {% endif %}
         </div>
     </div>

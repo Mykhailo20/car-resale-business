@@ -1,11 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
 <link rel="stylesheet" href="../static/css/add_purchase.css">
+<div class="header__go-back">
+    <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
+</div>
+{% for category, message in get_flashed_messages(with_categories=true) %}
+    {% if category == 'success' %}
+        <div class="alert alert-dismissible fade show flash-container alert-success" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% elif category == 'error' %}
+        <div class="alert alert-dismissible fade show flash-container alert-danger" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+{% endfor %}
 <div class="purchase-page-content">
     <div class="add-purchase-container">
         <div class="add-purchase-container__header-container">
             <p class="form-title">Purchase Car Registration</p>
-            <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
         </div>
         <hr class="divide-line">
         <div class="add-purchase-container__form-container">
@@ -54,7 +73,7 @@
                         {{ add_purchase_form.odometer(class="add-purchase-input", id="car-odometer") }}
                     </div>
                     <div class="add-purchase-container__form-container__entity-container__inputs">
-                        {{ add_purchase_form.purchase_date(class="add-purchase-input", id="purchase-date", placeholder="Purchase Date")}}
+                        {{ add_purchase_form.purchase_date(class="add-purchase-input", id="purchase-date", placeholder="Purchase Date", title="Purchase Date")}}
                         {{ add_purchase_form.purchase_price(class="add-purchase-input", id="purchase-price") }}
                     </div>
                     <div class="add-purchase-container__form-container__entity-container__inputs">

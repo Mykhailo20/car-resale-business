@@ -2,6 +2,7 @@
 {% block content %}
 <link rel="stylesheet" href="../static/css/car_page.css">
 <link rel="stylesheet" href="../static/css/add_repair.css">
+<link rel="stylesheet" href="../static/css/add_transaction.css">
 <div class="header__go-back">
     <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
 </div>
@@ -81,17 +82,14 @@
                             <span class="car-history__item__data__attributes-div__column__item__header">Color:</span>
                             <span>{{ car.color.name }}</span>
                         </div>
-                        {% if sale == None %}
-                            <div class="car-history__item__data__attributes-div__column__item">
-                                <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
-                                <span>{{ purchase.odometer }} mi</span>
-                            </div>
-                        {% endif %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ purchase.odometer }} mi</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    
     </div>
     <div class="car-repairs-container">
         <div class="car-repair-history-container">
@@ -117,7 +115,7 @@
                                         </div>
                                         <div class="car-history__item__data__attributes-div__column__item">
                                             <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
-                                            <span>{{ repair.condition }} ({{relative_conditions_list[loop.index + 1]}})</span>
+                                            <span>{{ repair.condition }} ({{relative_conditions_list[loop.index]}})</span>
                                         </div>
                                     </div>
                                     <div class="car-history__item__data__attributes-div__column">
@@ -154,7 +152,7 @@
                 </div>
             </div>
         </div>
-        <div class="car-add-repair-form-container">
+        <div class="car-add-transaction-form-container">
             <form method="POST" id="add_repair_form">
                 {{ add_repair_form.hidden_tag() }}
                 {{ add_repair_form.identifier(hidden=True, value='add_repair_form') }}
@@ -190,11 +188,11 @@
                         {{ add_repair_form.condition(class="add-transaction-input", id="repair-car-condition")}}
                     </div>
                     <div class="add-transaction-container__form-container__entity-container__inputs">
-                        {{ add_repair_form.repair_date(class="add-transaction-input", id="repair-date")}}
+                        {{ add_repair_form.repair_date(class="add-transaction-input", id="repair-date", title="Repair Date")}}
                         {{ add_repair_form.repair_cost(class="add-transaction-input", id="repair-cost")}}
                     </div>
                     <div class="add-transaction-container__form-container__entity-container__inputs">
-                        {{ add_repair_form.description(class="add-transaction-input-row", id="repair-date")}}
+                        {{ add_repair_form.description(class="add-transaction-input-row", id="repair-description")}}
                     </div>
                     <hr class="add-transaction-container__form-container__entity-container__divide-line">
                     <div class="add-transaction-container__form-container__entity-container__submit-btn-container">
@@ -206,5 +204,5 @@
     </div>
     {% endif %}
 </div>
-<script src="../static/js/add_repair.js"></script>
+<script src="../static/js/car_page.js"></script>
 {% endblock %}

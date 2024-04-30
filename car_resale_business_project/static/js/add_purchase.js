@@ -1,3 +1,7 @@
+document.getElementById("go-back-btn").addEventListener("click", () => {
+    history.back();
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     // Find the brand select element
     var brandSelect = document.getElementById('car-brand');
@@ -114,5 +118,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         };
         xhr.send();
+    });
+});
+
+var closeButtons = document.querySelectorAll('.flash-close-btn');
+closeButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+        var alertDiv = button.closest('.alert');
+        if (alertDiv) {
+            alertDiv.remove();
+        }
     });
 });

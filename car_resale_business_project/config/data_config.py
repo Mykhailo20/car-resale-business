@@ -5,6 +5,8 @@ TIMESTAMP_PATTERN = r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'
 
 MIN_CAR_SALE_PRICE = 4000
 MIN_TRANSACTION_DATE = date(2010, 1, 1)
+MIN_BUYER_AGE = 18                      # In years
+MAX_BUYER_AGE = 90                      # In years
 FILL_OLTP_MIN_RECORDS_NUMBER = 1000
 FILL_OLTP_BATCH_SIZE = 1000
 FILL_OLTP_CAR_CITY_CHANGE_FREQUENCY = 50

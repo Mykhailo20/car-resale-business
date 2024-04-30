@@ -1,4 +1,6 @@
 from flask import redirect, url_for, request, jsonify, render_template, flash 
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 
 import os
 from datetime import datetime
@@ -17,15 +19,14 @@ from car_resale_business_project.databases.fill_oltp.perform_filling import *
 from car_resale_business_project.utils.help_functions import *
 from car_resale_business_project.cars.utils.filters import remove_session_car_filters
 
-from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Sale
-from car_resale_business_project.forms import AddPurchaseForm, AddRepairForm
+from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Buyer, Sale
+from car_resale_business_project.forms import AddPurchaseForm, AddRepairForm, AddSaleForm
 
 
 @app.route('/')
 def index():
     # session.clear()
     remove_session_car_filters()
-    print(f"url_for('cars.car_page', vin=12345) = {url_for('cars.car_page', vin=12345)}")
     with open(MAIN_PAGE_CONFIG_FILENAME) as file:
         main_page_metadata = json.load(file)
 
@@ -131,56 +132,61 @@ def update_olap():
 def purchase():
     add_purchase_form = AddPurchaseForm()
     if add_purchase_form.identifier.data == "add_purchase_form" and request.method == 'POST': # It is not quite correct
-        
-        car_image = request.files['car-image']
-        car_image_content_type = None
-        if car_image:
-            car_image_content_type = car_image.mimetype
+        try:
+            car_image = request.files['car-image']
+            car_image_content_type = None
+            if car_image:
+                car_image_content_type = car_image.mimetype
 
-        form_data = request.form.to_dict()
-        print(f"form_data = {form_data}")
-        
-        seller = add_purchase_form.seller_name.data
-        employee = add_purchase_form.employee_name.data
-        
-        # Car
-        car_vin = add_purchase_form.car_vin.data
+            form_data = request.form.to_dict()
+            
+            seller = add_purchase_form.seller_name.data
+            employee = add_purchase_form.employee_name.data
+            
+            # Car
+            car_vin = add_purchase_form.car_vin.data
 
-        # Create a new car instance
-        car = Car(
-            vin=car_vin,
-            manufacture_year=add_purchase_form.manufacture_year.data,
-            make_id=add_purchase_form.brand.data.car_make_id,
-            model=form_data['model'],
-            trim=form_data['trim'],
-            body_type_id=add_purchase_form.body_type.data.car_body_type_id,
-            transmission=add_purchase_form.transmission.data,
-            color_id=add_purchase_form.color.data.color_id,
-            description=add_purchase_form.description.data,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
-        )
+            # Create a new car instance
+            car = Car(
+                vin=car_vin,
+                manufacture_year=add_purchase_form.manufacture_year.data,
+                make_id=add_purchase_form.brand.data.car_make_id,
+                model=form_data['model'],
+                trim=form_data['trim'],
+                body_type_id=add_purchase_form.body_type.data.car_body_type_id,
+                transmission=add_purchase_form.transmission.data,
+                color_id=add_purchase_form.color.data.color_id,
+                description=add_purchase_form.description.data,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
 
-        # Create a new purchase instance
-        purchase = Purchase(
-            car_vin=car_vin,
-            seller_id=seller.seller_id,
-            employee_id=employee.person_id,
-            price=add_purchase_form.purchase_price.data,
-            odometer=add_purchase_form.odometer.data,
-            condition=add_purchase_form.condition.data,
-            description=add_purchase_form.description.data,
-            car_image=car_image.read(),
-            car_image_content_type=car_image_content_type,
-            purchase_date=add_purchase_form.purchase_date.data,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
-        )
-    
-        db.session.add(car)
-        db.session.add(purchase)
-        db.session.commit()
-        return redirect(url_for('cars.last_purchased'))
+            # Create a new purchase instance
+            purchase = Purchase(
+                car_vin=car_vin,
+                seller_id=seller.seller_id,
+                employee_id=employee.person_id,
+                price=add_purchase_form.purchase_price.data,
+                odometer=add_purchase_form.odometer.data,
+                condition=add_purchase_form.condition.data,
+                description=add_purchase_form.description.data,
+                car_image=car_image.read() if car_image else None,
+                car_image_content_type=car_image_content_type,
+                purchase_date=add_purchase_form.purchase_date.data,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+        
+            db.session.add(car)
+            db.session.add(purchase)
+            db.session.commit()
+            flash("Registration of car purchase was successful. The registration results can be viewed on this page.", category='success')
+            return redirect(url_for('cars.car_page', vin=car_vin))
+        except Exception as e:
+            db.session.rollback()  # Rollback changes in case of exception
+            print(f"Error occured during the registration of car purchase: {e}")
+            flash("Error occured during the registration of car purchase. Please try again.", category='error')
+            return redirect(url_for('purchase'))
 
     return render_template('add_purchase.html', add_purchase_form=add_purchase_form)
 
@@ -218,41 +224,87 @@ def repair(vin):
             db.session.commit()
             flash("Registration of car repair was successful. The registration results can be viewed on this page (Repair History) or on the vehicle data page.", category='success')
         except Exception as e:
+            db.session.rollback()  # Rollback changes in case of exception
             print(f"Error occured during the registration of car repair: {e}")
-            flash("Error occured during the registration of car repair. Please try again", category='error')
+            flash("Error occured during the registration of car repair. Please try again.", category='error')
         
         return redirect(url_for('repair', vin=vin))
         
-    # Query the database to retrieve car details
-    car = Car.query.filter_by(vin=vin).first()
-    
-    # Query the database to retrieve purchase details
-    purchase = Purchase.query.filter_by(car_vin=vin).first()
-
-    repairs = Repair.query.filter_by(car_vin=vin).order_by(Repair.repair_date).all()
-
-    # Initialize the list to store condition deltas
-    repairs_condition_delta_list = []
-    relative_conditions_list = [CAR_RELATIVE_CONDITION_DICT(purchase.condition)]
-    car_condition = purchase.condition
-    car_rel_condition = CAR_RELATIVE_CONDITION_DICT(purchase.condition)
-    for i, repair in enumerate(repairs):
-        if i == 0:  # First repair
-            condition_delta = repair.condition - purchase.condition
-        else:
-            previous_repair = repairs[i - 1]
-            condition_delta = previous_repair.condition - repair.condition
-
-        car_condition = repair.condition
-        # Append the condition delta to the list
-        repairs_condition_delta_list.append(condition_delta)
-        repair_rel_condition = CAR_RELATIVE_CONDITION_DICT(repair.condition)
-        car_rel_condition = repair_rel_condition
-        relative_conditions_list.append(repair_rel_condition)
-    
-    car_image = {"image": base64.b64encode(purchase.car_image).decode("utf-8"), "content_type": purchase.car_image_content_type }
+    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount = get_car_transactions_data(vin)
 
     return render_template('add_repair.html', add_repair_form=add_repair_form, car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition)
+
+
+@app.route('/sale/<vin>', methods=['GET', 'POST'])
+def sale(vin):
+    add_sale_form = AddSaleForm()
+    if add_sale_form.identifier.data == "add_sale_form" and request.method == 'POST': # It is not quite correct
+        try:
+            car_image = request.files['car-image']
+            car_image_content_type = None
+            if car_image:
+                car_image_content_type = car_image.mimetype
+
+            employee = add_sale_form.employee_name.data
+            
+            # Buyer Address
+            address = Address(
+                city=add_sale_form.city.data,
+                street=add_sale_form.street.data,
+                postal_code=None,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+
+            db.session.add(address)
+            db.session.commit()
+
+            # Buyer
+            buyer = Buyer(
+                first_name=add_sale_form.buyer_first_name.data,
+                last_name=add_sale_form.buyer_last_name.data,
+                middle_name=add_sale_form.buyer_middle_name.data if add_sale_form.buyer_middle_name.data else None,
+                birth_date=add_sale_form.buyer_birth_date.data,
+                sex=add_sale_form.buyer_sex.data,
+                email=add_sale_form.buyer_email.data if add_sale_form.buyer_email.data else None,
+                address_id=address.address_id, 
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+
+            db.session.add(buyer)
+            db.session.commit()
+
+            # Create a new purchase instance
+            sale = Sale(
+                car_vin=vin,
+                buyer_id=buyer.person_id,
+                employee_id=employee.person_id,
+                price=add_sale_form.sale_price.data,
+                odometer=add_sale_form.odometer.data,
+                condition=add_sale_form.condition.data,
+                description=add_sale_form.description.data,
+                car_image=car_image.read() if car_image else None,
+                car_image_content_type=car_image_content_type,
+                sale_date=add_sale_form.sale_date.data,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+
+            db.session.add(sale)
+            db.session.commit()
+            flash("Registration of car sale was successful. The registration results can be viewed on this page.", category='success')
+            return redirect(url_for('cars.car_page', vin=vin))
+        except Exception as e:
+            db.session.rollback()  # Rollback changes in case of exception
+            print(f"Error occured during the registration of car sale: {e}")
+            flash("Error occured during the registration of car sale. Please try again.", category='error')
+            return redirect(url_for('sale', vin=vin))
+        
+    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount = get_car_transactions_data(vin)
+
+    return render_template('add_sale.html', add_sale_form=add_sale_form, car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_cost=repairs_cost, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale)
+
 
 
 @app.route('/get_car_brand_models/<make_id>')

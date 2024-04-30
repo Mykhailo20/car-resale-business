@@ -1,4 +1,4 @@
-.car-repairs-container {
+.car-sale-container {
     display: flex;
     flex-direction: column;
     gap: 2vh;
@@ -6,7 +6,7 @@
     margin: 0 0.5vw 1vh 0;
 }
 
-.car-repair-history-container {
+.car-sale-history-container {
     display: flex;
     height: fit-content;
     width: 100%;
@@ -15,6 +15,15 @@
     align-items: start;
     padding: 1vh 2vw;
     background-color: rgba(144, 144, 144, 0.1);
+    border-radius: 10px; 
+}
+
+.car-add-sale-form-container {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    width: 100%;
+    padding: 1vh 2vw;
+    background-color: rgba(144, 144, 144, 0.1);
     border-radius: 10px;
-    
 }
