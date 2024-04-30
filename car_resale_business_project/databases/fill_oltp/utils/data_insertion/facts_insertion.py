@@ -47,7 +47,7 @@ def insert_into_purchase_table(conn, purchases, logger):
         INSERT INTO purchase(
             car_vin, seller_id, employee_id, 
         	price, odometer, condition, 
-            description, car_image, content_type, 
+            description, car_image, car_image_content_type, 
             purchase_date, created_at, updated_at
         )
         VALUES
@@ -166,7 +166,7 @@ def insert_into_sale_table(conn, sale_records, logger):
         INSERT INTO sale(
         	car_vin, buyer_id, employee_id, 
         	mmr, price, odometer, 
-        	condition,  description, car_image, content_type,
+        	condition,  description, car_image, car_image_content_type,
         	sale_date, created_at, updated_at
         )
         VALUES

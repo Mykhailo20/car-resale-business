@@ -16,6 +16,7 @@ def car_page(vin):
     car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount = get_car_transactions_data(vin)
     return render_template('car_page.html', car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale, gross_profit_amount=gross_profit_amount)
 
+
 @cars.route('/last_purchased')
 def last_purchased():
 
@@ -109,12 +110,18 @@ def last_sold():
                 base_query = base_query.filter(filter_operation(filter_value))
 
     last_sales = base_query.paginate(page=page, per_page=CAR_CARDS_PER_PAGE)
+    purchases_list = []
     for sale in last_sales.items:
         if sale.car_image_content_type:
             sale.car_image = base64.b64encode(sale.car_image).decode("utf-8")
 
+        matching_purchase = Purchase.query.filter_by(car_vin=sale.car_vin).first()
+        if matching_purchase.car_image_content_type:
+            matching_purchase.car_image = base64.b64encode(matching_purchase.car_image).decode("utf-8")
+        purchases_list.append(matching_purchase)
+
     filter_values_dict = get_filter_values(session.get('sale_brand', None), session.get('sale_model', None))
-    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=last_sales, main_page=True)
+    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=last_sales, main_page=True, purchases_list=purchases_list)
 
 
 @cars.route('/last_sold/filter', methods=['POST'])
@@ -128,6 +135,8 @@ def last_sold_filter():
     # Execute the query and fetch the results
     filtered_sales = [sale for sale in base_query.items]
     filtered_sales_dict = [sale.to_dict() for sale in filtered_sales]
+    matching_purchases_list = [Purchase.query.filter_by(car_vin=filtered_sale.car_vin).first() for filtered_sale in filtered_sales]
+    matching_purchases_dict = [purchase.to_dict() for purchase in matching_purchases_list]
 
     pages = list(base_query.iter_pages())
     urls = {
@@ -140,13 +149,15 @@ def last_sold_filter():
         urls['last_transaction'][page_num] = url_for('cars.last_sold', page=page_num)
         urls['search_results'][page_num] = url_for('cars.search_results', search_place_choice='cars_sold', page=page_num)
 
+
     return jsonify(
         {
             "transactionName": "Sale",
             "transactionData": filtered_sales_dict,
             "mainPage": True,
             "pages": pages,
-            "urls": urls
+            "urls": urls,
+            "purchases": matching_purchases_dict
         })
 
 @cars.route('/search_results/last_sold/filter', methods=['POST'])
@@ -160,6 +171,9 @@ def search_results_last_sold_filter():
     # Execute the query and fetch the results
     filtered_sales = [sale for sale in base_query.items]
     filtered_sales_dict = [sale.to_dict() for sale in filtered_sales]
+
+    matching_purchases_list = [Purchase.query.filter_by(car_vin=filtered_sale.car_vin).first() for filtered_sale in filtered_sales]
+    matching_purchases_dict = [purchase.to_dict() for purchase in matching_purchases_list]
 
     pages = list(base_query.iter_pages())
     urls = {
@@ -178,7 +192,8 @@ def search_results_last_sold_filter():
             "transactionData": filtered_sales_dict,
             "mainPage": False,
             "pages": pages,
-            "urls": urls
+            "urls": urls,
+            "purchases": matching_purchases_dict
         })
 
 
@@ -241,6 +256,7 @@ def search_results(search_place_choice):
     if search_place_choice == 'cars_sold':
         base_query = Sale.query.order_by(desc(Sale.sale_date))
         transaction_name = 'Sale'
+        purchases_list = []
 
     for filter_name, filter_value in filters.items():
         if filter_name in ['csrf_token']:
@@ -256,7 +272,12 @@ def search_results(search_place_choice):
         if transaction_record.car_image_content_type:
             transaction_record.car_image = base64.b64encode(transaction_record.car_image).decode("utf-8")
 
+        matching_purchase = Purchase.query.filter_by(car_vin=transaction_record.car_vin).first()
+        if matching_purchase.car_image_content_type:
+            matching_purchase.car_image = base64.b64encode(matching_purchase.car_image).decode("utf-8")
+        purchases_list.append(matching_purchase)
+
     filter_values_dict = get_filter_values(session.get('purchase_brand', None), session.get('purchase_model', None))
     if search_place_choice == 'cars_in_storage':
         return render_template('purchased_cars.html', filter_values_dict=filter_values_dict, purchased_cars=filtered_transaction_records, main_page=False)
-    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=filtered_transaction_records, main_page=False)
+    return render_template('sold_cars.html', filter_values_dict=filter_values_dict, transaction_cars=filtered_transaction_records, main_page=False, purchases_list=purchases_list)

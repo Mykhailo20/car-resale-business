@@ -1,10 +1,11 @@
 import random
+import typing
 
 from car_resale_business_project.databases.classes.OLTP.employee import *
 from car_resale_business_project.databases.classes.OLTP.buyer import *
 
 
-def generate_random_employee(faker, detector, employee_hire_date_range, employee_salary_range, position='Manager'):
+def generate_random_employee(faker, detector, logger, employee_hire_date_range, employee_salary_range, encountered_names:set, position='Manager'):
     
     # Generate random date of birth between 18 and 45 years ago
     birth_date = faker.date_of_birth(minimum_age=28, maximum_age=55)
@@ -13,6 +14,13 @@ def generate_random_employee(faker, detector, employee_hire_date_range, employee
     first_name = faker.first_name()
     last_name = faker.last_name()
     
+    while first_name + ' ' + last_name in encountered_names:
+        logger.warning(f"Random Employee Generation: the generated employee name = {first_name + ' ' + last_name} have already met before, therefore, to ensure the correctness of the program's operation, repeated random generation of the employee's first and last name was carried out.")
+        print(f"Random Employee Generation: the generated employee name = {first_name + ' ' + last_name} have already met before, therefore, to ensure the correctness of the program's operation, repeated random generation of the employee's first and last name was carried out.")
+        first_name = faker.first_name()
+        last_name = faker.last_name()
+
+    encountered_names.add(first_name + ' ' + last_name)
     # Determine sex based on first name
     sex = detector.get_gender(first_name)
     
@@ -33,7 +41,7 @@ def generate_random_employee(faker, detector, employee_hire_date_range, employee
         birth_date=birth_date, sex=sex, email=f"{first_name.lower()}.{last_name.lower()}@gmail.com", 
         position=position, salary=salary, hire_date=hire_date
     )
-    return employee
+    return employee, encountered_names
 
 
 def generate_random_buyer(faker, detector, city):

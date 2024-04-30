@@ -30,10 +30,28 @@
                 <img src="data:{{ car_image['content_type'] }};base64,{{ car_image['image'] }}" alt="Car Image" class="car-img">
             {% endif %}
         </div>
+        {% if sale %}
         <div class="car-preview__buttons">
-            <a href="{{ url_for('sale', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Sell</a>
-            <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Repair</a>
+            <div class="car-preview__buttons__car-sold-msg-container">
+                <p class="car-preview__buttons__car-sold-msg">The car has been successfully sold.</p>
+            </div>
+            <div class="car-preview__sole_chars">
+                <div class="car-history__item__data__attributes-div__column__item">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Gross Profit Amount:</span>
+                    <span>{{ gross_profit_amount }}$</span>
+                </div>
+                <div class="car-history__item__data__attributes-div__column__item">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Gross Profit Percentage:</span>
+                    <span>{{ ((gross_profit_amount / sale.price) * 100)|int }}%</span>
+                </div>
+            </div>
         </div>
+        {% else %}
+            <div class="car-preview__buttons">
+                <a href="{{ url_for('sale', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Sell</a>
+                <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Repair</a>
+            </div>
+        {% endif %}
     </div>
     <div class="car-chars">
         <span class="car-history__item__header">Car Characteristics</span>
@@ -62,6 +80,11 @@
                             <span class="car-history__item__data__attributes-div__column__item__header">Current Condition:</span>
                             <span>{{ car_condition }} ({{ car_rel_condition }})</span>
                         </div>
+                    {% else %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                            <span>{{ car_condition }} ({{ car_rel_condition }})</span>
+                        </div>
                     {% endif %}
                 </div>
                 <div class="car-history__item__data__attributes-div__column">
@@ -82,6 +105,11 @@
                         <span>{{ car.color.name }}</span>
                     </div>
                     {% if sale == None %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ purchase.odometer }} mi</span>
+                        </div>
+                    {% else %}
                         <div class="car-history__item__data__attributes-div__column__item">
                             <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
                             <span>{{ purchase.odometer }} mi</span>

@@ -49,7 +49,7 @@ function handleFilterChange(event) {
             // Request successful, update car cards with fetched data
             var responseData = JSON.parse(xhr.responseText);
             console.log("responseData = ", responseData);
-            updateCarCards(responseData['transactionName'], responseData['transactionData'], responseData['mainPage'], responseData['pages'], responseData['urls']);
+            updateCarCards(responseData['transactionName'], responseData['transactionData'], responseData['mainPage'], responseData['pages'], responseData['urls'], responseData['purchases']);
         }
     };
     xhr.send(JSON.stringify(data));
@@ -63,7 +63,7 @@ filters.forEach(function(filter) {
 });
 
 
-function updateCarCards(transaction_name, transactionData, mainPage, pages, urls) {
+function updateCarCards(transactionName, transactionData, mainPage, pages, urls, purchases) {
     var carCardsContainer = document.querySelector('.car-cards');
     var carCards = document.querySelectorAll('.car-card');
     carCards.forEach(function(card) {
@@ -86,13 +86,14 @@ function updateCarCards(transaction_name, transactionData, mainPage, pages, urls
         </div>`;
         return; // Exit the function early
     }
+    var transaction_index = 0;
     transactionData.forEach(function(transaction) {
         var transaction_date = '';
         var transaction_city = '';
-        if(transaction_name === 'Purchase') {
+        if(transactionName === 'Purchase') {
             transaction_date = transaction.purchase_date;
             transaction_city = transaction.seller.address.city.name;
-        } else if(transaction_name === 'Sale') {
+        } else if(transactionName === 'Sale') {
             transaction_date = transaction.sale_date;
             transaction_city = transaction.buyer.address.city.name;
         }
@@ -102,6 +103,7 @@ function updateCarCards(transaction_name, transactionData, mainPage, pages, urls
                 <div class="car-card__left-side">
                     <div class="car-card__left-side__car-image">
                         ${transaction.car_image_content_type ? `<img src="data:${transaction.car_image_content_type};base64,${transaction.car_image}" alt="Car Image" class="car-img">` : ''}
+                        ${!transaction.car_image_content_type && purchases.length > 0 && purchases[transaction_index].car_image_content_type ? `<img src="data:${purchases[transaction_index].car_image_content_type};base64,${purchases[transaction_index].car_image}" alt="Car Image" class="car-img">` : ''}
                     </div>
                     <a href="/car/${transaction.car.vin}" class="btn btn-outline-success details-btn">Details</a>
                 </div>
@@ -124,7 +126,7 @@ function updateCarCards(transaction_name, transactionData, mainPage, pages, urls
                                     <span>${transaction.odometer} mi</span>
                                 </div>
                                 <div class="car-card__right-side__car-details-body__item">
-                                    <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="${transaction_name} Date">
+                                    <img src="../static/images/icons/transaction-date-icon.png" alt="date-icon" width="20px" title="${transactionName} Date">
                                     <span>${transaction_date}</span>
                                 </div>
                             </div>
@@ -147,6 +149,7 @@ function updateCarCards(transaction_name, transactionData, mainPage, pages, urls
                 </div>
             </div>`;
         carCardsContainer.innerHTML += carCardHTML;
+        transaction_index += 1;
     });
 
     if (pages.length > 1) {

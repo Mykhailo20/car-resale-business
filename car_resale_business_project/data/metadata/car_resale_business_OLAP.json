@@ -340,7 +340,7 @@
                     "unit_of_measurement": "USD",
                     "column": "mmr",
                     "data_type": "integer",
-                    "value_restriction": "lambda x: x >= 0",
+                    "value_restriction": "NOT SPECIFIED",
                     "error_handling": {
                         "severity_level": "warning",
                         "error_code": "warnings.warn('Invalid value detected for Manheim Market Report. The value should be non-negative.', UserWarning)",
@@ -363,7 +363,7 @@
                         "conclusion": "The process is stopped because incorrect price margin data could lead to significant loss of profit."
                     },
                     "calculation_formula": "price_margin = sale_price - mmr",
-                    "calculation_code": "lambda sale_price, mmr: sale_price - mmr",
+                    "calculation_code": "lambda sale_price, mmr: sale_price - mmr if mmr is not None else None",
                     "calculation_description": "The price margin shows how much higher or lower the selling price is compared to the estimated market value provided by MMR."
                 },
                 "car_years": {

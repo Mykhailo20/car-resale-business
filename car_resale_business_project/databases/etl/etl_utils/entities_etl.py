@@ -359,7 +359,6 @@ def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
                         $$
                         DECLARE
                             employee_exists BOOLEAN;
-                            employee_id_local INT;
                         BEGIN
                             DROP TABLE IF EXISTS temp_table;
                             -- Check if the record with the specified employee_oltp_id exists
@@ -367,13 +366,11 @@ def purchase_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_load
 
                             -- If the record exists, retrieve the corresponding employee_id
                             IF employee_exists THEN
-                                SELECT employee_id INTO employee_id_local FROM dim_employee 
-                                WHERE employee_oltp_id = %s AND is_valid = 1;
                                 
                                 CREATE TEMPORARY TABLE temp_table AS
-                                -- Select the employee_experience from the fact_car_purchase table
-                                SELECT employee_experience FROM fact_car_purchase 
-                                WHERE employee_id = employee_id_local;
+                                -- Select the employee_experience from the dim_employee table
+                                SELECT work_experience FROM dim_employee 
+		                        WHERE employee_oltp_id = %s AND is_valid = 1;
                             ELSE
                                 CREATE TEMPORARY TABLE temp_table AS
                                 SELECT -1;
@@ -573,7 +570,6 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
         for  _, row in employee_sales_df.iterrows():
 
             olap_sale_obj = OLTP_to_OLAP_sale_df(row, metadata)
-
             if index == 0:
                 if initial_data_loading:
                     print(f"fact_car_sale initial data loading")
@@ -581,6 +577,7 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
                     # Insert the first record into dim_emloyee table and other tables
                     load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)
                 else:
+                    print(f"fact_car_sale etl")
                     """
                         It is necessary to understand whether to insert a new record in the dim_employee table or not in case of new records in the fact_car_purchase table:
                         1) If an employee with the specified employee_oltp_id already exists in the dim_employee table and his experience matches the work experience (fact_car_purchase.employee_experience) in the current fact_car_purchase object, then there is no need to insert a new record into the dim_employee table.
@@ -591,7 +588,6 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
                         $$
                         DECLARE
                             employee_exists BOOLEAN;
-                            employee_id_local INT;
                         BEGIN
                             DROP TABLE IF EXISTS temp_table;
                             -- Check if the record with the specified employee_oltp_id exists
@@ -599,13 +595,11 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
 
                             -- If the record exists, retrieve the corresponding employee_id
                             IF employee_exists THEN
-                                SELECT employee_id INTO employee_id_local FROM dim_employee 
-                                WHERE employee_oltp_id = %s AND is_valid = 1;
                                 
                                 CREATE TEMPORARY TABLE temp_table AS
-                                -- Select the employee_experience from the fact_car_sale table
-                                SELECT employee_experience FROM fact_car_sale 
-                                WHERE employee_id = employee_id_local;
+                                -- Select the employee_experience from the dim_employee table
+                                SELECT work_experience FROM dim_employee 
+                                WHERE employee_oltp_id = %s AND is_valid = 1;
                             ELSE
                                 CREATE TEMPORARY TABLE temp_table AS
                                 SELECT -1;
@@ -620,7 +614,6 @@ def sale_etl(oltp_config_dict, olap_config_dict, metadata, initial_data_loading,
                         cur.execute(query, (olap_sale_obj.employee_dim.oltp_id, olap_sale_obj.employee_dim.oltp_id))
                         # Fetch the results
                         data = cur.fetchall()
-                    
                     prev_work_experience = data[0][0]
                     if prev_work_experience != olap_sale_obj.employee_dim.work_experience:
                         load_fact_car_sale(olap_db_conn, [olap_sale_obj], insert_new_employee=True, initial_data_loading=initial_data_loading)

@@ -178,19 +178,19 @@ def perform_seller_filling(conn, car_df, logger):
     insert_into_seller_address_tables(conn, sellers_list, logger)
 
 
-def perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger):
-    # The first EMPLOYEES_NUMBER_PER_TRANSACTION employees are Car Buyers
-    car_employees_list = [
-        generate_random_employee(
-            faker, detector, employee_hire_date_range=[EMPLOYEE_HIRE_DATE_RANGE[0], EMPLOYEE_HIRE_DATE_RANGE[1]], 
-            employee_salary_range=EMPLOYEE_SALARY_RANGE, position='Manager'
+def perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger, encountered_names:set):
+    car_employees_list = []
+    for i in range(EMPLOYEES_NUMBER_PER_TRANSACTION):
+        new_employee, encountered_names = generate_random_employee(
+            faker, detector, logger, employee_hire_date_range=[EMPLOYEE_HIRE_DATE_RANGE[0], EMPLOYEE_HIRE_DATE_RANGE[1]], 
+            employee_salary_range=EMPLOYEE_SALARY_RANGE, encountered_names=encountered_names, position='Manager'
         )
-        for i in range(EMPLOYEES_NUMBER_PER_TRANSACTION)
-    ]
+        car_employees_list.append(new_employee)
+
 
     print(f"len(car_buyer_employees_list) = {len(car_employees_list)}")
     insert_into_employee_table(conn, car_employees_list, logger)
-    return car_employees_list
+    return car_employees_list, encountered_names
 
 
 def perform_employee_filling(conn, car_df, logger):
@@ -204,15 +204,16 @@ def perform_employee_filling(conn, car_df, logger):
     # Initialize Faker and Gender Detector
     faker = Faker()
     detector = gender.Detector()
+    encountered_names = set()
 
     # The first EMPLOYEES_NUMBER_PER_TRANSACTION employees are Car Buyers
-    car_buyer_employees_list = perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger)
+    car_buyer_employees_list, encountered_names = perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger, encountered_names)
 
     # The next EMPLOYEES_NUMBER_PER_TRANSACTION employees are Car Mechanics
-    car_mechanic_employees_list = perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger)
+    car_mechanic_employees_list, encountered_names = perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger, encountered_names)
 
     # The last EMPLOYEES_NUMBER_PER_TRANSACTION employees are Car Sellers
-    car_seller_employees_list = perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger)
+    car_seller_employees_list, encountered_names = perform_employee_class_filling(conn, faker, detector, EMPLOYEE_HIRE_DATE_RANGE, EMPLOYEE_SALARY_RANGE, EMPLOYEES_NUMBER_PER_TRANSACTION, logger, encountered_names)
 
     return car_buyer_employees_list, car_mechanic_employees_list, car_seller_employees_list
 

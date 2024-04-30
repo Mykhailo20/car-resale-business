@@ -159,3 +159,23 @@
 .car-history__repairs-no-repairs__repair-btn {
     margin-bottom: 2vh;
 }
+
+.car-preview__buttons__car-sold-msg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.car-preview__buttons__car-sold-msg {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.car-preview__sole_chars {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 2vw 1vh 1vw;
+    width: 100%;
+}
+
