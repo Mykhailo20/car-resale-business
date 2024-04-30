@@ -305,7 +305,14 @@ def sale(vin):
 
     return render_template('add_sale.html', add_sale_form=add_sale_form, car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_cost=repairs_cost, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale)
 
+@app.route('/dasboard/purchases')
+def dashboard_purchases():
+    return render_template('bi_purchases_dashboard.html')
 
+
+@app.route('/dasboard/sales')
+def dashboard_sales():
+    return render_template('bi_sales_dashboard.html')
 
 @app.route('/get_car_brand_models/<make_id>')
 def get_car_brand_models(make_id):

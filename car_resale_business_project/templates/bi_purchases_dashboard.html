@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/bi_dashboard.css">
+<script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+<div class="bi-dashdoard">
+    <tableau-viz id="tableauViz"       
+        src='https://public.tableau.com/views/dashboards_17145009566290/PurchasesDashboard?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link'      
+        toolbar="bottom" hide-tabs>
+    </tableau-viz>
+</div>
+{% endblock %}
