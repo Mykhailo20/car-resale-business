@@ -9,8 +9,8 @@ import base64
 
 from car_resale_business_project import app, db, oltp_config_dict, olap_config_dict
 
-from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME, FILL_OLTP_CONFIG_FILENAME, ETL_CONFIG_FILENAME
-from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT
+from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME, FILL_OLTP_CONFIG_FILENAME, ETL_CONFIG_FILENAME, OLAP_METADATA_FILENAME
+from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT, CUBE_NAMES_DICT, CUBES_EXPORT_FILE_EXTENSIONS
 from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME
 
 from car_resale_business_project.databases.etl.perform_etl import perform_etl
@@ -309,10 +309,16 @@ def sale(vin):
 def dashboard_purchases():
     return render_template('bi_purchases_dashboard.html')
 
-
 @app.route('/dasboard/sales')
 def dashboard_sales():
     return render_template('bi_sales_dashboard.html')
+
+@app.route('/cubes/export')
+def olap_cubes_export():
+    with open(OLAP_METADATA_FILENAME) as file:
+        olap_metadata = json.load(file)
+    return render_template('olap_cubes_export.html', olap_metadata=olap_metadata, cube_names_dict=CUBE_NAMES_DICT, file_extensions=CUBES_EXPORT_FILE_EXTENSIONS)
+
 
 @app.route('/get_car_brand_models/<make_id>')
 def get_car_brand_models(make_id):

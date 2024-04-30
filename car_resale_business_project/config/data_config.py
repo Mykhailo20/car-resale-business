@@ -63,3 +63,11 @@ SELLER_TYPE_DICT = {
     'dealership': ['auto sales', 'dealer', 'group'],
     'individual': ['individual']
 }
+
+CUBE_NAMES_DICT = {
+    'fact_car_purchase': 'Purchases',
+    'fact_car_repair': 'Repairs',
+    'fact_car_sale': 'Sales'
+}
+
+CUBES_EXPORT_FILE_EXTENSIONS = ['csv', 'json']
