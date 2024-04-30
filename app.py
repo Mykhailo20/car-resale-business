@@ -1,5 +1,4 @@
-from flask import redirect, url_for, request, jsonify, session, render_template, Response, stream_with_context
-from werkzeug.utils import secure_filename
+from flask import redirect, url_for, request, jsonify, render_template, flash 
 
 import os
 from datetime import datetime
@@ -190,34 +189,37 @@ def repair(vin):
     
     add_repair_form = AddRepairForm()
     if add_repair_form.identifier.data == "add_repair_form" and request.method == 'POST': # It is not quite correct
+        try:
+            address = Address(
+                city=add_repair_form.city.data,
+                street=add_repair_form.street.data,
+                postal_code=None,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
 
-        address = Address(
-            city=add_repair_form.city.data,
-            street=add_repair_form.street.data,
-            postal_code=None,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
-        )
+            db.session.add(address)
+            db.session.commit()
 
-        db.session.add(address)
-        db.session.commit()
-
-        repair = Repair(
-            car_vin=vin,
-            employee_id=add_repair_form.employee_name.data.person_id,
-            address_id=address.address_id,
-            repair_type=add_repair_form.repair_type.data,
-            cost=add_repair_form.repair_cost.data,
-            condition=add_repair_form.condition.data,
-            description= add_repair_form.description.data,
-            repair_date=add_repair_form.repair_date.data,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
-        )
-
-        print(f"address = {address}; repair = {repair}")
-        db.session.add(repair)
-        db.session.commit()
+            repair = Repair(
+                car_vin=vin,
+                employee_id=add_repair_form.employee_name.data.person_id,
+                address_id=address.address_id,
+                repair_type=add_repair_form.repair_type.data,
+                cost=add_repair_form.repair_cost.data,
+                condition=add_repair_form.condition.data,
+                description= add_repair_form.description.data,
+                repair_date=add_repair_form.repair_date.data,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+            
+            db.session.add(repair)
+            db.session.commit()
+            flash("Registration of car repair was successful. The registration results can be viewed on this page (Repair History) or on the vehicle data page.", category='success')
+        except Exception as e:
+            print(f"Error occured during the registration of car repair: {e}")
+            flash("Error occured during the registration of car repair. Please try again", category='error')
         
         return redirect(url_for('repair', vin=vin))
         

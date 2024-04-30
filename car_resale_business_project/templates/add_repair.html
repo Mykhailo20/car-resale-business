@@ -5,7 +5,26 @@
 <div class="header__go-back">
     <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
 </div>
+{% for category, message in get_flashed_messages(with_categories=true) %}
+    {% if category == 'success' %}
+        <div class="alert alert-dismissible fade show flash-container alert-success" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% elif category == 'error' %}
+        <div class="alert alert-dismissible fade show flash-container alert-danger" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+{% endfor %}
+
 <div class="main-content">
+    {% if car %}
     <div class="car-details">
         <div class="car-preview">
             <div class="car-preview__car-image">
@@ -72,6 +91,7 @@
                 </div>
             </div>
         </div>
+    
     </div>
     <div class="car-repairs-container">
         <div class="car-repair-history-container">
@@ -184,7 +204,7 @@
             </form>
         </div>
     </div>
-    
+    {% endif %}
 </div>
 <script src="../static/js/add_repair.js"></script>
 {% endblock %}

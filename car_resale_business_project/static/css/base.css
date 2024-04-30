@@ -97,3 +97,14 @@ body {
 .car-img {
     width: 100%;
 }
+
+.flash-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 4.5vw 1vh 1vw;
+}
+
+.flash-close-btn {
+    border-radius: 5px;
+    background-color: rgba(144, 144, 144, 0.1);
+}

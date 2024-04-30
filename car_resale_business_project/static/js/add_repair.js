@@ -31,3 +31,13 @@ function expandChild(index) {
 document.getElementById("go-back-btn").addEventListener("click", () => {
   history.back();
 });
+
+var closeButtons = document.querySelectorAll('.flash-close-btn');
+closeButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+        var alertDiv = button.closest('.alert');
+        if (alertDiv) {
+            alertDiv.remove();
+        }
+    });
+});
