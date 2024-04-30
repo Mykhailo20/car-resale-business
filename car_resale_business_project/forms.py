@@ -1,18 +1,20 @@
 from datetime import datetime, date
+import re
 
 import psycopg2 as pg2
 
 from sqlalchemy import func
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SubmitField, IntegerField, FloatField, DateField,TextAreaField
-from wtforms.validators import InputRequired, NumberRange
+from wtforms.validators import InputRequired, NumberRange, Regexp, ValidationError
 from wtforms_components import DateField, DateRange
 
 from wtforms_sqlalchemy.fields import QuerySelectField
 
+from car_resale_business_project.config.data_config import MIN_TRANSACTION_DATE
 from car_resale_business_project import oltp_config_dict
 from car_resale_business_project.databases.fill_oltp.utils.data_insertion.general_functions import get_db_enum_values
-from car_resale_business_project.models import CarMake, CarBodyType, Car, Seller, Employee, Color
+from car_resale_business_project.models import CarMake, CarBodyType, Car, Seller, Employee, Color, Buyer, City
 
 
 class AddPurchaseForm(FlaskForm):
@@ -52,15 +54,45 @@ class AddPurchaseForm(FlaskForm):
     transmission = SelectField(choices=[(transmission, transmission) for transmission in transmission_values], validators=[InputRequired()])
 
     condition = SelectField(choices=[(condition / 10, condition / 10) for condition in range(10, 51)], render_kw={"placeholder": "Condition"})
-    # condition = FloatField('Condition', validators=[InputRequired(), NumberRange(min=1, max=5)])
     odometer = IntegerField('Odometer', validators=[InputRequired(), NumberRange(min=0)], render_kw={"placeholder": "Odometer"})
     purchase_date = DateField('Date', format='%Y-%m-%d', default=date.today(), validators=[
         InputRequired(),
         DateRange(
-            min=date(2010, 1, 1),
+            min=MIN_TRANSACTION_DATE,
             max=date.today()
         )
     ])
     purchase_price = IntegerField('Price', validators=[InputRequired(), NumberRange(min=0)], render_kw={"placeholder": "Price"})
     description = TextAreaField('Description', render_kw={"placeholder": "Description"})
+    submit = SubmitField("Submit")
+
+
+class AddRepairForm(FlaskForm):
+    identifier = StringField()
+
+    # Emplyee
+    employee_query = lambda: Employee.query.distinct(Employee.first_name, Employee.last_name).all()
+    employee_name = QuerySelectField('Employee', query_factory=employee_query, get_label=lambda emp: f"{emp.first_name} {emp.last_name}", allow_blank=True, blank_text="Employee", validators=[InputRequired()])
+
+    # Location
+    city = QuerySelectField('City', query_factory=lambda: City.query.all(), get_label="name", allow_blank=True, blank_text="City")
+    street = StringField(render_kw={"placeholder": "Street"})
+
+    # Repair
+    # Read unique values for repair_type field from the repair_type_enum in OLTP DB
+    oltp_db_conn = pg2.connect(database=oltp_config_dict['database'], user=oltp_config_dict['user'], password=oltp_config_dict['password'])
+    repair_type_values = get_db_enum_values(oltp_db_conn, enum_name='repair_type_enum')
+    oltp_db_conn.close()
+    repair_type = SelectField(choices=[(repair_type, repair_type) for repair_type in repair_type_values], validators=[InputRequired()])
+
+    condition = SelectField(choices=[(condition / 10, condition / 10) for condition in range(10, 51)], render_kw={"placeholder": "Condition"})
+    description = TextAreaField('Description', render_kw={"placeholder": "Description"})
+    repair_date = DateField('Date', format='%Y-%m-%d', default=date.today(), validators=[
+        InputRequired(),
+        DateRange(
+            min=MIN_TRANSACTION_DATE,
+            max=date.today()
+        )
+    ])
+    repair_cost = IntegerField('Cost', validators=[InputRequired(), NumberRange(min=0)], render_kw={"placeholder": "Cost"})
     submit = SubmitField("Submit")

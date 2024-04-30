@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/car_page.css">
+<link rel="stylesheet" href="../static/css/add_repair.css">
+<div class="header__go-back">
+    <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
+</div>
+<div class="main-content">
+    <div class="car-details">
+        <div class="car-preview">
+            <div class="car-preview__car-image">
+                {% if car_image %}
+                    <img src="data:{{ car_image['content_type'] }};base64,{{ car_image['image'] }}" alt="Car Image" class="car-img">
+                {% endif %}
+            </div>
+            <div class="car-preview__buttons">
+                <a href="{{ url_for('cars.car_page', vin=car.vin) }}" class="btn btn-outline-success details-btn">Car Page</a>
+                <button class="btn btn-outline-success car-preview__buttons_btn">Sell</button>
+            </div>
+        </div>
+        <div class="car-chars">
+            <span class="car-history__item__header">Car Characteristics</span>
+            <hr class="car-history__item__header_divide-line">
+            <div class="car-characteristics__item__data">
+                <div class="car-history__item__data__attributes-div">
+                    <div class="car-history__item__data__attributes-div__column">
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">VIN:</span>
+                            <span>{{ car.vin }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Model:</span>
+                            <span>{{ car.model }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Body Type:</span>
+                            <span>{{ car.body_type.name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Manufacture Year:</span>
+                            <span>{{ car.manufacture_year }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Current Condition:</span>
+                            <span>{{ car_condition }} ({{ car_rel_condition }})</span>
+                        </div>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column">
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Brand:</span>
+                            <span>{{ car.make.name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Trim:</span>
+                            <span>{{ car.trim }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Transmission:</span>
+                            <span>{{ car.transmission }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Color:</span>
+                            <span>{{ car.color.name }}</span>
+                        </div>
+                        {% if sale == None %}
+                            <div class="car-history__item__data__attributes-div__column__item">
+                                <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                                <span>{{ purchase.odometer }} mi</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="car-repairs-container">
+        <div class="car-repair-history-container">
+            <div id="item_1" class="car-history__item">
+                <span class="car-history__item__header" onclick="expandRepairData(1)">Repair History</span>
+                <hr class="car-history__item__header_divide-line">
+                    <div class="car-history__repairs">
+                    {%if repairs %}
+                        {% for repair in repairs %}
+                            <div id="repair_{{loop.index}}" class="car-history__item__repair" onclick="expandChild({{loop.index}})">
+                            <span class="car-history__item__repair__header">Repair {{ loop.index }}</span>
+                            <hr class="car-history__item__header_divide-line">
+                            <div class="car-history__item__data">
+                                <div class="car-history__item__data__attributes-div">
+                                    <div class="car-history__item__data__attributes-div__column">
+                                        <div class="car-history__item__data__attributes-div__column__item">
+                                            <span class="car-history__item__data__attributes-div__column__item__header">Employee-Manager:</span>
+                                            <span>{{ repair.employee.first_name + ' ' + repair.employee.last_name }}</span>
+                                        </div>
+                                        <div class="car-history__item__data__attributes-div__column__item">
+                                            <span class="car-history__item__data__attributes-div__column__item__header">Repair Cost:</span>
+                                            <span>{{ repair.cost }}</span>
+                                        </div>
+                                        <div class="car-history__item__data__attributes-div__column__item">
+                                            <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                                            <span>{{ repair.condition }} ({{relative_conditions_list[loop.index + 1]}})</span>
+                                        </div>
+                                    </div>
+                                    <div class="car-history__item__data__attributes-div__column">
+                                        <div class="car-history__item__data__attributes-div__column__item">
+                                            <span class="car-history__item__data__attributes-div__column__item__header">Repair City:</span>
+                                            <span>{{ repair.address.city.name }}</span>
+                                        </div>
+                                        <div class="car-history__item__data__attributes-div__column__item">
+                                            <span class="car-history__item__data__attributes-div__column__item__header">Repair Date:</span>
+                                            <span>{{ repair.repair_date }}</span>
+                                        </div>
+                                        <div class="car-history__item__data__attributes-div__column__item">
+                                            <span class="car-history__item__data__attributes-div__column__item__header">Condition Delta:</span>
+                                            <span>{{ repairs_condition_delta_list[loop.index - 1] }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="car-history__item__data__description-div">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair Description: </span>
+                                    <div class="car-history__item__data__description-div__text">
+                                        {% if repair.description %}
+                                            {{ repair.description }}
+                                        {% else %}
+                                            No description.
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="car-history__repairs-no-repairs">No repairs were carried out on the car.</p>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="car-add-repair-form-container">
+            <form method="POST" id="add_repair_form">
+                {{ add_repair_form.hidden_tag() }}
+                {{ add_repair_form.identifier(hidden=True, value='add_repair_form') }}
+                <div class="add-transaction-container__header-container">
+                    <p class="form-title">Repair Car Registration</p>
+                </div>
+                <hr class="divide-line add-transaction-from-divide-line">
+                <div class="add-repair-container__form-container__entity-container">
+                    <div class="add-transaction-container__form-container__entity-container__title">
+                        Employee
+                    </div>
+                    <div class="add-transaction-container__form-container__entity-container__inputs">
+                        {{ add_repair_form.employee_name(class="add-transaction-input-row", id="car-employee-mechanic-manager")}}
+                    </div>
+                    <hr class="add-transaction-container__form-container__entity-container__divide-line">
+                </div>
+                <div class="add-repair-container__form-container__entity-container">
+                    <div class="add-transaction-container__form-container__entity-container__title">
+                        Location
+                    </div>
+                    <div class="add-purchase-container__form-container__entity-container__inputs">
+                        {{ add_repair_form.city(class="add-transaction-input", id="repair-city")}}
+                        {{ add_repair_form.street(class="add-transaction-input", id="repair-street")}}
+                    </div>
+                    <hr class="add-transaction-container__form-container__entity-container__divide-line">
+                </div>
+                <div class="add-repair-container__form-container__entity-container">
+                    <div class="add-transaction-container__form-container__entity-container__title">
+                        Repair Details
+                    </div>
+                    <div class="add-transaction-container__form-container__entity-container__inputs">
+                        {{ add_repair_form.repair_type(class="add-transaction-input", id="repair-type")}}
+                        {{ add_repair_form.condition(class="add-transaction-input", id="repair-car-condition")}}
+                    </div>
+                    <div class="add-transaction-container__form-container__entity-container__inputs">
+                        {{ add_repair_form.repair_date(class="add-transaction-input", id="repair-date")}}
+                        {{ add_repair_form.repair_cost(class="add-transaction-input", id="repair-cost")}}
+                    </div>
+                    <div class="add-transaction-container__form-container__entity-container__inputs">
+                        {{ add_repair_form.description(class="add-transaction-input-row", id="repair-date")}}
+                    </div>
+                    <hr class="add-transaction-container__form-container__entity-container__divide-line">
+                    <div class="add-transaction-container__form-container__entity-container__submit-btn-container">
+                        {{ add_repair_form.submit(class="btn btn-outline-success submit-transaction-btn", id="add-repair-submit-btn") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</div>
+<script src="../static/js/add_repair.js"></script>
+{% endblock %}

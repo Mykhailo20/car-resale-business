@@ -15,7 +15,7 @@
         </div>
         <div class="car-preview__buttons">
             <button class="btn btn-outline-success car-preview__buttons_btn">Sell</button>
-            <button class="btn btn-outline-success car-preview__buttons_btn">Repair</button>
+            <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success details-btn">Repair</a>
         </div>
     </div>
     <div class="car-chars">

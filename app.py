@@ -4,11 +4,12 @@ from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 import json
+import base64
 
 from car_resale_business_project import app, db, oltp_config_dict, olap_config_dict
 
 from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME, FILL_OLTP_CONFIG_FILENAME, ETL_CONFIG_FILENAME
-from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER
+from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT
 from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME
 
 from car_resale_business_project.databases.etl.perform_etl import perform_etl
@@ -17,8 +18,8 @@ from car_resale_business_project.databases.fill_oltp.perform_filling import *
 from car_resale_business_project.utils.help_functions import *
 from car_resale_business_project.cars.utils.filters import remove_session_car_filters
 
-from car_resale_business_project.models import Car, CarBodyType, Purchase, Repair, Sale
-from car_resale_business_project.forms import AddPurchaseForm
+from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Sale
+from car_resale_business_project.forms import AddPurchaseForm, AddRepairForm
 
 
 @app.route('/')
@@ -184,6 +185,74 @@ def purchase():
 
     return render_template('add_purchase.html', add_purchase_form=add_purchase_form)
 
+@app.route('/repair/<vin>', methods=['GET', 'POST'])
+def repair(vin):
+    
+    add_repair_form = AddRepairForm()
+    if add_repair_form.identifier.data == "add_repair_form" and request.method == 'POST': # It is not quite correct
+
+        address = Address(
+            city=add_repair_form.city.data,
+            street=add_repair_form.street.data,
+            postal_code=None,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+
+        db.session.add(address)
+        db.session.commit()
+
+        repair = Repair(
+            car_vin=vin,
+            employee_id=add_repair_form.employee_name.data.person_id,
+            address_id=address.address_id,
+            repair_type=add_repair_form.repair_type.data,
+            cost=add_repair_form.repair_cost.data,
+            condition=add_repair_form.condition.data,
+            description= add_repair_form.description.data,
+            repair_date=add_repair_form.repair_date.data,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+
+        print(f"address = {address}; repair = {repair}")
+        db.session.add(repair)
+        db.session.commit()
+        
+        return redirect(url_for('repair', vin=vin))
+        
+    # Query the database to retrieve car details
+    car = Car.query.filter_by(vin=vin).first()
+    
+    # Query the database to retrieve purchase details
+    purchase = Purchase.query.filter_by(car_vin=vin).first()
+
+    repairs = Repair.query.filter_by(car_vin=vin).order_by(Repair.repair_date).all()
+
+    # Initialize the list to store condition deltas
+    repairs_condition_delta_list = []
+    relative_conditions_list = [CAR_RELATIVE_CONDITION_DICT(purchase.condition)]
+    car_condition = purchase.condition
+    car_rel_condition = CAR_RELATIVE_CONDITION_DICT(purchase.condition)
+    for i, repair in enumerate(repairs):
+        if i == 0:  # First repair
+            condition_delta = repair.condition - purchase.condition
+        else:
+            previous_repair = repairs[i - 1]
+            condition_delta = previous_repair.condition - repair.condition
+
+        car_condition = repair.condition
+        # Append the condition delta to the list
+        repairs_condition_delta_list.append(condition_delta)
+        repair_rel_condition = CAR_RELATIVE_CONDITION_DICT(repair.condition)
+        car_rel_condition = repair_rel_condition
+        relative_conditions_list.append(repair_rel_condition)
+    
+    car_image = {"image": base64.b64encode(purchase.car_image).decode("utf-8"), "content_type": purchase.car_image_content_type }
+
+    return render_template('add_repair.html', add_repair_form=add_repair_form, car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition)
+
+
 @app.route('/get_car_brand_models/<make_id>')
 def get_car_brand_models(make_id):
     if make_id is None:
@@ -274,6 +343,7 @@ def get_car_brand_model_trims(make_id, model_name):
     print(f"trims = {trims}; trim_values = {trim_values}")
     return jsonify(trim_values)
     
+
 
 if __name__ == '__main__':
     app.run(debug=True)

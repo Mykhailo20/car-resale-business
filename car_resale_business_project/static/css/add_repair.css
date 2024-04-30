@@ -1,0 +1,95 @@
+.car-repairs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    width: 55%;
+    margin: 0 0.5vw 1vh 0;
+}
+
+.car-repair-history-container {
+    display: flex;
+    height: fit-content;
+    width: 100%;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    padding: 1vh 2vw;
+    background-color: rgba(144, 144, 144, 0.1);
+    border-radius: 10px;
+    
+}
+
+.car-add-repair-form-container {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    width: 100%;
+    padding: 1vh 2vw;
+    background-color: rgba(144, 144, 144, 0.1);
+    border-radius: 10px;
+}
+
+.add-transaction-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    margin: 3vh 0px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: rgba(144, 144, 144, 0.1);
+}
+
+.add-transaction-container__header-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.add-transaction-from-divide-line {
+    margin: 0 0 2vh;
+}
+
+.go-back-btn {
+    min-width: 7vw;
+    max-width: 7vw;
+}
+
+.add-transaction-container__form-container__entity-container {
+    margin: 0 1vw 0 1vw;
+}
+
+.add-transaction-container__form-container__entity-container__title {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 1vh;
+}
+
+.add-transaction-input-row {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 2vh;
+}
+
+.add-transaction-input {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 49.6%;
+    margin-bottom: 2vh;
+}
+
+.add-transaction-container__form-container__entity-container__divide-line {
+    margin-top: 0.25rem;
+}
+
+.add-transaction-container__form-container__entity-container__submit-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 1vh;
+}
