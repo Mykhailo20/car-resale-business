@@ -2,7 +2,7 @@
 {% block content %}
 <link rel="stylesheet" href="../static/css/olap_cubes_export.css">
 <div class="main-content">
-    <div class="cubes-selection-container">
+    <form method="POST" class="cubes-selection-container" id="cubes-export-form">
         <div class="cubes-selection-container__logical-block-container">
             <div class="cubes-selection-container__logical-block-container__title">
                 Export Cubes Configuration
@@ -14,7 +14,7 @@
                     <div id="export-cubes-cube-metric-container">
                         <div class="export-cubes-label-input-container">
                             <label class="export-cubes-input-label" for="file-name-input">OLAP Cube</label>
-                            <select class="export-cubes-input" id="olap-cube-select">
+                            <select class="export-cubes-input" id="olap-cube-select" required>
                                 {% for fact_name in cube_names_dict.keys() %}
                                     <option value="{{ fact_name }}" {% if fact_name == 'fact_car_purchase' %} default {% endif %}>{{ cube_names_dict[fact_name] }}</option>
                                 {% endfor %}
@@ -27,7 +27,7 @@
                 <div class="col-md-3 mb-3">
                     <div class="export-cubes-label-input-container">
                         <label class="export-cubes-input-label" for="file-name-input">File Name</label>
-                        <input type="text" class="export-cubes-input" id="file-name-input" placeholder="Enter file name">
+                        <input type="text" class="export-cubes-input" id="file-name-input" placeholder="Enter file name" required>
                     </div>  
                 </div>
                 
@@ -35,7 +35,7 @@
                 <div class="col-md-3 mb-3">
                     <div class="export-cubes-label-input-container">
                         <label class="export-cubes-input-label" for="file-extension-select">File Extension</label>
-                        <select class="export-cubes-input" id="file-extension-select">
+                        <select class="export-cubes-input" id="file-extension-select" required>
                             {% for file_extension in file_extensions %}
                                 <option value="{{ file_extension }}">{{ file_extension }}</option>
                             {% endfor %}
@@ -77,7 +77,11 @@
                 
             </div>
             <div class="cubes-selection-container__submit-btn-container">
-                <button class="btn btn-outline-success", id="submit-export-btn">Export</button>
+                <div class="cubes-selection-container__submit-tip-btn-container">
+                    <div id="submit-tip" class="submit-tip hidden">Please select at least one metric and one dimension before exporting.</div>
+                <button type="submit" class="btn btn-outline-success", id="submit-export-btn">Export</button>
+                </div>
+                
             </div>
         </div>
     </div>

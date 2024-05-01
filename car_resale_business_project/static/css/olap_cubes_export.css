@@ -15,6 +15,7 @@
     height: fit-content;
     padding: 1vw;
     border-radius: 10px;
+    margin: 0 0.5vw;
 }
 
 .cubes-selection-container__logical-block-container {
@@ -118,4 +119,14 @@
 
 #submit-export-btn {
     min-width: 7vw;
+    max-width: 7vw;
+}
+
+.cubes-selection-container__submit-tip-btn-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none;
 }

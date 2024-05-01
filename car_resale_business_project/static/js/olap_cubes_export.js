@@ -8,11 +8,40 @@ function createNewMetricsContainer() {
     return newMetricsContainer;
 }
 
-
 document.addEventListener("DOMContentLoaded", function() {
     // Get references to the relevant elements
     const olapCubeSelect = document.getElementById("olap-cube-select");
     const metricsContainer = document.getElementById("cube-metrics-container");
+
+    // To hide submit-tip
+    const fileExtentionSelect = document.getElementById("file-extension-select");
+    const fileNameInput = document.getElementById("file-name-input");
+    const dateFromInput = document.getElementById("filter-date-from");
+    const dateToInput = document.getElementById("filter-date-to");
+
+    fileExtentionSelect.addEventListener("click", function(){
+        messageContainer = document.getElementById('submit-tip')
+        // Clear previous messages
+        messageContainer.classList.add('hidden');
+    })
+
+    fileNameInput.addEventListener("click", function(){
+        messageContainer = document.getElementById('submit-tip')
+        // Clear previous messages
+        messageContainer.classList.add('hidden');
+    })
+
+    dateFromInput.addEventListener("click", function(){
+        messageContainer = document.getElementById('submit-tip')
+        // Clear previous messages
+        messageContainer.classList.add('hidden');
+    })
+
+    dateToInput.addEventListener("click", function(){
+        messageContainer = document.getElementById('submit-tip')
+        // Clear previous messages
+        messageContainer.classList.add('hidden');
+    })
 
     // Event listener for OLAP cube selection change
     olapCubeSelect.addEventListener("change", function() {
@@ -22,6 +51,10 @@ document.addEventListener("DOMContentLoaded", function() {
         inputsDivs.forEach(div => {
             metricsContainer.removeChild(div);
         });
+
+        messageContainer = document.getElementById('submit-tip')
+        // Clear previous messages
+        messageContainer.classList.add('hidden');
 
         const selectedCube = olapCubeSelect.value;
         const cubeMetadata = olapMetadata["facts"][selectedCube];
@@ -50,6 +83,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
                 `;
                 currentMetricsRowContainer.appendChild(metricCheckbox);
+
+                metricCheckbox.addEventListener('change', function() {
+                    messageContainer = document.getElementById('submit-tip')
+                    // Clear previous messages
+                    messageContainer.classList.add('hidden');
+                });
             }
         });
         
@@ -108,6 +147,9 @@ document.addEventListener("DOMContentLoaded", function() {
             // Add event listener to the checkbox to toggle the select
             const checkbox = document.getElementById(`${dimension}-checkbox`);
             checkbox.addEventListener('change', function() {
+                messageContainer = document.getElementById('submit-tip')
+                // Clear previous messages
+                messageContainer.innerHTML = '';
                 hierarchySelect.disabled = !this.checked;
             });
         });
@@ -117,4 +159,42 @@ document.addEventListener("DOMContentLoaded", function() {
     olapCubeSelect.selectedCube = "Purchases";  // Set the value of the select element to "Purchases"
     olapCubeSelect.dispatchEvent(new Event('change'));  // Manually trigger the 'change' event
     console.log('imitate purchase cube selection')
+});
+
+// Get the form element
+const form = document.getElementById('cubes-export-form');
+
+// Add event listener for form submission
+form.addEventListener('submit', function(event) {
+   
+    messageContainer = document.getElementById('submit-tip')
+    // Clear previous messages
+    messageContainer.innerHTML = '';
+    
+    // Get the metrics container
+    const metricsContainer = document.querySelector('#cube-metrics-container');
+
+    // Get the dimensions and hierarchies container
+    const dimsHiersContainer = document.querySelector('.cubes-selection-container__logical-block-container-dims-hiers');
+
+    // Check if at least one metric is selected
+    const selectedMetrics = metricsContainer.querySelectorAll('input[type="checkbox"]:checked');
+    if (selectedMetrics.length === 0) {
+        event.preventDefault(); // Prevent form submission
+        messageContainer.innerHTML = 'Please select at least one metric.'
+        messageContainer.classList.remove('hidden'); // Show tip message
+        return;
+    }
+
+    // Check if at least one dimension is selected
+    const selectedDimsHiers = dimsHiersContainer.querySelectorAll('input[type="checkbox"]:checked');
+    if (selectedDimsHiers.length === 0) {
+        event.preventDefault(); // Prevent form submission 
+        messageContainer.innerHTML = 'Please select at least one dimension.'
+        messageContainer.classList.remove('hidden'); // Show tip message
+        return;
+    }
+
+    // If both conditions are met, allow the form submission
+    messageContainer.classList.add('hidden');
 });
