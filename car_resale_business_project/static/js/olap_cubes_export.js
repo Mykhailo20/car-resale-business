@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const selectedCube = olapCubeSelect.value;
         const cubeMetadata = olapMetadata["facts"][selectedCube];
+        console.log("selectedCube = ", selectedCube);
+        console.log("cubeMetadata = ", cubeMetadata);
         
         // Populate Metrics container
         Object.keys(cubeMetadata.metrics).forEach((metricKey, index) => {
@@ -41,8 +43,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 metricCheckbox.classList.add(`col-md-${Math.floor(bootstrapColsNo / metricsColsNo)}`);
                 metricCheckbox.innerHTML = `
                     <div class="form-check">
-                        <input class="form-check-input export-cubes-check-input" type="checkbox" id="${metricKey}Checkbox">
-                        <label class="form-check-label" for="${metricKey}Checkbox">
+                        <input class="form-check-input export-cubes-check-input" type="checkbox" id="${metricKey}-checkbox">
+                        <label class="form-check-label" for="${metricKey}-checkbox">
                             ${metric.name}
                         </label>
                     </div>
@@ -96,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 hierarchySelect.appendChild(option);
             });
             hierarchySelect.disabled = true;
-            
+
             // Append the select to the dimension row container
             dimRowContainer.appendChild(hierarchySelect);
 
@@ -110,4 +112,9 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     });
+
+    // Simulate the selection of the "Purchase" cube
+    olapCubeSelect.selectedCube = "Purchases";  // Set the value of the select element to "Purchases"
+    olapCubeSelect.dispatchEvent(new Event('change'));  // Manually trigger the 'change' event
+    console.log('imitate purchase cube selection')
 });

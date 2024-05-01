@@ -15,9 +15,8 @@
                         <div class="export-cubes-label-input-container">
                             <label class="export-cubes-input-label" for="file-name-input">OLAP Cube</label>
                             <select class="export-cubes-input" id="olap-cube-select">
-                                <option value="__None" hidden>Cube</option>
                                 {% for fact_name in cube_names_dict.keys() %}
-                                    <option value="{{ fact_name }}">{{ cube_names_dict[fact_name] }}</option>
+                                    <option value="{{ fact_name }}" {% if fact_name == 'fact_car_purchase' %} default {% endif %}>{{ cube_names_dict[fact_name] }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -66,7 +65,7 @@
             </div>
             <hr class="cubes-selection-container__logical-block-container__divide-line">
             <div class="cubes-selection-container__logical-block-container__inputs">
-        
+
             </div>
         </div>
         <div class="cubes-selection-container__logical-block-container-dims-hiers">
@@ -75,6 +74,7 @@
             </div>
             <hr class="cubes-selection-container__logical-block-container__divide-line">
             <div class="cubes-selection-container__logical-block-container__inputs__dims-hiers">
+                
             </div>
             <div class="cubes-selection-container__submit-btn-container">
                 <button class="btn btn-outline-success", id="submit-export-btn">Export</button>
