@@ -11,7 +11,7 @@ from car_resale_business_project import app, db, oltp_config_dict, olap_config_d
 
 from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME, FILL_OLTP_CONFIG_FILENAME, ETL_CONFIG_FILENAME, OLAP_METADATA_FILENAME
 from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT, CUBE_NAMES_DICT, CUBES_EXPORT_FILE_EXTENSIONS
-from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME
+from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME, OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, BOOTSTRAP_GRID_COLUMNS_NO
 
 from car_resale_business_project.databases.etl.perform_etl import perform_etl
 from car_resale_business_project.databases.fill_oltp.perform_filling import *
@@ -317,7 +317,7 @@ def dashboard_sales():
 def olap_cubes_export():
     with open(OLAP_METADATA_FILENAME) as file:
         olap_metadata = json.load(file)
-    return render_template('olap_cubes_export.html', olap_metadata=olap_metadata, cube_names_dict=CUBE_NAMES_DICT, file_extensions=CUBES_EXPORT_FILE_EXTENSIONS)
+    return render_template('olap_cubes_export.html', olap_metadata=olap_metadata, cube_names_dict=CUBE_NAMES_DICT, file_extensions=CUBES_EXPORT_FILE_EXTENSIONS, metrics_cols_no=OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, bootstrap_cols_no=BOOTSTRAP_GRID_COLUMNS_NO)
 
 
 @app.route('/get_car_brand_models/<make_id>')

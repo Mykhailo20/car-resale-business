@@ -11,14 +11,16 @@
             <div class="cubes-selection-container__logical-block-container__inputs">
                 <!-- First column: Select for OLAP cube -->
                 <div class="col-md-3 mb-3">
-                    <div class="export-cubes-label-input-container">
-                        <label class="export-cubes-input-label" for="file-name-input">OLAP Cube</label>
-                        <select class="export-cubes-input" id="olap-cube-select">
-                            <option value="__None" hidden>Cube</option>
-                            {% for fact_name in cube_names_dict.keys() %}
-                                <option value="{{ fact_name }}">{{ cube_names_dict[fact_name] }}</option>
-                            {% endfor %}
-                        </select>
+                    <div id="export-cubes-cube-metric-container">
+                        <div class="export-cubes-label-input-container">
+                            <label class="export-cubes-input-label" for="file-name-input">OLAP Cube</label>
+                            <select class="export-cubes-input" id="olap-cube-select">
+                                <option value="__None" hidden>Cube</option>
+                                {% for fact_name in cube_names_dict.keys() %}
+                                    <option value="{{ fact_name }}">{{ cube_names_dict[fact_name] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
@@ -58,65 +60,13 @@
                 </div>
             </div>  
         </div>
-        <div class="cubes-selection-container__logical-block-container">
+        <div class="cubes-selection-container__logical-block-container" id="cube-metrics-container">
             <div class="cubes-selection-container__logical-block-container__title">
                 Metrics
             </div>
             <hr class="cubes-selection-container__logical-block-container__divide-line">
             <div class="cubes-selection-container__logical-block-container__inputs">
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input export-cubes-check-input" type="checkbox" id="metric1Checkbox">
-                        <label class="form-check-label" for="metric1Checkbox">
-                            Metric 1
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input export-cubes-check-input" type="checkbox" id="metric2Checkbox">
-                        <label class="form-check-label" for="metric2Checkbox">
-                            Metric 2
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="metric3Checkbox">
-                        <label class="form-check-label" for="metric3Checkbox">
-                            Metric 3
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="metric4Checkbox">
-                        <label class="form-check-label" for="metric4Checkbox">
-                            Metric 4
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="metric5Checkbox">
-                        <label class="form-check-label" for="metric5Checkbox">
-                            Metric 5
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="metric6Checkbox">
-                        <label class="form-check-label" for="metric6Checkbox">
-                            Metric 6
-                        </label>
-                    </div>
-                </div>
+        
             </div>
         </div>
         <div class="cubes-selection-container__logical-block-container-dims-hiers">
@@ -124,41 +74,7 @@
                 Dimensions and Hierarchies
             </div>
             <hr class="cubes-selection-container__logical-block-container__divide-line">
-            <div class="cubes-selection-container__logical-block-container__inputs">
-                <div class="col-md-6">
-                    <!-- Dimension 1 -->
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="dimension1Checkbox">
-                        <label class="form-check-label" for="dimension1Checkbox">
-                            Dimension 1
-                        </label>
-                    </div>
-                    
-                    <!-- Dimension 2 -->
-                    <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" id="dimension2Checkbox">
-                        <label class="form-check-label" for="dimension2Checkbox">
-                            Dimension 2
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Second column: Selects for hierarchy levels -->
-                <div>
-                     <!-- Select for hierarchy level of Dimension 1 -->
-                     <select class="export-cubes-input" id="dimension1LevelSelect">
-                        <option value="level1">Level 1</option>
-                        <option value="level2">Level 2</option>
-                        <option value="level3">Level 3</option>
-                    </select>
-                    <!-- Select for hierarchy level of Dimension 2 -->
-                    <select class="export-cubes-input" id="dimension2LevelSelect">
-                        <option value="level1">Level 1</option>
-                        <option value="level2">Level 2</option>
-                        <option value="level3">Level 3</option>
-                    </select>
-                    
-                </div>
+            <div class="cubes-selection-container__logical-block-container__inputs__dims-hiers">
             </div>
             <div class="cubes-selection-container__submit-btn-container">
                 <button class="btn btn-outline-success", id="submit-export-btn">Export</button>
@@ -169,6 +85,8 @@
 <script>
     // Define a global variable to store olap_metadata
     var olapMetadata = {{ olap_metadata | tojson | safe }};
+    let metricsColsNo = {{ metrics_cols_no |safe }};
+    let bootstrapColsNo = {{ bootstrap_cols_no |safe }};
 </script>
 <script src="../static/js/olap_cubes_export.js"></script>
 {% endblock %}

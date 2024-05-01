@@ -4,7 +4,7 @@
     gap: 2vh;
     min-height: 100vh;
     height: 100%;
-    margin: 1vh 1vw 0vh;
+    margin: 1vh 0.25vw 0vh;
 }
 
 .cubes-selection-container {
@@ -30,6 +30,13 @@
 .cubes-selection-container__logical-block-container__inputs {
     display: flex;
     flex-direction: row;
+    gap: 2vh;
+}
+
+.cubes-selection-container__logical-block-container__inputs__dims-hiers {
+    display: flex;
+    flex-direction: column;
+    gap: 5%;
 }
 
 .export-cubes-input {
@@ -39,6 +46,15 @@
     border-radius: 5px;
     width: 60%;
     margin-bottom: 2vh;
+}
+
+.export-cubes-hier-input {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 25%;
+    margin: 2vh 0;
 }
 
 .export-cubes-label-input-container {
@@ -76,11 +92,26 @@
 
 .cubes-selection-container__logical-block-container-dims-hiers {
     margin: 5vh 1vw 0 1vw;
+    display: flex;
+    flex-direction: column;
 }
+
+.cubes-selection-container__logical-block-container__inputs__dim-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5%;
+}
+
+.cubes-selection-container__logical-block-container__inputs__dim-row__dim-name {
+    min-width: 30%;
+}
+
 
 .cubes-selection-container__submit-btn-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
     margin: 2vh 2.4vw 1vh 0vw;
 }
