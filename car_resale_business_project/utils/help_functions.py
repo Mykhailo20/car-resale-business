@@ -95,6 +95,9 @@ def get_car_transactions_data(vin):
             car_image["image"] = sale.car_image 
             car_image["content_type"] = sale.car_image_content_type 
     
-    car_image['image'] = base64.b64encode(car_image['image']).decode("utf-8")
+    if car_image['image'] is not None:
+        car_image['image'] = base64.b64encode(car_image['image']).decode("utf-8")
+    else:
+        car_image = None
 
     return car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount

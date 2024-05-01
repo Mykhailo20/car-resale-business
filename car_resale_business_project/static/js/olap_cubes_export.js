@@ -1,6 +1,16 @@
 // Access properties of the olapMetadata object
 console.log(olapMetadata);
 
+var closeButtons = document.querySelectorAll('.flash-close-btn');
+closeButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+        var alertDiv = button.closest('.alert');
+        if (alertDiv) {
+            alertDiv.remove();
+        }
+    });
+});
+
 // Function to create a new metrics container
 function createNewMetricsContainer() {
     const newMetricsContainer = document.createElement("div");
@@ -76,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 metricCheckbox.classList.add(`col-md-${Math.floor(bootstrapColsNo / metricsColsNo)}`);
                 metricCheckbox.innerHTML = `
                     <div class="form-check">
-                        <input class="form-check-input export-cubes-check-input" type="checkbox" id="${metricKey}-checkbox">
+                        <input class="form-check-input export-cubes-check-input" type="checkbox" id="${metricKey}-checkbox" name="metric_${metricKey}">
                         <label class="form-check-label" for="${metricKey}-checkbox">
                             ${metric.name}
                         </label>
@@ -117,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
             dimensionCheckbox.classList.add('form-check');
             dimensionCheckbox.classList.add('cubes-selection-container__logical-block-container__inputs__dim-row__dim-name');
             dimensionCheckbox.innerHTML = `
-                <input class="form-check-input" type="checkbox" id="${dimension}-checkbox">
+                <input class="form-check-input" type="checkbox" id="${dimension}-checkbox" name="${dimension}">
                 <label class="form-check-label" for="${dimension}-checkbox">
                     ${dimMetadata.name}
                 </label>
@@ -128,6 +138,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const hierarchySelect = document.createElement('select');
             hierarchySelect.classList.add('export-cubes-hier-input');
             hierarchySelect.id = `${dimension}-levelSelect`;
+            hierarchySelect.name = `level-${dimension}`; // Add name attribute
 
             // Populate options for hierarchy levels
             dimMetadata.hierarchies.forEach((hierarchy, hierarchyIndex) => {

@@ -18,6 +18,7 @@ from car_resale_business_project.databases.fill_oltp.perform_filling import *
 
 from car_resale_business_project.utils.help_functions import *
 from car_resale_business_project.cars.utils.filters import remove_session_car_filters
+from car_resale_business_project.utils.olap_cubes_extract import *
 
 from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Buyer, Sale
 from car_resale_business_project.forms import AddPurchaseForm, AddRepairForm, AddSaleForm
@@ -319,6 +320,29 @@ def olap_cubes_export():
         olap_metadata = json.load(file)
     return render_template('olap_cubes_export.html', olap_metadata=olap_metadata, cube_names_dict=CUBE_NAMES_DICT, file_extensions=CUBES_EXPORT_FILE_EXTENSIONS, metrics_cols_no=OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, bootstrap_cols_no=BOOTSTRAP_GRID_COLUMNS_NO)
 
+@app.route('/cubes/perform_export', methods=['GET', 'POST'])
+def olap_cubes_perform_export():
+    request_data = request.form
+    print(f"Request form data: {request_data.to_dict(flat=False)}")
+    try:
+        filename, date_filter_list, fact_tablename, metrics_list, dim_dict = parse_request_data(request_data)
+        print(f"olap_cubes_perform_export")
+        print(f"filename = {filename}; fact_tablename = {fact_tablename}")
+        print(f"date_filter_list = {date_filter_list}")
+        print(f"metrics_list = {metrics_list}")
+        print(f"dim_dict = {dim_dict}")
+        flash("The file was exported successfully.", category='success')
+    except ValueError as e:
+        if "filename" in str(e).lower():
+            flash(f"Error occurred while exporting the cube: The filename {filename} is incorrect. Please provide a valid filename.", category='error')
+        else:
+            flash("Error occurred while exporting the cube. Please try again.", category='error')
+
+        print(f"Error occurred while exporting the cube: {e}")
+    except Exception as e:
+        flash("Error occurred while exporting the cube. Please try again.", category='error')
+        print(f"Error occurred while exporting the cube: {e}")
+    return redirect(url_for('olap_cubes_export'))
 
 @app.route('/get_car_brand_models/<make_id>')
 def get_car_brand_models(make_id):

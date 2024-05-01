@@ -130,3 +130,9 @@
 .hidden {
     display: none;
 }
+
+.flash-container-cube-export {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0.5vw 1vh 1vw;
+}

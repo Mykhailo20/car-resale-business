@@ -1,8 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
 <link rel="stylesheet" href="../static/css/olap_cubes_export.css">
+{% for category, message in get_flashed_messages(with_categories=true) %}
+    {% if category == 'success' %}
+        <div class="alert alert-dismissible fade show flash-container-cube-export alert-success" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% elif category == 'error' %}
+        <div class="alert alert-dismissible fade show flash-container-cube-export alert-danger" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+{% endfor %}
 <div class="main-content">
-    <form method="POST" class="cubes-selection-container" id="cubes-export-form">
+    <form method="POST" action="{{url_for('olap_cubes_perform_export')}}" class="cubes-selection-container" id="cubes-export-form">
         <div class="cubes-selection-container__logical-block-container">
             <div class="cubes-selection-container__logical-block-container__title">
                 Export Cubes Configuration
@@ -14,7 +31,7 @@
                     <div id="export-cubes-cube-metric-container">
                         <div class="export-cubes-label-input-container">
                             <label class="export-cubes-input-label" for="file-name-input">OLAP Cube</label>
-                            <select class="export-cubes-input" id="olap-cube-select" required>
+                            <select name="cube_name" class="export-cubes-input" id="olap-cube-select" required>
                                 {% for fact_name in cube_names_dict.keys() %}
                                     <option value="{{ fact_name }}" {% if fact_name == 'fact_car_purchase' %} default {% endif %}>{{ cube_names_dict[fact_name] }}</option>
                                 {% endfor %}
@@ -27,7 +44,7 @@
                 <div class="col-md-3 mb-3">
                     <div class="export-cubes-label-input-container">
                         <label class="export-cubes-input-label" for="file-name-input">File Name</label>
-                        <input type="text" class="export-cubes-input" id="file-name-input" placeholder="Enter file name" required>
+                        <input name="export_file_name" type="text" class="export-cubes-input" id="file-name-input" placeholder="Enter file name" required>
                     </div>  
                 </div>
                 
@@ -35,7 +52,7 @@
                 <div class="col-md-3 mb-3">
                     <div class="export-cubes-label-input-container">
                         <label class="export-cubes-input-label" for="file-extension-select">File Extension</label>
-                        <select class="export-cubes-input" id="file-extension-select" required>
+                        <select name="export_file_extention" class="export-cubes-input" id="file-extension-select" required>
                             {% for file_extension in file_extensions %}
                                 <option value="{{ file_extension }}">{{ file_extension }}</option>
                             {% endfor %}
@@ -49,11 +66,11 @@
                     <div class="export-cubes-label-filter-container">
                         <div class="export-cubes-label-input-container__date-filter-container">
                             <label class="export-cubes-input-label" for="filter-date-from">Date From</label>
-                            <input type="date" class="export-cubes-filter" id="filter-date-from" placeholder="From" aria-label="From date">
+                            <input name="filter-date-from" type="date" class="export-cubes-filter" id="filter-date-from" placeholder="From" aria-label="From date">
                         </div>
                         <div class="export-cubes-label-input-container__date-filter-container">
                             <label class="export-cubes-input-label" for="filter-date-to">Date To</label>
-                            <input type="date" class="export-cubes-filter" id="filter-date-to" placeholder="To" aria-label="To date">
+                            <input name="filter-date-to" type="date" class="export-cubes-filter" id="filter-date-to" placeholder="To" aria-label="To date">
                         </div>
                     </div>
                 </div>

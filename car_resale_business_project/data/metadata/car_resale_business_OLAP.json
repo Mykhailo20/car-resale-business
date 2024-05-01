@@ -125,22 +125,6 @@
                     "calculation_formula": "employee_experience = (current_date - hire_date).month",
                     "calculation_code": "lambda current_date, hire_date: (current_date.year - hire_date.year) * 12 + current_date.month - hire_date.month",
                     "calculation_description": "The experience of the employee is calculated as the difference in months between the current date and the date of hiring."
-                },
-                "purchase_time": {
-                    "name": "Purchase Time",
-                    "definition": "Negotiation time between an employee of the researched company and a car seller",
-                    "unit_of_measurement": "hour",
-                    "column": "purchase_time",
-                    "data_type": "integer",
-                    "value_restriction": "lambda x: x >= 0",
-                    "error_handling": {
-                        "severity_level": "warning",
-                        "error_code": "warnings.warn('Invalid value detected for purchase time. The value should be non-negative.', UserWarning)",
-                        "conclusion": "Incorrect values may indicate discrepancies in the market report data, but they do not have a critical impact on the process."
-                    },
-                    "calculation_formula": "service_time = (sale_end_timestamp - sale_start_timestamp).seconds / 3600",
-                    "calculation_code": "lambda sale_start_timestamp, sale_end_timestamp: (sale_end_timestamp - sale_start_timestamp).total_seconds() / 3600",
-                    "calculation_description": "Service time is calculated as the difference between the sale's start timestamp and end timestamp, converted to hours."
                 }
             }
         },
@@ -212,7 +196,7 @@
                     "unit_of_measurement": null,
                     "column": "condition",
                     "data_type": "float",
-                    "value_restriction": "lambda x: x >= 0",
+                    "value_restriction": "NOT SPECIFIED",
                     "error_handling": {
                         "severity_level": "warning",
                         "error_code": "warnings.warn('Invalid car repair condition_delta value detected. The condition_delta value must be greater than or equal to 0.', UserWarning)",
@@ -688,6 +672,8 @@
                 }
             },
             "hierarchies": [
+                ["car", "make"],
+                ["car", "make", "model"],
                 [
                     "car",
                     "make",
@@ -842,6 +828,10 @@
                 }
             },
             "hierarchies": [
+                [
+                    "employee",
+                    "age"
+                ],
                 [
                     "employee",
                     "age",
@@ -1089,6 +1079,14 @@
                 [
                     "date",
                     "month",
+                    "year"
+                ],
+                [
+                    "date",
+                    "month"
+                ],
+                [
+                    "date",
                     "year"
                 ],
                 [
