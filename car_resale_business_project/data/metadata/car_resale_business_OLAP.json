@@ -4,33 +4,28 @@
             "name": "Car Purchase",
             "table": "fact_car_purchase",
             "type": "transactional",
-            "key_fields": [
-                {
+            "dimensions_key_fields": {
+                "dim_car": {
                     "column": "car_vin",
-                    "dimension_table": "dim_car",
                     "dimension_key_column": "vin"
                 },
-                {
+                "dim_seller": {
                     "column": "seller_id",
-                    "dimension_table": "dim_seller",
                     "dimension_key_column": "seller_id"
                 },
-                {
+                "dim_employee": {
                     "column": "employee_id",
-                    "dimension_table": "dim_employee",
                     "dimension_key_column": "employee_id"
                 },
-                {
+                "dim_location": {
                     "column": "location_id",
-                    "dimension_table": "dim_location",
                     "dimension_key_column": "location_id"
                 },
-                {
+                "dim_date": {
                     "column": "date_id",
-                    "dimension_table": "dim_date",
                     "dimension_key_column": "date_id"
                 }
-            ],
+            },
             "sources": [
                 {
                     "name": "purchase",
@@ -51,6 +46,7 @@
                     "definition": "The price at which the car was purchased from the seller.",
                     "unit_of_measurement": "USD",
                     "column": "price",
+                    "aggregation_function": "SUM",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x > 0",
                     "error_handling": {
@@ -67,6 +63,7 @@
                     "definition": "Age of the sold car",
                     "unit_of_measurement": "year",
                     "column": "car_years",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -83,6 +80,7 @@
                     "definition": "Mileage of the sold car",
                     "unit_of_measurement": "mi",
                     "column": "odometer",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -99,6 +97,7 @@
                     "definition": "Technical condition of the sold car",
                     "unit_of_measurement": null,
                     "column": "condition",
+                    "aggregation_function": "AVG",
                     "data_type": "float",
                     "value_restriction": "lambda x: 1.0 <= x <= 5.0",
                     "error_handling": {
@@ -115,6 +114,7 @@
                     "definition": "Experience of the employee",
                     "unit_of_measurement": "month",
                     "column": "employee_experience",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -132,33 +132,28 @@
             "name": "Car Repair",
             "table": "fact_car_repair",
             "type": "transactional",
-            "key_fields": [
-                {
+            "dimensions_key_fields": {
+                "dim_car": {
                     "column": "car_vin",
-                    "dimension_table": "dim_car",
                     "dimension_key_column": "vin"
                 },
-                {
+                "dim_employee": {
                     "column": "employee_id",
-                    "dimension_table": "dim_employee",
                     "dimension_key_column": "employee_id"
                 },
-                {
+                "dim_location": {
                     "column": "location_id",
-                    "dimension_table": "dim_location",
                     "dimension_key_column": "location_id"
                 },
-                {
+                "dim_date": {
                     "column": "date_id",
-                    "dimension_table": "dim_date",
                     "dimension_key_column": "date_id"
                 },
-                {
+                "dim_car_repair_type": {
                     "column": "repair_type_id",
-                    "dimension_table": "dim_car_repair_type",
                     "dimension_key_column": "repair_type_id"
                 }
-            ],
+            },
             "sources": [
                 {
                     "name": "repair",
@@ -179,6 +174,7 @@
                     "definition": "The cost of the car repair",
                     "unit_of_measurement": "USD",
                     "column": "cost",
+                    "aggregation_function": "SUM",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x > 0",
                     "error_handling": {
@@ -195,6 +191,7 @@
                     "definition": "Change in the technical condition of the car as a result of additional work.",
                     "unit_of_measurement": null,
                     "column": "condition",
+                    "aggregation_function": "AVG",
                     "data_type": "float",
                     "value_restriction": "NOT SPECIFIED",
                     "error_handling": {
@@ -228,33 +225,28 @@
             "name": "Car Sale",
             "table": "fact_car_sale",
             "type": "transactional",
-            "key_fields": [
-                {
+            "dimensions_key_fields": {
+                "dim_car": {
                     "column": "car_vin",
-                    "dimension_table": "dim_car",
                     "dimension_key_column": "vin"
                 },
-                {
+                "dim_buyer": {
                     "column": "buyer_id",
-                    "dimension_table": "dim_buyer",
                     "dimension_key_column": "buyer_id"
                 },
-                {
+                "dim_employee": {
                     "column": "employee_id",
-                    "dimension_table": "dim_employee",
                     "dimension_key_column": "employee_id"
                 },
-                {
+                "dim_location": {
                     "column": "location_id",
-                    "dimension_table": "dim_location",
                     "dimension_key_column": "location_id"
                 },
-                {
+                "dim_date": {
                     "column": "date_id",
-                    "dimension_table": "dim_date",
                     "dimension_key_column": "date_id"
                 }
-            ],
+            },
             "sources": [
                 {
                     "name": "sale",
@@ -275,6 +267,7 @@
                     "definition": "The price at which the car was sold to the buyer.",
                     "unit_of_measurement": "USD",
                     "column": "price",
+                    "aggregation_function": "SUM",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x > 0",
                     "error_handling": {
@@ -291,6 +284,7 @@
                     "definition": "The amount of gross profit from the sale of the car",
                     "unit_of_measurement": "USD",
                     "column": "gross_profit_amount",
+                    "aggregation_function": "SUM",
                     "data_type": "integer",
                     "value_restriction": "NOT SPECIFIED",
                     "error_handling": {
@@ -307,6 +301,7 @@
                     "definition": "Percentage of gross profit",
                     "unit_of_measurement": "%",
                     "column": "gross_profit_percentage",
+                    "aggregation_function": "AVG",
                     "data_type": "float",
                     "value_restriction": "lambda x: 0 <= x <= 100",
                     "error_handling": {
@@ -323,6 +318,7 @@
                     "definition": "Current wholesale market value of the car",
                     "unit_of_measurement": "USD",
                     "column": "mmr",
+                    "aggregation_function": "SUM",
                     "data_type": "integer",
                     "value_restriction": "NOT SPECIFIED",
                     "error_handling": {
@@ -339,6 +335,7 @@
                     "definition": "Markup compared to Manheim Market Report (MMR)",
                     "unit_of_measurement": "USD",
                     "column": "price_margin",
+                    "aggregation_function": "SUM",
                     "data_type": "integer",
                     "value_restriction": "NOT SPECIFIED",
                     "error_handling": {
@@ -355,6 +352,7 @@
                     "definition": "Age of the sold car",
                     "unit_of_measurement": "year",
                     "column": "car_years",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -371,6 +369,7 @@
                     "definition": "Mileage of the sold car",
                     "unit_of_measurement": "mi",
                     "column": "odometer",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -388,6 +387,7 @@
                     "unit_of_measurement": null,
                     "column": "condition",
                     "data_type": "float",
+                    "aggregation_function": "AVG",
                     "value_restriction": "lambda x: 1.0 <= x <= 5.0",
                     "error_handling": {
                         "severity_level": "warning",
@@ -403,6 +403,7 @@
                     "definition": "Experience of the employee",
                     "unit_of_measurement": "month",
                     "column": "employee_experience",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -419,6 +420,7 @@
                     "definition": "Negotiation time between an employee of the researched company and a car buyer",
                     "unit_of_measurement": "hour",
                     "column": "service_time",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {
@@ -435,6 +437,7 @@
                     "definition": "Sum of all costs for servicing the car (at the time of car sale)",
                     "unit_of_measurement": "USD",
                     "column": "service_cost",
+                    "aggregation_function": "AVG",
                     "data_type": "integer",
                     "value_restriction": "lambda x: x >= 0",
                     "error_handling": {

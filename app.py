@@ -318,30 +318,44 @@ def dashboard_sales():
 def olap_cubes_export():
     with open(OLAP_METADATA_FILENAME) as file:
         olap_metadata = json.load(file)
-    return render_template('olap_cubes_export.html', olap_metadata=olap_metadata, cube_names_dict=CUBE_NAMES_DICT, file_extensions=CUBES_EXPORT_FILE_EXTENSIONS, metrics_cols_no=OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, bootstrap_cols_no=BOOTSTRAP_GRID_COLUMNS_NO)
+    
+    # Get min and max date for filters
+    min_date, max_date = get_min_max_date(get_olap_fill_demonstration_config())
+    return render_template('olap_cubes_export.html', olap_metadata=olap_metadata, cube_names_dict=CUBE_NAMES_DICT, file_extensions=CUBES_EXPORT_FILE_EXTENSIONS, metrics_cols_no=OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, bootstrap_cols_no=BOOTSTRAP_GRID_COLUMNS_NO, min_date=min_date, max_date=max_date)
 
 @app.route('/cubes/perform_export', methods=['GET', 'POST'])
 def olap_cubes_perform_export():
     request_data = request.form
+    cubes_extract_logger = cubes_extract_configure_logging()
+    
     print(f"Request form data: {request_data.to_dict(flat=False)}")
     try:
-        filename, date_filter_list, fact_tablename, metrics_list, dim_dict = parse_request_data(request_data)
-        print(f"olap_cubes_perform_export")
-        print(f"filename = {filename}; fact_tablename = {fact_tablename}")
-        print(f"date_filter_list = {date_filter_list}")
-        print(f"metrics_list = {metrics_list}")
-        print(f"dim_dict = {dim_dict}")
-        flash("The file was exported successfully.", category='success')
+        filename, file_extension, date_filter_dict, fact_tablename, metrics_list, dim_dict = parse_request_data(request_data)
+        cube_name = fact_tablename.split('_')[-1].capitalize() + 's'
+        query, column_names = create_cube_extract_query(fact_tablename, date_filter_dict, metrics_list, dim_dict, metadata_filename=OLAP_METADATA_FILENAME)
+        cubes_extract_logger.info(f"Starting the process of exporting the cube {cube_name} to a file {filename}: query = \n{query}")
+        print(f"query = \n{query}")
+        db_data = get_data_from_db(olap_config_dict, query)
+        print(f"db_data = {db_data}")
+        if file_extension == 'csv':
+            save_to_csv(filename=filename, data=db_data, column_names=column_names)
+        elif file_extension == 'json':
+            save_to_json(filename=filename, data=db_data, column_names=column_names)
+
+        flash(f"The {cube_name} cube was successfully exported to file '{filename}'.", category='success')
+        cubes_extract_logger.info(f"The {cube_name} cube was successfully exported to file '{filename}'.")
     except ValueError as e:
         if "filename" in str(e).lower():
-            flash(f"Error occurred while exporting the cube: The filename {filename} is incorrect. Please provide a valid filename.", category='error')
+            flash(f"Error occurred while exporting the cube {cube_name}: The filename '{filename}' is incorrect. Please provide a valid filename.", category='error')
+            cubes_extract_logger.info(f"Error occurred while exporting the cube {cube_name}: The filename '{filename}' is incorrect. Please provide a valid filename.")
         else:
-            flash("Error occurred while exporting the cube. Please try again.", category='error')
-
+            flash(f"Error occurred while exporting the cube {cube_name}. Please try again.", category='error')
+            cubes_extract_logger.info(f"Error occurred while exporting the cube {cube_name} to the file '{filename}': {e}")
         print(f"Error occurred while exporting the cube: {e}")
     except Exception as e:
         flash("Error occurred while exporting the cube. Please try again.", category='error')
         print(f"Error occurred while exporting the cube: {e}")
+        cubes_extract_logger.info(f"Error occurred while exporting the cube {cube_name} to the file '{filename}': {e}")
     return redirect(url_for('olap_cubes_export'))
 
 @app.route('/get_car_brand_models/<make_id>')

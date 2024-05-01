@@ -7,3 +7,5 @@ FILL_OLTP_LOGGING_FILENAME = 'car_resale_business_project/logging/fill_oltp_logg
 ETL_CONFIG_FILENAME = 'car_resale_business_project/config/fill_oltp_etl_config.json'
 ETL_LOGGING_FILENAME = 'car_resale_business_project/logging/etl_logging.log'
 
+CUBES_EXPORT_LOGGING_FILENAME = 'car_resale_business_project/logging/cubes_export_logging.log'
+

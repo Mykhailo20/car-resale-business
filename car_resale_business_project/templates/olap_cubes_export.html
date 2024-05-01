@@ -66,11 +66,11 @@
                     <div class="export-cubes-label-filter-container">
                         <div class="export-cubes-label-input-container__date-filter-container">
                             <label class="export-cubes-input-label" for="filter-date-from">Date From</label>
-                            <input name="filter-date-from" type="date" class="export-cubes-filter" id="filter-date-from" placeholder="From" aria-label="From date">
+                            <input name="filter-date-from" type="date" class="export-cubes-filter" id="filter-date-from" placeholder="From" aria-label="From date" min="{{ min_date }}" max="{{ max_date }}">
                         </div>
                         <div class="export-cubes-label-input-container__date-filter-container">
                             <label class="export-cubes-input-label" for="filter-date-to">Date To</label>
-                            <input name="filter-date-to" type="date" class="export-cubes-filter" id="filter-date-to" placeholder="To" aria-label="To date">
+                            <input name="filter-date-to" type="date" class="export-cubes-filter" id="filter-date-to" placeholder="To" aria-label="To date" min="{{ min_date }}" max="{{ max_date }}">
                         </div>
                     </div>
                 </div>
