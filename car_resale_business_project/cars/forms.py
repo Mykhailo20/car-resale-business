@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SubmitField
+from wtforms import StringField, SelectField, SubmitField, IntegerField
 from wtforms_sqlalchemy.fields import QuerySelectField
+from wtforms.validators import InputRequired, NumberRange, Length, Email
+from wtforms_components import DateField, DateRange
 
 from car_resale_business_project.models import CarMake, CarBodyType, Car, Seller, City, Purchase
 
@@ -56,3 +58,14 @@ class SearchByFiltersForm(FlaskForm):
                                 ], default=("cars_in_storage", "Cars in Storage")
                             )
     submit = SubmitField("Search")
+
+
+class AddEstimationForm(FlaskForm):
+    identifier = StringField()
+    estimated_price = IntegerField('Price', validators=[InputRequired(), NumberRange(min=0)], render_kw={"placeholder": "Estimated Price"})
+    submit = SubmitField("Reestimate")
+
+
+class AddAutoEstimationForm(FlaskForm):
+    identifier = StringField()
+    submit = SubmitField("Automatic reestimation")

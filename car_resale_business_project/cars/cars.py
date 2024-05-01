@@ -1,20 +1,64 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session, flash
 from sqlalchemy import desc
 import base64
 
 from car_resale_business_project import db
-from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm
+from car_resale_business_project.cars.forms import SearchByVinForm, SearchByFiltersForm, AddEstimationForm, AddAutoEstimationForm
 from car_resale_business_project.cars.utils.filters import *
+from car_resale_business_project.cars.utils.estimation import *
 from car_resale_business_project.utils.help_functions import get_car_transactions_data
 from car_resale_business_project.models import Car, CarMake, Seller, Purchase, Sale, Repair
 from car_resale_business_project.config.website_config import CAR_CARDS_PER_PAGE
 
 cars = Blueprint("cars", __name__, template_folder="templates", static_folder="static")
 
-@cars.route('/<vin>')
+@cars.route('/<vin>', methods=['GET', 'POST'])
 def car_page(vin):
-    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount = get_car_transactions_data(vin)
-    return render_template('car_page.html', car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale, gross_profit_amount=gross_profit_amount)
+    add_estimation_form = AddEstimationForm()
+    add_auto_estimation_form = AddAutoEstimationForm()
+    if add_estimation_form.identifier.data == "add_estimation_form" and request.method == 'POST': # It is not quite correct
+        try:
+            estimation = Estimation(
+                car_vin=vin,
+                price=add_estimation_form.estimated_price.data,
+                estimation_date=datetime.datetime.now().date(),
+                created_at=datetime.datetime.now(),
+                updated_at=datetime.datetime.now()
+            )
+            print(f"estimation = {estimation}")
+            db.session.add(estimation)
+            db.session.commit()
+            flash("Registration of car estimation was successful. The registration results can be viewed on this page.", category='success')
+        except Exception as e:
+            db.session.rollback()  # Rollback changes in case of exception
+            print(f"Error occured during the registration of car estimation: {e}")
+            flash("Error occured during the registration of car estimation. Please try again.", category='error')
+
+        return redirect(url_for('cars.car_page', vin=vin))
+    
+    if add_auto_estimation_form.identifier.data == "add_auto_estimation_form" and request.method == 'POST': # It is not quite correct
+        try:
+            new_estimation_price = get_new_estimation_price(car_vin=vin)
+            estimation = Estimation(
+                car_vin=vin,
+                price=new_estimation_price,
+                estimation_date=datetime.datetime.now().date(),
+                created_at=datetime.datetime.now(),
+                updated_at=datetime.datetime.now()
+            )
+            print(f"auto estimation = {estimation}")
+            db.session.add(estimation)
+            db.session.commit()
+            flash("Registration of automatic car estimation was successful. The registration results can be viewed on this page.", category='success')
+        except Exception as e:
+            # db.session.rollback()  # Rollback changes in case of exception
+            print(f"Error occured during the registration of automatic car estimation: {e}")
+            flash("Error occured during the registration of automatic car estimation.", category='error')
+
+        return redirect(url_for('cars.car_page', vin=vin)) 
+     
+    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount, latest_estimation = get_car_transactions_data(vin)
+    return render_template('car_page.html', car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale, gross_profit_amount=gross_profit_amount, latest_estimation=latest_estimation, add_estimation_form=add_estimation_form, add_auto_estimation_form=add_auto_estimation_form)
 
 
 @cars.route('/last_purchased')

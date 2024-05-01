@@ -3,8 +3,9 @@ import json
 import base64
 
 import psycopg2 as pg2
+from sqlalchemy import desc
 
-from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Sale
+from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Sale, Estimation
 from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT
 
 
@@ -58,6 +59,12 @@ def get_car_transactions_data(vin):
     # Query the database to retrieve sale details
     sale = Sale.query.filter_by(car_vin=vin).first()
 
+    # Query the database to retrieve latest estimation details
+    latest_estimation = Estimation.query \
+        .filter_by(car_vin=vin) \
+        .order_by(desc(Estimation.estimation_date), desc(Estimation.created_at)) \
+        .first()
+
     # Query the database to retrieve repair details
     repairs = Repair.query.filter_by(car_vin=vin).order_by(Repair.repair_date).all()
 
@@ -100,4 +107,4 @@ def get_car_transactions_data(vin):
     else:
         car_image = None
 
-    return car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount
+    return car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount, latest_estimation

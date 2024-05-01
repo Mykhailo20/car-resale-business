@@ -557,3 +557,30 @@ class Sale(db.Model):
             'buyer': self.buyer.to_dict() if self.buyer else None,
             'employee': self.employee.to_dict() if self.employee else None,
         }
+
+
+@dataclass
+class Estimation(db.Model):
+    __tablename__ = 'estimation'
+
+    estimation_id: int
+    car_vin: str
+    price: int
+    estimation_date: date
+    
+    estimation_id = db.Column(db.Integer, primary_key=True)
+    car_vin = db.Column(db.String(17),  db.ForeignKey('car.vin'))
+    price = db.Column(db.Integer)
+    estimation_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime)
+    updated_at = db.Column(db.DateTime)
+
+    def to_dict(self):
+        return {
+            'estimation_id': self.estimation_id,
+            'car_vin': self.car_vin,
+            'price': self.price,
+            'estimation_date': self.estimation_date.isoformat() if self.estimation_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }

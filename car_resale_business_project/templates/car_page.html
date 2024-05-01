@@ -289,16 +289,36 @@
                             {% endif %}
                     </div>
                 </div>
-            {% else %}
+            {% elif latest_estimation %}
             <div class="car-history__item__data__attributes-div">
                 <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
                         <span class="car-history__item__data__attributes-div__column__item__header">Estimated Price:</span>
-                        <span>Estimated Price</span>
+                        <span>{{ latest_estimation.price }}</span>
                     </div>
+                    <form method="POST" id="add_estimation_form">
+                        {{ add_estimation_form.hidden_tag() }}
+                        {{ add_estimation_form.identifier(hidden=True, value='add_estimation_form') }}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            {{ add_estimation_form.estimated_price(class="add-transaction-input-row", id="car-estimation-price") }}
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            {{ add_estimation_form.submit(class="btn btn-outline-success", id="car-estimation-submit-btn") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
                     <div class="car-history__item__data__attributes-div__column__item">
-                        <button class="btn btn-outline-success">Reestimate</button>
+                        <span class="car-history__item__data__attributes-div__column__item__header">Estimation Date:</span>
+                        <span>{{ latest_estimation.estimation_date }}</span>
                     </div>
+                    <form method="POST" id="add_auto_estimation_form">
+                        {{ add_auto_estimation_form.hidden_tag() }}
+                        {{ add_auto_estimation_form.identifier(hidden=True, value='add_auto_estimation_form') }}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            {{ add_auto_estimation_form.submit(class="btn btn-outline-success", id="car-auto-estimation-submit-btn") }}
+                        </div>
+                    </form>
                 </div>
             </div>
             {% endif %}

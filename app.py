@@ -6,11 +6,12 @@ import os
 from datetime import datetime
 import json
 import base64
+import random
 
 from car_resale_business_project import app, db, oltp_config_dict, olap_config_dict
 
 from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME, FILL_OLTP_CONFIG_FILENAME, ETL_CONFIG_FILENAME, OLAP_METADATA_FILENAME
-from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT, CUBE_NAMES_DICT, CUBES_EXPORT_FILE_EXTENSIONS
+from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT, CUBE_NAMES_DICT, CUBES_EXPORT_FILE_EXTENSIONS, ESTIMATION_PRICE_INCREASE_RANGE
 from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME, OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, BOOTSTRAP_GRID_COLUMNS_NO
 
 from car_resale_business_project.databases.etl.perform_etl import perform_etl
@@ -20,7 +21,7 @@ from car_resale_business_project.utils.help_functions import *
 from car_resale_business_project.cars.utils.filters import remove_session_car_filters
 from car_resale_business_project.utils.olap_cubes_extract import *
 
-from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Buyer, Sale
+from car_resale_business_project.models import Address, Car, CarBodyType, Purchase, Repair, Buyer, Sale, Estimation
 from car_resale_business_project.forms import AddPurchaseForm, AddRepairForm, AddSaleForm
 
 
@@ -177,9 +178,20 @@ def purchase():
                 created_at=datetime.now(),
                 updated_at=datetime.now()
             )
+
+            estimation = Estimation(
+                car_vin=car_vin,
+                price=add_purchase_form.purchase_price.data + random.randint(ESTIMATION_PRICE_INCREASE_RANGE[0], ESTIMATION_PRICE_INCREASE_RANGE[1]),
+                estimation_date=datetime.now().date(),
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
         
             db.session.add(car)
             db.session.add(purchase)
+            db.session.commit()
+            
+            db.session.add(estimation)
             db.session.commit()
             flash("Registration of car purchase was successful. The registration results can be viewed on this page.", category='success')
             return redirect(url_for('cars.car_page', vin=car_vin))
@@ -190,6 +202,7 @@ def purchase():
             return redirect(url_for('purchase'))
 
     return render_template('add_purchase.html', add_purchase_form=add_purchase_form)
+
 
 @app.route('/repair/<vin>', methods=['GET', 'POST'])
 def repair(vin):
@@ -223,7 +236,7 @@ def repair(vin):
             
             db.session.add(repair)
             db.session.commit()
-            flash("Registration of car repair was successful. The registration results can be viewed on this page (Repair History) or on the vehicle data page.", category='success')
+            flash("Registration of car repair was successful. The registration results can be viewed on this page (Repair History) or on the car page.", category='success')
         except Exception as e:
             db.session.rollback()  # Rollback changes in case of exception
             print(f"Error occured during the registration of car repair: {e}")
@@ -231,7 +244,7 @@ def repair(vin):
         
         return redirect(url_for('repair', vin=vin))
         
-    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount = get_car_transactions_data(vin)
+    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount, latest_estimation = get_car_transactions_data(vin)
 
     return render_template('add_repair.html', add_repair_form=add_repair_form, car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition)
 
@@ -302,14 +315,15 @@ def sale(vin):
             flash("Error occured during the registration of car sale. Please try again.", category='error')
             return redirect(url_for('sale', vin=vin))
         
-    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount = get_car_transactions_data(vin)
+    car, car_image, purchase, repairs, repairs_cost, repairs_condition_delta_list, relative_conditions_list, car_condition, car_rel_condition, sale, gross_profit_amount, latest_estimation = get_car_transactions_data(vin)
 
     return render_template('add_sale.html', add_sale_form=add_sale_form, car=car, car_image=car_image, purchase=purchase, repairs=repairs, repairs_cost=repairs_cost, repairs_condition_delta_list=repairs_condition_delta_list, relative_conditions_list=relative_conditions_list, car_condition=car_condition, car_rel_condition=car_rel_condition, sale=sale)
+
 
 @app.route('/dasboard/purchases')
 def dashboard_purchases():
     return render_template('bi_purchases_dashboard.html')
-
+    
 @app.route('/dasboard/sales')
 def dashboard_sales():
     return render_template('bi_sales_dashboard.html')
