@@ -12,7 +12,7 @@ from car_resale_business_project import app, db, oltp_config_dict, olap_config_d
 
 from car_resale_business_project.config.files_config import FILL_OLTP_DATA_FILENAME, FILL_OLTP_CONFIG_FILENAME, ETL_CONFIG_FILENAME, OLAP_METADATA_FILENAME
 from car_resale_business_project.config.data_config import FILL_OLTP_MIN_RECORDS_NUMBER, CAR_RELATIVE_CONDITION_DICT, CUBE_NAMES_DICT, CUBES_EXPORT_FILE_EXTENSIONS, ESTIMATION_PRICE_INCREASE_RANGE
-from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME, OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, BOOTSTRAP_GRID_COLUMNS_NO
+from car_resale_business_project.config.website_config import MAIN_PAGE_CONFIG_FILENAME, OLAP_CUBES_EXPORT_METRICS_PER_ROW_NO, BOOTSTRAP_GRID_COLUMNS_NO, FILL_OLTP_DB_SLIDER_STEP
 
 from car_resale_business_project.databases.etl.perform_etl import perform_etl
 from car_resale_business_project.databases.fill_oltp.perform_filling import *
@@ -44,7 +44,7 @@ def databases():
 
     renew_main_page_metadata(filename=MAIN_PAGE_CONFIG_FILENAME, page_name='cars.last_purchased')
 
-    return render_template('databases.html', filename=os.path.basename(FILL_OLTP_DATA_FILENAME), min_records_no=FILL_OLTP_MIN_RECORDS_NUMBER, max_records_no=records_number, oltp_db_filled=oltp_db_filled, olap_db_filled=olap_db_filled)
+    return render_template('databases.html', filename=os.path.basename(FILL_OLTP_DATA_FILENAME), min_records_no=FILL_OLTP_MIN_RECORDS_NUMBER, max_records_no=records_number, oltp_db_filled=oltp_db_filled, olap_db_filled=olap_db_filled,slider_step=FILL_OLTP_DB_SLIDER_STEP)
 
 """
 @app.route('/fill_oltp')
@@ -197,8 +197,12 @@ def purchase():
             return redirect(url_for('cars.car_page', vin=car_vin))
         except Exception as e:
             db.session.rollback()  # Rollback changes in case of exception
-            print(f"Error occured during the registration of car purchase: {e}")
-            flash("Error occured during the registration of car purchase. Please try again.", category='error')
+            error_message = str(e)
+            if "Key (vin)=" in error_message and "already exists" in error_message:
+                flash("The car with the specified VIN is already registered. Re-registration is not allowed. Please check that the VIN is correct and try again.", category='error')
+            else:
+                flash("Error occurred during the registration of car purchase. Please try again.", category='error')
+            print(f"Error occurred during the registration of car purchase: {error_message}")
             return redirect(url_for('purchase'))
 
     return render_template('add_purchase.html', add_purchase_form=add_purchase_form)

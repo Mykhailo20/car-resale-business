@@ -19,10 +19,7 @@ class SearchByFiltersForm(FlaskForm):
 
     model = QuerySelectField('Model', query_factory=lambda: Car.query.filter(None).all(), get_label="model", allow_blank=True, blank_text="Model")
     body_type = QuerySelectField('Body_Type', query_factory=lambda: CarBodyType.query.all(), get_label="name", allow_blank=True, blank_text="Body Type")
-    #transmission = QuerySelectField('Transmission', query_factory=lambda: Car.query.distinct(Car.transmission).all(), get_label="transmission", allow_blank=True, blank_text="Transmission")
-    # seller_name = QuerySelectField('Seller', query_factory=lambda: Seller.query.distinct(Seller.name).all(), get_label="name", allow_blank=True, blank_text="Seller")
     city = QuerySelectField('City', query_factory=lambda: City.query.all(), get_label="name", allow_blank=True, blank_text="City")
-    # manufacture_year = QuerySelectField('Year From', query_factory=lambda: Car.query.distinct(Car.manufacture_year).all(), get_label="manufacture_year", allow_blank=True, blank_text="Manufacture Year")
     condition = SelectField(choices=
                                 [
                                   ("__None", "Condition"),

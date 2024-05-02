@@ -232,7 +232,9 @@
             {% endfor %}
         {% else %}
             <p class="car-history__repairs-no-repairs">No repairs were carried out on the car.</p>
-            <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success details-btn">Repair</a>
+            {% if sale == None %}
+                <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success details-btn">Repair</a>
+            {% endif %}
         {% endif %}
         </div>
     </div>

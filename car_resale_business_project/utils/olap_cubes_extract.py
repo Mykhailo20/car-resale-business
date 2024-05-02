@@ -190,5 +190,6 @@ def save_to_csv(filename, data, column_names):
 
 
 def save_to_json(filename, data, column_names):
+    data = [dict(zip(column_names, array)) for array in data]
     with open(filename, 'w') as file:
         json.dump(data, file, indent=4)

@@ -130,3 +130,38 @@ closeButtons.forEach(function(button) {
         }
     });
 });
+
+function hideNoneOption(ids) {
+    ids.forEach(id => {
+      var select = document.getElementById(id);
+      var noneOption = select.querySelector('option[value="__None"]');
+      if(noneOption) {
+        noneOption.setAttribute('hidden', 'hidden');
+      }
+    });
+}
+
+function addHideNoneOptions(idValuePairs) {
+    idValuePairs.forEach(pair => {
+      var select = document.getElementById(pair.id);
+      var newOption = `<option value="__None" selected hidden>${pair.value}</option>`;
+      select.insertAdjacentHTML('afterbegin', newOption);
+      var noneOption = select.querySelector(`option[value="__None"]`);
+      if(noneOption) {
+        noneOption.disabled = true;
+        noneOption.setAttribute('hidden', 'hidden');
+      }
+    });
+}
+
+var hideNonOptionIds = ['car-seller', 'car-employee-buyer', 'car-brand', 'car-body-type', 'car-color'];
+hideNoneOption(hideNonOptionIds);
+
+var addHideNonOptionIds = [
+    { id: 'car-transmission', value: 'Transmission' },
+    { id: 'car-manufacture-year', value: 'Manufacture Year' },
+    { id: 'car-condition', value: 'Condition' },
+    { id: 'purchase-date', value: 'Purchase Date' }
+];
+
+addHideNoneOptions(addHideNonOptionIds);

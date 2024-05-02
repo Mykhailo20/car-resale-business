@@ -17,7 +17,7 @@
                         <p class="databases-records-no">Number of records in '{{ filename }}': {{ max_records_no }}</p>
                         <div class="databases-records-no__slider-container">
                             <label for="records-no-slider">Please select the number of records (table 'car') to fill the OLTP database:</label><br>
-                            <input type="range" id="records-no-slider" name="records-slider" min="{{ min_records_no }}" max="{{ max_records_no }}" value="{{ min_records_no }}">
+                            <input type="range" id="records-no-slider" name="records-slider" min="{{ min_records_no }}" max="{{ max_records_no }}" value="{{ min_records_no }}" step="{{slider_step}}">
                             <span id="selected-records">{{ min_records_no }}</span>
                         </div>
                     </div>

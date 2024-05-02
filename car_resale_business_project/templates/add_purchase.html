@@ -54,7 +54,7 @@
                         Car
                     </div>
                     <div class="add-purchase-container__form-container__entity-container__inputs">
-                        {{ add_purchase_form.car_vin(class="add-purchase-input-row", id="car-vin")}}
+                        {{ add_purchase_form.car_vin(class="add-purchase-input-row", id="car-vin", pattern="[A-Z0-9]{17}", title="The VIN must be 17 characters long and can only contain uppercase letters and numbers.")}}
                     </div>
                     <div class="add-purchase-container__form-container__entity-container__inputs">
                         {{ add_purchase_form.brand(class="add-purchase-input", id="car-brand")}}

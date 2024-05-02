@@ -28,8 +28,7 @@ class AddPurchaseForm(FlaskForm):
             .order_by(Seller.name)  # Sort sellers alphabetically ignoring case
             .all(),
         get_label="name",
-        allow_blank=True,
-        blank_text="Seller",
+        allow_blank=True, blank_text="Seller", 
         validators=[InputRequired()]
     )
 
@@ -111,9 +110,9 @@ class AddSaleForm(FlaskForm):
     street = StringField(render_kw={"placeholder": "Street"}, validators=[InputRequired()])
 
     # Buyer
-    buyer_first_name = StringField(render_kw={"placeholder": "First Name"}, validators=[InputRequired()])
-    buyer_last_name = StringField(render_kw={"placeholder": "Last Name"}, validators=[InputRequired()])
-    buyer_middle_name = StringField(render_kw={"placeholder": "Middle Name (Optional)"})
+    buyer_first_name = StringField(render_kw={"placeholder": "First Name"}, validators=[InputRequired(), Length(min=1, max=50)])
+    buyer_last_name = StringField(render_kw={"placeholder": "Last Name"}, validators=[InputRequired(), Length(min=1, max=50)])
+    buyer_middle_name = StringField(render_kw={"placeholder": "Middle Name (Optional)"}, validators=[Length(min=1, max=50)])
     buyer_birth_date = DateField('Birth Date', format='%Y-%m-%d', validators=[
         InputRequired(),
         DateRange(

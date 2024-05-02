@@ -64,3 +64,12 @@
 .databases-container__database-block__content__olap-btns {
     width: 30%;
 }
+
+.databases-records-no__slider-container {
+    margin-top: 1vh;
+}
+
+#records-no-slider {
+    margin-top: 0.25vh;
+    width: 80%;
+}

@@ -82,7 +82,9 @@ def get_car_transactions_data(vin):
     # Iterate through repairs to calculate condition deltas
     for i, repair in enumerate(repairs):
         if i == 0:  # First repair
-            condition_delta = repair.condition - purchase.condition
+            condition_delta = None
+            if purchase.condition:
+                condition_delta = repair.condition - purchase.condition
         else:
             previous_repair = repairs[i - 1]
             condition_delta = previous_repair.condition - repair.condition

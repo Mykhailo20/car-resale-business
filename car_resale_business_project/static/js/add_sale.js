@@ -1,15 +1,3 @@
-// employee
-var employeeSelect = document.getElementById('car-employee-mechanic-manager');
-var noneOption = employeeSelect.querySelector('option[value="__None"]');
-noneOption.disabled = true;
-/*noneOption.removeAttribute('selected');*/
-noneOption.setAttribute('hidden', 'hidden');
-
-// repair-type
-var transmissionSelect = document.getElementById('repair-type');
-var newOption = '<option value="__None" hidden>Repair Type</option>';
-transmissionSelect.insertAdjacentHTML('afterbegin', newOption);
-
 function hideNoneOption(ids) {
     ids.forEach(id => {
       var select = document.getElementById(id);
@@ -33,12 +21,12 @@ function addHideNoneOptions(idValuePairs) {
     });
 }
 
-var hideNonOptionIds = ['car-employee-mechanic-manager', 'repair-city'];
+var hideNonOptionIds = ['car-employee-seller', 'buyer-city'];
 hideNoneOption(hideNonOptionIds);
 
 var addHideNonOptionIds = [
-    { id: 'repair-type', value: 'Repair Type' },
-    { id: 'repair-car-condition', value: 'Condition' }
+    { id: 'buyer-sex', value: 'Sex' },
+    { id: 'sale-car-condition', value: 'Condition' }
 ];
 
 addHideNoneOptions(addHideNonOptionIds);

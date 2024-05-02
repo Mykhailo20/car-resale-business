@@ -233,16 +233,16 @@
                             Buyer
                         </div>
                         <div class="add-purchase-container__form-container__entity-container__inputs">
-                            {{ add_sale_form.buyer_first_name(class="add-transaction-input", id="buyer-first-name")}}
-                            {{ add_sale_form.buyer_last_name(class="add-transaction-input", id="buyer-last-name")}}
+                            {{ add_sale_form.buyer_first_name(class="add-transaction-input", id="buyer-first-name", pattern="[A-Za-z]+", title="The first name can only contain letters and must have a minimum of 1 and a maximum of 50 letters.")}}
+                            {{ add_sale_form.buyer_last_name(class="add-transaction-input", id="buyer-last-name", pattern="[A-Za-z]+", title="The last name can only contain letters and must have a minimum of 1 and a maximum of 50 letters.")}}
                         </div>
                         <div class="add-purchase-container__form-container__entity-container__inputs">
-                            {{ add_sale_form.buyer_middle_name(class="add-transaction-input", id="buyer-middle-name")}}
+                            {{ add_sale_form.buyer_middle_name(class="add-transaction-input", id="buyer-middle-name", pattern="[A-Za-z]+", title="The middle name can only contain letters and must have a minimum of 1 and a maximum of 50 letters.")}}
                             {{ add_sale_form.buyer_birth_date(class="add-transaction-input", id="buyer-birth-date", title="Buyer's Birth Date")}}
                         </div>
                         <div class="add-purchase-container__form-container__entity-container__inputs">
                             {{ add_sale_form.buyer_sex(class="add-transaction-input", id="buyer-sex")}}
-                            {{ add_sale_form.buyer_email(class="add-transaction-input", id="buyer-email")}}
+                            {{ add_sale_form.buyer_email(class="add-transaction-input", id="buyer-email", type="email", pattern="[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,4}")}}
                         </div>
                         <div class="add-purchase-container__form-container__entity-container__inputs">
                             {{ add_sale_form.city(class="add-transaction-input", id="buyer-city")}}
@@ -279,4 +279,5 @@
     {% endif %}
 </div>
 <script src="../static/js/car_page.js"></script>
+<script src="../static/js/add_sale.js"></script>
 {% endblock %}

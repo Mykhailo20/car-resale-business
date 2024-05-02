@@ -296,11 +296,12 @@ def search_results(search_place_choice):
     base_query = Purchase.query.filter(Purchase.car_vin.not_in(Sale.query.with_entities(Sale.car_vin))).order_by(desc(Purchase.purchase_date))
     # base_query = Purchase.query.order_by(desc(Purchase.purchase_date))
     transaction_name = 'Purchase'
+    purchases_list = []
     # Check if the "car_search_choice" filter is set to "cars_sold"
     if search_place_choice == 'cars_sold':
         base_query = Sale.query.order_by(desc(Sale.sale_date))
         transaction_name = 'Sale'
-        purchases_list = []
+        
 
     for filter_name, filter_value in filters.items():
         if filter_name in ['csrf_token']:

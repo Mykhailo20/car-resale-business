@@ -42,27 +42,21 @@
                 </div>
                 <!-- Filters Row 3 -->
                 <div class="filter-row">
-                    <select class="filter__filter-input" id="car-filter-seller-name" name="seller_name">
-                        <option value="__None" hidden>Seller</option>
-                        {% for seller_name in car_filters['seller_name'] %}
-                            <option value="{{ seller_name }}">{{ seller_name }}</option>
-                        {% endfor %}
-                    </select>
                     {{ car_filters_form.city(class="filter__filter-input", id="car-filter-city")}}
-                </div>
-                <!-- Filters Row 4 -->
-                <div class="filter-row">
                     <select class="filter__filter-input" id="car-filter-manufacture_year" name="manufacture_year">
                         <option value="__None" hidden>Manufacture Year</option>
                         {% for manufacture_year in car_filters['car_manufacture_years'] %}
                             <option value="{{ manufacture_year }}">{{ manufacture_year }}</option>
                         {% endfor %}
                     </select>
+                </div>
+                <!-- Filters Row 4 -->
+                <div class="filter-row">
                     {{ car_filters_form.condition(class="filter__filter-input", id="car-filter-condition")}}
+                    {{ car_filters_form.odometer(class="filter__filter-input", id="car-filter-odometer") }}
                 </div>
                 <!-- Filters Row 5 -->
                 <div class="filter-row">
-                    {{ car_filters_form.odometer(class="filter__filter-input", id="car-filter-odometer") }}
                     {{ car_filters_form.car_search_choice(class="filter__filter-input", id="car-filter-choice") }} 
                 </div>
                 <div class="search-btn-div">

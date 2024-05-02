@@ -13,6 +13,7 @@ FILL_OLTP_CAR_CITY_CHANGE_FREQUENCY = 50
 FILL_OLTP_CAR_REPAIR_FREQUENCY = 10
 
 CAR_RELATIVE_CONDITION_DICT = lambda condition: (
+    None if condition is None else
     'Bad' if 1.0 <= condition < 2.0 else
     'Normal' if 2.0 <= condition < 3.0 else
     'Good' if 3.0 <= condition < 4.0 else

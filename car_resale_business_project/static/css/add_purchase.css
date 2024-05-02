@@ -50,8 +50,8 @@
     padding: 0.5rem 0.75rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 49.6%;
     margin-bottom: 2vh;
+    width: 49.6%;
 }
 
 .add-purchase-container__form-container__entity-container__divide-line {
@@ -63,4 +63,9 @@
     justify-content: flex-end;
     align-items: center;
     margin-bottom: 1vh;
+}
+
+.add-purchase-container__form-container__entity-container__inputs {
+    display: flex;
+    gap: 1vw;
 }
