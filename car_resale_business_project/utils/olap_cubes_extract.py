@@ -1,12 +1,16 @@
 import json
 import logging
 import csv
+import os
 
 import psycopg2 as pg2
 
 from car_resale_business_project.config.files_config import CUBES_EXPORT_LOGGING_FILENAME
 
 def cubes_extract_configure_logging():
+    # Check if the log file exists, create it if it doesn't
+    if not os.path.exists(CUBES_EXPORT_LOGGING_FILENAME):
+        open(CUBES_EXPORT_LOGGING_FILENAME, 'w').close()
     cubes_export_logger = logging.getLogger('oltp')
     cubes_export_logger.setLevel(logging.DEBUG)
     cubes_export_handler = logging.FileHandler(CUBES_EXPORT_LOGGING_FILENAME)

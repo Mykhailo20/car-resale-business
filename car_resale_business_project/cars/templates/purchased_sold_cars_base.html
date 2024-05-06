@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <link rel="stylesheet" href="../static/css/last_purchased.css">
+    <div class="page-links">
+        <a href="{{ url_for('cars.last_purchased') }}" class="link-active">Last Purchased Cars</a>
+        <a href="{{ url_for('cars.last_sold') }}" class="link">Last Sold Cars</a>
+        <a href="{{ url_for('cars.search') }}" class="link">Find Car</a>
+    </div>
+    <hr class="divide-line">
+    {% block transaction_data %}
+
+    {% endblock %}
+{% endblock %}

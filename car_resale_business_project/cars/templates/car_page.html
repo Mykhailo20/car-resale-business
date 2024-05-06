@@ -1,0 +1,333 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/car_page.css">
+<div class="header__go-back">
+    <button id="go-back-btn" class="btn btn-outline-success go-back-btn">&lt; Back</button>
+</div>
+{% for category, message in get_flashed_messages(with_categories=true) %}
+    {% if category == 'success' %}
+        <div class="alert alert-dismissible fade show flash-container alert-success" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% elif category == 'error' %}
+        <div class="alert alert-dismissible fade show flash-container alert-danger" role="alert">
+            {{ message }}
+            <button type="button" class="close flash-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+{% endfor %}
+<div class="main-content">
+ <div class="car-details">
+    <div class="car-preview">
+        <div class="car-preview__car-image">
+            {% if car_image %}
+                <img src="data:{{ car_image['content_type'] }};base64,{{ car_image['image'] }}" alt="Car Image" class="car-img">
+            {% endif %}
+        </div>
+        {% if sale %}
+        <div class="car-preview__buttons">
+            <div class="car-preview__buttons__car-sold-msg-container">
+                <p class="car-preview__buttons__car-sold-msg">The car has been successfully sold.</p>
+            </div>
+            <div class="car-preview__sole_chars">
+                <div class="car-history__item__data__attributes-div__column__item">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Gross Profit Amount:</span>
+                    <span>{{ gross_profit_amount }}$</span>
+                </div>
+                <div class="car-history__item__data__attributes-div__column__item">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Gross Profit Percentage:</span>
+                    <span>{{ ((gross_profit_amount / sale.price) * 100)|int }}%</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="car-preview__buttons">
+                <a href="{{ url_for('sale', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Sell</a>
+                <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success car-preview__buttons_btn">Repair</a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="car-chars">
+        <span class="car-history__item__header">Car Characteristics</span>
+        <hr class="car-history__item__header_divide-line">
+        <div class="car-characteristics__item__data">
+            <div class="car-history__item__data__attributes-div">
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">VIN:</span>
+                        <span>{{ car.vin }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Model:</span>
+                        <span>{{ car.model }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Body Type:</span>
+                        <span>{{ car.body_type.name }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Manufacture Year:</span>
+                        <span>{{ car.manufacture_year }}</span>
+                    </div>
+                    {% if sale == None %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Current Condition:</span>
+                            <span>{{ car_condition }} ({{ car_rel_condition }})</span>
+                        </div>
+                    {% else %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                            <span>{{ car_condition }} ({{ car_rel_condition }})</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Brand:</span>
+                        <span>{{ car.make.name }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Trim:</span>
+                        <span>{{ car.trim }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Transmission:</span>
+                        <span>{{ car.transmission }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Color:</span>
+                        <span>{{ car.color.name }}</span>
+                    </div>
+                    {% if sale == None %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ purchase.odometer }} mi</span>
+                        </div>
+                    {% else %}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ purchase.odometer }} mi</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+ <div class="car-history">
+    <div id="item_1" class="car-history__item">
+        <span class="car-history__item__header" onclick="expandData(1)">Car Purchase</span>
+        <hr class="car-history__item__header_divide-line">
+        <div class="car-history__item__data">
+            <div class="car-history__item__data__attributes-div">
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Seller:</span>
+                        <span>{{ purchase.seller.name }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                        <span>{{ purchase.condition }} ({{relative_conditions_list[0]}})</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase City:</span>
+                        <span>{{ purchase.seller.address.city.name }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Price:</span>
+                        <span>{{ purchase.price }} $</span>
+                    </div>
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Employee:</span>
+                        <span>{{ purchase.employee.first_name + ' ' + purchase.employee.last_name }}</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                        <span>{{ purchase.odometer }} mi</span>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Purchase Date:</span>
+                        <span>{{ purchase.purchase_date }}</span>
+                    </div>
+                </div>
+            </div>
+            
+                <div class="car-history__item__data__description-div">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Purchase Description: </span>
+                    <div class="car-history__item__data__description-div__text">
+                        {% if purchase.description %}
+                            {{ purchase.description }}
+                        {% else %}
+                            No description.
+                        {% endif %}
+                    </div>
+                </div>
+            
+        </div>
+    </div>
+    <div id="item_2" class="car-history__item">
+    <span class="car-history__item__header" onclick="expandRepairData(2)">Car Repairs</span>
+    <hr class="car-history__item__header_divide-line">
+       <div class="car-history__repairs">
+        {%if repairs %}
+            {% for repair in repairs %}
+                <div id="repair_{{loop.index}}" class="car-history__item__repair" onclick="expandChild({{loop.index}})">
+                    <span class="car-history__item__repair__header">Repair {{ loop.index }}</span>
+                    <hr class="car-history__item__header_divide-line">
+                    <div class="car-history__item__data">
+                        <div class="car-history__item__data__attributes-div">
+                            <div class="car-history__item__data__attributes-div__column">
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Employee-Manager:</span>
+                                    <span>{{ repair.employee.first_name + ' ' + repair.employee.last_name }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair Cost:</span>
+                                    <span>{{ repair.cost }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                                    {% if sale %}
+                                        <span>{{ repair.condition }} ({{relative_conditions_list[loop.index + 1]}})</span>
+                                    {% else %}
+                                        <span>{{ repair.condition }} ({{relative_conditions_list[loop.index]}})</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="car-history__item__data__attributes-div__column">
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair City:</span>
+                                    <span>{{ repair.address.city.name }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Repair Date:</span>
+                                    <span>{{ repair.repair_date }}</span>
+                                </div>
+                                <div class="car-history__item__data__attributes-div__column__item">
+                                    <span class="car-history__item__data__attributes-div__column__item__header">Condition Delta:</span>
+                                    <span>{{ repairs_condition_delta_list[loop.index - 1] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="car-history__item__data__description-div">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Repair Description: </span>
+                            <div class="car-history__item__data__description-div__text">
+                                {% if repair.description %}
+                                    {{ repair.description }}
+                                {% else %}
+                                    No description.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="car-history__repairs-no-repairs">No repairs were carried out on the car.</p>
+            {% if sale == None %}
+                <a href="{{ url_for('repair', vin=car.vin) }}" class="btn btn-outline-success details-btn">Repair</a>
+            {% endif %}
+        {% endif %}
+        </div>
+    </div>
+     <div id="item_3" class="car-history__item">
+        <span class="car-history__item__header" onclick="expandData(3)">Car Sale</span>
+        <hr class="car-history__item__header_divide-line">
+        <div class="car-history__item__data">
+            {% if sale %}
+                <div class="car-history__item__data__attributes-div">
+                    <div class="car-history__item__data__attributes-div__column">
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Buyer:</span>
+                            <span>{{ sale.buyer.first_name + ' ' + sale.buyer.last_name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Condition:</span>
+                            <span>{{ sale.condition }} ({{ relative_conditions_list[1] }})</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Sale City:</span>
+                            <span>{{ sale.buyer.address.city.name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Sale Price:</span>
+                            <span>{{ sale.price }} $</span>
+                        </div>
+                    </div>
+                    <div class="car-history__item__data__attributes-div__column">
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Employee-Seller:</span>
+                            <span>{{ sale.employee.first_name + ' ' + sale.employee.last_name }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Odometer:</span>
+                            <span>{{ sale.odometer }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Sale Date:</span>
+                            <span>{{ sale.sale_date }}</span>
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            <span class="car-history__item__data__attributes-div__column__item__header">Gross Profit Amount:</span>
+                            <span>{{ gross_profit_amount }} $</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="car-history__item__data__description-div">
+                    <span class="car-history__item__data__attributes-div__column__item__header">Sale Description: </span>
+                    <div class="car-history__item__data__description-div__text">
+                        {% if sale.description %}
+                                {{ sale.description }}
+                            {% else %}
+                                No description.
+                            {% endif %}
+                    </div>
+                </div>
+            {% elif latest_estimation %}
+            <div class="car-history__item__data__attributes-div">
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Estimated Price:</span>
+                        <span>{{ latest_estimation.price }}</span>
+                    </div>
+                    <form method="POST" id="add_estimation_form">
+                        {{ add_estimation_form.hidden_tag() }}
+                        {{ add_estimation_form.identifier(hidden=True, value='add_estimation_form') }}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            {{ add_estimation_form.estimated_price(class="add-transaction-input-row", id="car-estimation-price") }}
+                        </div>
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            {{ add_estimation_form.submit(class="btn btn-outline-success", id="car-estimation-submit-btn") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="car-history__item__data__attributes-div__column">
+                    <div class="car-history__item__data__attributes-div__column__item">
+                        <span class="car-history__item__data__attributes-div__column__item__header">Estimation Date:</span>
+                        <span>{{ latest_estimation.estimation_date }}</span>
+                    </div>
+                    <form method="POST" id="add_auto_estimation_form">
+                        {{ add_auto_estimation_form.hidden_tag() }}
+                        {{ add_auto_estimation_form.identifier(hidden=True, value='add_auto_estimation_form') }}
+                        <div class="car-history__item__data__attributes-div__column__item">
+                            {{ add_auto_estimation_form.submit(class="btn btn-outline-success", id="car-auto-estimation-submit-btn") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+ </div>
+</div>
+<script src="../static/js/car_page.js"></script>
+{% endblock %}
+

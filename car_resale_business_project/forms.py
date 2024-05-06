@@ -25,7 +25,7 @@ class AddPurchaseForm(FlaskForm):
         'Seller',
         query_factory=lambda: Seller.query
             .distinct(Seller.name)
-            .order_by(Seller.name)  # Sort sellers alphabetically ignoring case
+            .order_by(Seller.name)
             .all(),
         get_label="name",
         allow_blank=True, blank_text="Seller", 

@@ -1,4 +1,5 @@
 import logging
+import os
 import psycopg2 as pg2
 
 from car_resale_business_project.config.files_config import FILL_OLTP_LOGGING_FILENAME, FILL_OLTP_DATA_FILENAME
@@ -12,6 +13,11 @@ from car_resale_business_project.databases.fill_oltp.utils.data_insertion.facts_
 
 
 def configure_logging():
+
+    # Check if the log file exists, create it if it doesn't
+    if not os.path.exists(FILL_OLTP_LOGGING_FILENAME):
+        open(FILL_OLTP_LOGGING_FILENAME, 'w').close()
+        
     oltp_logger = logging.getLogger('oltp')
     oltp_logger.setLevel(logging.DEBUG)
     oltp_handler = logging.FileHandler(FILL_OLTP_LOGGING_FILENAME)

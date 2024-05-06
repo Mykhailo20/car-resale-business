@@ -23,8 +23,11 @@
                             <li><a class="dropdown-item" href="{{ url_for('cars.search') }}">Find Car</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('purchase') }}">Purchase Car</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Cars in Storage</a></li>
-                            <li><a class="dropdown-item" href="#">Sold Cars</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('cars.last_purchased') }}">Last Purchased</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('cars.last_sold') }}">Last Sold</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('cars.search_results', search_place_choice='cars_in_storage', **{}) }}">Cars in Storage</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('cars.search_results', search_place_choice='cars_sold', **{}) }}">Sold Cars</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
