@@ -24,6 +24,29 @@ Creation of an information system for the car resale business with the implement
 The ["Used Car Auction Prices"](https://www.kaggle.com/datasets/tunguz/used-car-auction-prices) dataset found on the [Kaggle](https://www.kaggle.com/) platform was chosen as the historical data source.  
 The original dataset contained 558811 sales records of various cars along with vehicle characteristics such as year of manufacture, make, model, trim, transmission, vehicle mileage, and others. However, after dataset preprocessing, the number of records was reduced to 401377.  
 
+## :hammer_and_wrench: Technologies Used
+<p align='center'>
+   <img src='readme_files/diagrams/technologies_used.png' width='500' alt='system_diagram'>
+</p>
+
+The following technologies where used in this project:
+- **Working with Data**:
+  - **Faker**: Generating fake data.
+  - **Gender-Guesser**: Guessing gender from first names.
+  - **Pandas**: Data processing and analysis.
+  - **Psycopg2**: PostgreSQL database adapter for Python.
+
+- **Backend Part**:
+  - **Flask**: Lightweight WSGI web application framework in Python.
+  - **SQLAlchemy**: SQL toolkit and Object Relational Mapper for Python.
+  - **PostgreSQL**: Popular open source relational database management system (DBMS) known for its reliability, scalability, and extensive feature set.
+
+- **Frontend Part**:
+  - **HTML**: Standard markup language for creating web pages.
+  - **CSS**: Style sheet language used for describing the presentation of a document written in HTML.
+  - **JavaScript (JS)**: Programming language that allows you to implement complex features on web pages.
+  - **Bootstrap**: CSS framework for developing responsive and mobile-first websites.
+
 ## :open_file_folder: Project Files Description
 <p align='center'>
    <img src='readme_files/images/project_structure.png' alt='project_structure'>
