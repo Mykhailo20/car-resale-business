@@ -47,14 +47,27 @@ The following technologies where used in this project:
   - **JavaScript (JS)**: Programming language that allows you to implement complex features on web pages.
   - **Bootstrap**: CSS framework for developing responsive and mobile-first websites.
 
+## :toolbox: System Structure
+<p align='center'>
+   <img src='readme_files/diagrams/system_structure.png' alt='system_structure'>
+</p>
+
+The system consists of several parts:
+- **Parser & Generator**: Are responsible for reading, preprocessing the dataset data and randomly generating the required data.
+- **OLTP DB, ORM & Backend (Transactions)**: Related to transaction facts: registration of the purchase, repairs, valuation and sale of a car with the necessary information (participants of the transaction, date, car characteristics, price, details), viewing for each car the data on the operations performed on it; search, filtering, viewing data about cars.
+- **ETL**: Preparation and transfer of accumulated 
+data from the OLTP database to the analytical storage (OLAP database) with logging of performed actions.
+- **OLAP DB, Psycopg2 & Backend (Analytics)**: Related to analytics and business performance analysis: export of OLAP (Online Analytical Processing) cubes for analytical analysis, availability of interactive information panels for graphical presentation of aggregated data.
+- **Frontend**: An interface implemented according to the logic of business processes that correspond to the subject area.
+
 ## :open_file_folder: Project Files Description
 <p align='center'>
-   <img src='readme_files/images/project_structure.png' alt='project_structure'>
+   <img src='readme_files/images/project_files_structure.png' alt='project_files_structure'>
 </p>
 
 This project consists of a set of modules, each of which is responsible for performing a certain logically unified function of the system:
 - **app.py**: The main file, the entry point to the program. It contains endpoints that implement a significant part of the business logic of the information system: registration of purchase, repair, cost estimation, car sale, OLTP database filling, ETL, data export by OLAP cube slices.
-- **requirements.txt**: Lists all the dependencies and their versions needed to run the project,
+- **requirements.txt**: Lists all the dependencies and their versions needed to run the project.
 - **cars**: Contains a set of files and folders that are responsible for performing operations on the "Car" entity: filtering, searching, displaying information about an individual car.
 - **config**: Is an auxiliary module that contains files with configurations necessary for the correct operation of the information system: permissible values ​​for certain values, connections to databases, relative paths to the corresponding files, displaying information on web pages.
 - **data**: Data used in other modules of the information system.
