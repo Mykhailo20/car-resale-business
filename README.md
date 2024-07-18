@@ -97,12 +97,56 @@ This project consists of a set of modules, each of which is responsible for perf
          <img src='readme_files/images/car_purchase_registration_page.png' alt='purchase-registration-page' width='900'>
       </p>
 
-  2. **Process of Registration**:
+  2. **Filled Car Purchase Registration Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_purchase_registration_page_filled.png' alt='filled-purchase-registration-page' width='900'>
+      </p>
+
+   3. **Successful Registration of the Car Purchase**:
+      <p align='center'>
+         <img src='readme_files/images/car_purchase_result.png' alt='purchase-registration-result' width='900'>
+      </p>
+
+  4. **Process of Registration**:
       <p align='center'>
          <img src='readme_files/images/car_purchase.gif' alt='car-purchase' width='900'>
       </p>
 
 - **View Information about the Car and the Performed Business Operations**:
    <p align='center'>
+      <img src='readme_files/images/car_info.png' alt='car-info' width='900'>
+   </p>
+
+   <p align='center'>
       <img src='readme_files/images/car_info.gif' alt='car-info' width='900'>
    </p>
+
+- **Registration of Car Repair**:
+  1. **Car Repair Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_repair.png' alt='car-repair' width='900'>
+      </p>
+   2. **Successful Registration of the Car Repair**:
+      <p align='center'>
+         <img src='readme_files/images/car_repair_result.png' alt='car-repair-result' width='900'>
+      </p>
+
+- **Reestimation of Car Price**:
+   1. **Car Reestimation Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_manual_reestimation.png' alt='car-reestimation' width='900'>
+      </p>
+   2. **Successful Manual Car Price Reestimation**:
+      <p align='center'>
+         <img src='readme_files/images/car_manual_reestimation_result.png' alt='car-reestimation-result' width='900'>
+      </p>
+
+- **Registration of Car Sale**:
+  1. **Car Sale Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_sale.png' alt='car-sale' width='900'>
+      </p>
+  2. **Successful Registration of the Car Sale**:
+      <p align='center'>
+         <img src='readme_files/images/car_sale_result.png' alt='car-sale-result' width='900'>
+      </p>
