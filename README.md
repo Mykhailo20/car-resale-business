@@ -79,3 +79,30 @@ This project consists of a set of modules, each of which is responsible for perf
 - **\_\_init__.py**: Contains Flask web application initialization code, OLTP database connection and cars module connection.
 - **forms.py**: Contains the Python code for the HTML forms used in the web application.
 - **models.py**: Contains SQLAlchemy ORM classes for interaction with the OLTP database.
+
+## :computer: Functionality Overview
+- **Filling the OLTP storage**:
+   <p align='center'>
+      <img src='readme_files/images/fill_oltp.gif' alt='fill-oltp' width='900'>
+   </p>
+
+- **Filling the OLAP storage (Primary ETL)**:
+   <p align='center'>
+      <img src='readme_files/images/primary_etl.gif' alt='primary-etl' width='900'>
+   </p>
+
+- **Registration of Car Purchase**:
+  1. **Car Purchase Registration Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_purchase_registration_page.png' alt='purchase-registration-page' width='900'>
+      </p>
+
+  2. **Process of Registration**:
+      <p align='center'>
+         <img src='readme_files/images/car_purchase.gif' alt='car-purchase' width='900'>
+      </p>
+
+- **View Information about the Car and the Performed Business Operations**:
+   <p align='center'>
+      <img src='readme_files/images/car_info.gif' alt='car-info' width='900'>
+   </p>

@@ -25,3 +25,4 @@ db_config.py
 logging/
 datasets_data/
 etl_config.json
+example_car_images/

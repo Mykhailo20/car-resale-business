@@ -13,7 +13,7 @@ from car_resale_business_project.databases.fill_oltp.utils.data_insertion.facts_
 
 
 def configure_logging():
-
+    
     # Check if the log file exists, create it if it doesn't
     if not os.path.exists(FILL_OLTP_LOGGING_FILENAME):
         open(FILL_OLTP_LOGGING_FILENAME, 'w').close()

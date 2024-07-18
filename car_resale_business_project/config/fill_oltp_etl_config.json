@@ -1,12 +1,12 @@
 {
     "fill_oltp": {
         "last_filling": {
-            "datetime": "2024-05-05 20:49:13"
+            "datetime": "2024-07-18 13:33:42"
         }
     },
     "etl": {
         "last_etl": {
-            "datetime": "2024-05-05 20:52:05"
+            "datetime": "2024-07-18 13:40:27"
         }
     }
 }
