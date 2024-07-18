@@ -81,15 +81,16 @@ This project consists of a set of modules, each of which is responsible for perf
 - **models.py**: Contains SQLAlchemy ORM classes for interaction with the OLTP database.
 
 ## :computer: Functionality Overview
-- **Filling the OLTP storage**:
-   <p align='center'>
-      <img src='readme_files/images/fill_oltp.gif' alt='fill-oltp' width='900'>
-   </p>
+- **Work with OLTP and OLAP databases**:
+  - **Filling the OLTP storage**:
+      <p align='center'>
+         <img src='readme_files/images/fill_oltp.gif' alt='fill-oltp' width='900'>
+      </p>
 
-- **Filling the OLAP storage (Primary ETL)**:
-   <p align='center'>
-      <img src='readme_files/images/primary_etl.gif' alt='primary-etl' width='900'>
-   </p>
+  - **Filling the OLAP storage (Primary ETL)**:
+      <p align='center'>
+         <img src='readme_files/images/primary_etl.gif' alt='primary-etl' width='900'>
+      </p>
 
 - **Registration of Car Purchase**:
   1. **Car Purchase Registration Page**:
@@ -120,6 +121,37 @@ This project consists of a set of modules, each of which is responsible for perf
    <p align='center'>
       <img src='readme_files/images/car_info.gif' alt='car-info' width='900'>
    </p>
+
+- **View Information about the Last Purchased and Last Sold Cars**:
+   <p align='center'>
+      <img src='readme_files/images/last_purchased.png' alt='last-purchased' width='900'>
+   </p>
+
+- **Filter Cars by Different Characteristics**:
+   <p align='center'>
+      <img src='readme_files/images/car_filtering.gif' alt='car-filtering' width='900'>
+   </p> 
+
+- **Search for Cars by Different Characteristics**:
+   1. **Car Search Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_search_page.png' alt='car-search' width='900'>
+      </p> 
+   
+   2. **Filled Car Search Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_search_page_filled.png' alt='car-search-filled' width='900'>
+      </p>
+
+   3. **Car Search Results Page**:
+      <p align='center'>
+         <img src='readme_files/images/car_search_page_results.png' alt='car-search-results' width='900'>
+      </p>  
+
+- **Search for Cars Using the Search Bar in the Navigation Bar**:
+   <p align='center'>
+      <img src='readme_files/images/car_search_navbar.gif' alt='car-search-navbar' width='900'>
+   </p> 
 
 - **Registration of Car Repair**:
   1. **Car Repair Page**:
