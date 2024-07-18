@@ -16,28 +16,28 @@ def get_filter_values(brand_id=None, model_name=None):
     filters_values['car_manufacture_years'] = car_manufacture_years
 
     # Fetch distinct brands
-    car_brands = CarMake.query.with_entities(CarMake.car_make_id, CarMake.name).distinct().all()
+    car_brands = CarMake.query.with_entities(CarMake.car_make_id, CarMake.name).distinct().order_by(CarMake.name).all()
     brand_dict_list = [{'brand_id': brand[0], 'brand_name': brand[1]} for brand in car_brands]
     filters_values['car_brands'] = brand_dict_list
     
     # Fetch distinct models for the specified brand
     brand_id = int(brand_id) if brand_id is not None else None
-    car_brand_models = Car.query.filter(Car.make_id == brand_id).with_entities(Car.model).distinct().all()
+    car_brand_models = Car.query.filter(Car.make_id == brand_id).with_entities(Car.model).distinct().order_by(Car.model).all()
     car_brand_models = [model[0] for model in car_brand_models]
     filters_values['car_models'] = car_brand_models
 
     # Fetch distinct body types
     model_name = model_name if model_name is not None else None
     if brand_id is None:
-        car_body_types = CarBodyType.query.with_entities(CarBodyType.car_body_type_id, CarBodyType.name).distinct().all()
+        car_body_types = CarBodyType.query.with_entities(CarBodyType.car_body_type_id, CarBodyType.name).distinct().order_by(CarBodyType.name).all()
     elif (brand_id is not None) and (model_name is None):
-        car_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name).join(Car).filter(Car.make_id == brand_id).distinct().all()
+        car_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name).join(Car).filter(Car.make_id == brand_id).distinct().order_by(CarBodyType.name).all()
     elif (brand_id is not None) and (model_name is not None):
         car_body_types = db.session.query(CarBodyType.car_body_type_id, CarBodyType.name)\
                     .join(Car)\
                     .filter(Car.make_id == brand_id)\
                     .filter(Car.model == model_name)\
-                    .distinct().all()
+                    .distinct().order_by(CarBodyType.name).all()
 
     car_body_types = [{'body_type_id': body_type[0], 'body_type_name': body_type[1]} for body_type in car_body_types]
     filters_values['car_body_types'] = car_body_types
@@ -48,12 +48,12 @@ def get_filter_values(brand_id=None, model_name=None):
     filters_values['car_transmissions'] = car_transmissions
 
     # Fetch distinct sellers
-    seller_names = Seller.query.with_entities(Seller.name).distinct().all()
+    seller_names = Seller.query.with_entities(Seller.name).distinct().order_by(Seller.name).all()
     seller_names = [name[0] for name in seller_names]
     filters_values['seller_name'] = seller_names
 
     # Fetch distinct cities
-    cities = db.session.query(City).distinct(City.name).all()
+    cities = db.session.query(City).distinct(City.name).order_by(City.name).all()
     filters_values['cities'] = cities
 
     return filters_values
