@@ -81,13 +81,13 @@ This project consists of a set of modules, each of which is responsible for perf
 - **models.py**: Contains SQLAlchemy ORM classes for interaction with the OLTP database.
 
 ## :computer: Functionality Overview
-- **Work with OLTP and OLAP databases**:
-  - **Filling the OLTP storage**:
+- **Work with OLTP and OLAP Databases**:
+  - **Filling the OLTP Storage**:
       <p align='center'>
          <img src='readme_files/images/fill_oltp.gif' alt='fill-oltp' width='900'>
       </p>
 
-  - **Filling the OLAP storage (Primary ETL)**:
+  - **Filling the OLAP Storage (Primary ETL)**:
       <p align='center'>
          <img src='readme_files/images/primary_etl.gif' alt='primary-etl' width='900'>
       </p>
@@ -152,6 +152,34 @@ This project consists of a set of modules, each of which is responsible for perf
    <p align='center'>
       <img src='readme_files/images/car_search_navbar.gif' alt='car-search-navbar' width='900'>
    </p> 
+
+- **View Analytical Reports built in the form of Tableau Dashboards with Interactive Charts**:
+  - **Sales Dashboard Page**:
+      <p align='center'>
+         <img src='readme_files/images/analytics_sales_dashboard.gif' alt='sales-dashboard' width='900'>
+      </p>
+  - **Interactive Charts**:
+      <p align='center'>
+         <img src='readme_files/images/analytics_interactive_charts.gif' alt='interactive-charts' width='900'>
+      </p>
+
+- **Creation of Analytical Reports for Accumulated Data**:
+   - **OLAP Cubes Export Page**:
+      <p align='center'>
+         <img src='readme_files/images/cubes_export.png' alt='cubes-export' width='900'>
+      </p>
+    - **Filled OLAP Cubes Export Page**:
+      <p align='center'>
+         <img src='readme_files/images/cubes_export_filled.png' alt='cubes-export-filled' width='900'>
+      </p>
+   - **OLAP Cube Export Results**:
+      <p align='center'>
+         <img src='readme_files/images/cubes_export_result.png' alt='cubes-export-result' width='900'>
+      </p>
+
+      <p align='center'>
+         <img src='readme_files/images/cubes_export_result_file.png' alt='cubes-export-result-file' width='900'>
+      </p>
 
 - **Registration of Car Repair**:
   1. **Car Repair Page**:
